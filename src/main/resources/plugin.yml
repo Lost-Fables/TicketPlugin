@@ -1,6 +1,6 @@
 name: TicketPlugin
-version: ${project.version}
-main: io.github.plizga.ticketplugin.main.TicketPlugin
+version: 0.01
+main: io.github.plizga.ticketplugin.TicketPlugin
 authors: [Plizga]
 description: A Ticket Plugin for Spigot that allows users to submit tickets, and allows moderators to answer said tickets.
 website: plizga.github.io

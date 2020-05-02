@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TicketPlugin:jar">
+    <output-path>$PROJECT_DIR$/../MC SERVERS/Test/plugins</output-path>
+    <root id="archive" name="TicketPlugin.jar">
+      <element id="module-output" name="TicketPlugin" />
+    </root>
+  </artifact>
+</component>

@@ -21,15 +21,15 @@ public class ConcreteDatabase extends Database
     private String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS " + TICKET_TABLE_NAME + " (" +
             "`id` int(11) NOT NULL," + //unique id of ticket
             "`Player` varchar(32) NOT NULL," + //player who gen'd the ticket
-            "`PlayerUUID` int(11) NOT NULL" + //uuid of player who gen'd the ticket
-            "`Status` varchar(32) NOT NULL" + //status of the ticket (OPEN, CLAIMED, CLOSED)
-            "`Assigned_Team` varchar(32)" + //team assigned to the ticket, may be nobody
-            "`Assigned_Moderator` varchar(32)" + //moderator working on the ticket
-            "`Date_Created` varchar(32) NOT NULL" + //date the ticket was created
-            "`Date_Cleared` varchar(32)" + //date the ticket was completed
-            "`Location` varchar(32) NOT NULL" + //location where the ticket was originally generated.
-            "`Initial_Request` varchar(100) NOT NULL" + //request string associated with the ticket. Basically wtf is going on in the ticket.
-            "`Admin_Flag` bool NOT NULL" + //admin flag, applied by a mod to a ticket that needs an admin to look at it.
+            "`PlayerUUID` int(11) NOT NULL," + //uuid of player who gen'd the ticket
+            "`Status` varchar(32) NOT NULL," + //status of the ticket (OPEN, CLAIMED, CLOSED)
+            "`Assigned_Team` varchar(32)," + //team assigned to the ticket, may be nobody
+            "`Assigned_Moderator` varchar(32)," + //moderator working on the ticket
+            "`Date_Created` varchar(32) NOT NULL," + //date the ticket was created
+            "`Date_Cleared` varchar(32)," + //date the ticket was completed
+            "`Location` varchar(32) NOT NULL," + //location where the ticket was originally generated.
+            "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
+            "`Admin_Flag` bool NOT NULL," + //admin flag, applied by a mod to a ticket that needs an admin to look at it.
             "PRIMARY KEY (`ID`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
 

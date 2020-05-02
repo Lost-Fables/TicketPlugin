@@ -44,18 +44,7 @@ public abstract class Database
     {
         connection = getSqlConnection();
 
-        try
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
-                    " WHERE ID = ?");
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            close(preparedStatement, resultSet);
-        }
-        catch(SQLException e)
-        {
-            plugin.getServer().getConsoleSender().sendMessage(ChatColor.DARK_RED + "TicketPlugin unable to establish connection to the database... that fuckin sucks.");
-        }
     }
 
     public void close(PreparedStatement preparedStatement, ResultSet resultSet)

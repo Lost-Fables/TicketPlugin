@@ -1,5 +1,7 @@
 package io.github.plizga.ticketplugin.sqlite;
 
+import io.github.plizga.ticketplugin.enums.Status;
+import io.github.plizga.ticketplugin.enums.Team;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -8,7 +10,9 @@ import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -19,9 +23,8 @@ public class ConcreteDatabase extends Database
     /** This is the String that represents the creation of this sql table. IMPORTANT!!! If changes are made here,
      * please ensure you make the necessary changes in the CreateNewTicket function as well. */
     private String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS " + TICKET_TABLE_NAME + " (" +
-            "`id` int(11) NOT NULL," + //unique id of ticket
+            "`id` varchar(36) NOT NULL," + //unique id of ticket
             "`Player` varchar(32) NOT NULL," + //player who gen'd the ticket
-            "`PlayerUUID` int(11) NOT NULL," + //uuid of player who gen'd the ticket
             "`Status` varchar(32) NOT NULL," + //status of the ticket (OPEN, CLAIMED, CLOSED)
             "`Assigned_Team` varchar(32)," + //team assigned to the ticket, may be nobody
             "`Assigned_Moderator` varchar(32)," + //moderator working on the ticket
@@ -30,7 +33,7 @@ public class ConcreteDatabase extends Database
             "`Location` varchar(32) NOT NULL," + //location where the ticket was originally generated.
             "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
             "`Admin_Flag` bool NOT NULL," + //admin flag, applied by a mod to a ticket that needs an admin to look at it.
-            "PRIMARY KEY (`ID`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
+            "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
 
 
@@ -119,7 +122,7 @@ public class ConcreteDatabase extends Database
      * @param adminFlag represents whether this is a request that needs admin attention or not. (0 false, 1 true)
      */
     @Override
-    void createNewTicket(Player player, String status, String ticketData, boolean adminFlag)
+    public void createNewTicket(Player player, Status status, String ticketData, boolean adminFlag)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -128,35 +131,41 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             //BELOW - The question marks need to match the amount of columns. Don't ask me why
             preparedStatement = connection.prepareStatement("REPLACE INTO " + TICKET_TABLE_NAME +
-                    " (id,Player,PlayerUUID,Status,Assigned_Team,Assigned_Moderator,Date_Created," +
-                    "Date_Cleared,Location,Initial_Request,Admin_Flag) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+                    " (id,Player,Status,Assigned_Team,Assigned_Moderator,Date_Created," +
+                    "Date_Cleared,Location,Initial_Request,Admin_Flag) VALUES(?,?,?,?,?,?,?,?,?,?)");
             //SetString requires an index associated with the column being changed. For this default dance ticket, we will modify some core details that cannot be null.
             //NOTE!! Index is 1-based here, not 0. don't fucking zero index it. that's so silly dude imagine using the number 0 in literally anything.
             preparedStatement.setString(1, UUID.randomUUID().toString());
 
-            preparedStatement.setString(2, player.getName());
+            preparedStatement.setString(2, player.getName().toLowerCase());
 
-            preparedStatement.setString(3, player.getUniqueId().toString());
+            preparedStatement.setString(3, status.name());
 
-            preparedStatement.setString(4, status);
+            preparedStatement.setString(4, Team.NONE.name());
+
+            preparedStatement.setString(5, null);
 
             //create a date for the next one.
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
-            preparedStatement.setString(7, dateFormat.format(date));
+            preparedStatement.setString(6, dateFormat.format(date));
 
-            preparedStatement.setString(9, player.getLocation().toString());
+            preparedStatement.setString(7, null);
 
-            preparedStatement.setString(10, ticketData);
+            preparedStatement.setString(8, player.getLocation().toString());
+
+            preparedStatement.setString(9, ticketData);
 
             if(adminFlag) //set to 1 if true, 0 otherwise.
             {
-                preparedStatement.setString(11, "1");
+                preparedStatement.setString(10, "1");
             }
             else
             {
-                preparedStatement.setString(11, "0");
+                preparedStatement.setString(10, "0");
             }
+
+            preparedStatement.executeUpdate();
 
         }
         catch(SQLException e)
@@ -182,7 +191,7 @@ public class ConcreteDatabase extends Database
         try
         {
             connection = getSqlConnection();
-            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + "WHERE id = '" +
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + " WHERE id = '" +
                     id + "';");
 
             resultSet = preparedStatement.executeQuery();
@@ -195,6 +204,53 @@ public class ConcreteDatabase extends Database
                 }
             }
         } catch (SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet);
+        }
+
+        return null;
+    }
+
+    public List getOpenTickets()
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Ticket> ticketList = new ArrayList<Ticket>();
+        try
+        {
+            connection = getSqlConnection();
+            //preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + ";");
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
+                    " WHERE Status = '" + Status.OPEN.name() + "';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                String id = resultSet.getString("id");
+                String playerName = resultSet.getString("Player");
+                Status status = Status.valueOf(resultSet.getString("Status"));
+                Team team = Team.valueOf(resultSet.getString("Assigned_Team"));
+                String assignedModerator = resultSet.getString("Assigned_Moderator");
+                String dateCreated = resultSet.getString("Date_Created");
+                String dateCleared = resultSet.getString("Date_Cleared");
+                String location = resultSet.getString("Location");
+                String info = resultSet.getString("Initial_Request");
+                Boolean adminFlag = resultSet.getBoolean("Admin_Flag");
+                ticketList.add(new Ticket(this.plugin, id, playerName, status, team, assignedModerator, dateCreated, dateCleared,
+                        location, info, adminFlag));
+
+            }
+
+            return ticketList;
+
+        }
+        catch(SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         }

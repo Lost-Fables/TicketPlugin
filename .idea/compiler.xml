@@ -11,6 +11,11 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="TicketPlugin" target="1.8" />
+      <module name="tythan" target="1.5" />
+      <module name="tythan-bukkit" target="1.8" />
+      <module name="tythan-bungee" target="1.8" />
+      <module name="tythan-common" target="1.8" />
+      <module name="tythan-dist" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

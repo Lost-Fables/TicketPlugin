@@ -4,3 +4,8 @@ main: io.github.plizga.ticketplugin.TicketPlugin
 authors: [Plizga]
 description: A Ticket Plugin for Spigot that allows users to submit tickets, and allows moderators to answer said tickets.
 website: plizga.github.io
+softdepend: [Tythan]
+commands:
+  ticket:
+    description: Allows a player to create a new ticket.
+    usage: /<command>

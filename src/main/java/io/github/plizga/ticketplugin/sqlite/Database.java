@@ -1,6 +1,8 @@
 package io.github.plizga.ticketplugin.sqlite;
 
-import org.bukkit.ChatColor;
+import io.github.plizga.ticketplugin.commands.BaseCommand;
+import io.github.plizga.ticketplugin.enums.Status;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -8,13 +10,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Abstract class for the database. Defines the table name to be used in the ConcreteDatabase, and handles some basic
- * information about the database that can be abstracted here.
+ * information about the database that can be abstracted here. This is especially cool because I used SQLite like
+ * a dingus so when all that has to be replaced, abstraction should make it a bit easier.
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
-public abstract class Database
+public abstract class Database extends BaseCommand
 {
     /** The Java Plugin which will be associated with this database. */
     protected JavaPlugin plugin;
@@ -47,7 +51,7 @@ public abstract class Database
 
     }
 
-    public void close(PreparedStatement preparedStatement, ResultSet resultSet)
+     void close(PreparedStatement preparedStatement, ResultSet resultSet)
     {
         try
         {
@@ -66,7 +70,7 @@ public abstract class Database
             Error.close(plugin, e);
         }
     }
-    public void close(PreparedStatement preparedStatement, Connection connection)
+     void close(PreparedStatement preparedStatement, Connection connection)
     {
         try
         {
@@ -87,7 +91,9 @@ public abstract class Database
     }
 
     //todo will need to be updated when enum status is a thing!!
-    abstract void createNewTicket(Player player, String status, String ticketData, boolean adminFlag);
+    public abstract void createNewTicket(Player player, Status status, String ticketData, boolean adminFlag);
+
+    public abstract List getOpenTickets();
 
 
 }

@@ -6,12 +6,19 @@ description: A Ticket Plugin for Spigot that allows users to submit tickets, and
 website: plizga.github.io
 softdepend: [Tythan]
 commands:
-  ticket:
+  request:
     description: Allows a player to create a new ticket.
     usage: /<command>
 
-
 permissions:
-  ticket.finalize:
-    default: false
-    description: internal command that processes and finalizes tickets.
+  ticketplugin.create:
+    default: true
+    description: create a new request ticket for the staff to answer.
+  ticketplugin.view:
+    default: true
+    description: allows a player to view their currently open tickets.
+  ticketplugin.cancel:
+    default: true
+    description: allows a player to cancel 1 or all of their tickets.
+
+

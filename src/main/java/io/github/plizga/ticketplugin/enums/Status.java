@@ -5,5 +5,5 @@ package io.github.plizga.ticketplugin.enums;
  */
 public enum Status
 {
-    OPEN, CLOSED, CLAIMED,
+    OPEN, CLOSED, CLAIMED, CANCELLED
 }

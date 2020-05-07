@@ -288,7 +288,7 @@ public class ConcreteDatabase extends Database
     }
 
     @Override
-    public void removeTicket(String uuid)
+    public void removeTicketByUUID(String uuid)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -305,6 +305,29 @@ public class ConcreteDatabase extends Database
         catch(SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+    @Override
+    public void removeTicketByPlayer(String player)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM " + TICKET_TABLE_NAME +
+                    " WHERE Player ='" + player + "';");
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+         plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         }
         finally
         {

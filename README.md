@@ -1,19 +1,24 @@
 Player:
 
 
-Create Ticket (/req team blahblahblah or something)
+DONE: Create Ticket (/req team blahblahblah or something)
 
-See your open tickets, how/if it's been reassigned, and any staff comments left for the player
+DONE: See your open tickets
+       
+See how/if your ticket has  been reassigned
+      
+See any staff comments left for you
 
-Ability to cancel one's tickets
+DONE: Ability to cancel your tickets
 
 Leave simple review on completed tickets
 
 Staff:
 
 
+DONE: Still able to see one's open tickets
 
-Still able to see one's open tickets, able to check any tickets assigned to the appropriate team(s) you're part of.
+You are able to check any tickets assigned to the appropriate team(s) you're part of.
 
 Leave comments for Staff-Only or for the Player
 

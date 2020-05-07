@@ -98,7 +98,10 @@ public abstract class Database extends BaseCommand
 
     public abstract List getPlayerOpenTickets(String playerName);
 
-    public abstract void removeTicket(String uuid);
+    public abstract void removeTicketByUUID(String uuid);
+
+    public abstract void removeTicketByPlayer(String player);
+
 
 
 }

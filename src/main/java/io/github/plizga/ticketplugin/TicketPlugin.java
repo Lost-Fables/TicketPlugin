@@ -1,7 +1,8 @@
 package io.github.plizga.ticketplugin;
 
 import co.lotc.core.bukkit.command.Commands;
-import io.github.plizga.ticketplugin.commands.TicketCommand;
+import io.github.plizga.ticketplugin.commands.UserCommands;
+import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.sqlite.ConcreteDatabase;
 import io.github.plizga.ticketplugin.sqlite.Database;
 import org.bukkit.ChatColor;
@@ -36,8 +37,11 @@ public final class TicketPlugin extends JavaPlugin
         this.database.load();
         getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "TicketPlugin database established properly.");
 
-        Commands.build(getCommand("ticket"), TicketCommand::new);
-        //this.getCommand("ticket").setExecutor(new TicketCommand(this));
+
+        registerParameters();
+        Commands.build(getCommand("request"), UserCommands::new);
+        //this.getCommand("ticket").setExecutor(new UserCommands(this));
+
 
     }
 
@@ -53,8 +57,19 @@ public final class TicketPlugin extends JavaPlugin
         saveConfig();
     }
 
+
+
     public Database getDatabase()
     {
         return this.database;
+    }
+
+    private void registerParameters()
+    {
+        Commands.defineArgumentType(Team.class)
+                .defaultName("Team")
+                .completer((s,$) ->  Team.getAvailable(s))
+                .mapperWithSender(((sender, type) -> Team.getByName(type)))
+                .register();
     }
 }

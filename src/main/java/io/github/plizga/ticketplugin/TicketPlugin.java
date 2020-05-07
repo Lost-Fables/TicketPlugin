@@ -13,9 +13,10 @@ public final class TicketPlugin extends JavaPlugin
     private Database database;
 
     /** all of these static final strings be defining stuff.*/
-    public static final String PERMISSION_START = "ticket";
+    public static final String PERMISSION_START = "req";
     public final String PREFIX = ChatColor.DARK_AQUA + "";
     public final String ALT_COLOR = ChatColor.DARK_PURPLE + "";
+    public final String ERROR_COLOR = ChatColor.DARK_RED + "";
 
     private static TicketPlugin ticketPluginInstance;
 

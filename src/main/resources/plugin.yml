@@ -9,3 +9,9 @@ commands:
   ticket:
     description: Allows a player to create a new ticket.
     usage: /<command>
+
+
+permissions:
+  ticket.finalize:
+    default: false
+    description: internal command that processes and finalizes tickets.

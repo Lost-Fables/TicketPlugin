@@ -122,7 +122,7 @@ public class ConcreteDatabase extends Database
      * @param adminFlag represents whether this is a request that needs admin attention or not. (0 false, 1 true)
      */
     @Override
-    public void createNewTicket(Player player, Status status, String ticketData, boolean adminFlag)
+    public void createNewTicket(Player player, Status status, Team team, String ticketData, boolean adminFlag)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -141,7 +141,7 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(3, status.name());
 
-            preparedStatement.setString(4, Team.NONE.name());
+            preparedStatement.setString(4, team.name());
 
             preparedStatement.setString(5, null);
 
@@ -215,6 +215,41 @@ public class ConcreteDatabase extends Database
         return null;
     }
 
+    public List getPlayerOpenTickets(String playerName)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Ticket> ticketList = new ArrayList<Ticket>();
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
+                    " WHERE Player = '" + playerName + "' AND Status = '" + Status.OPEN.name() +
+                    "' ORDER BY 'Date_Created';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Ticket ticket = makeTicket(resultSet);
+
+                ticketList.add(ticket);
+            }
+            return ticketList;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet);
+        }
+        return null;
+    }
+
     public List getOpenTickets()
     {
         Connection connection = null;
@@ -224,7 +259,6 @@ public class ConcreteDatabase extends Database
         try
         {
             connection = getSqlConnection();
-            //preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + ";");
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Status = '" + Status.OPEN.name() + "';");
 
@@ -232,18 +266,9 @@ public class ConcreteDatabase extends Database
 
             while(resultSet.next())
             {
-                String id = resultSet.getString("id");
-                String playerName = resultSet.getString("Player");
-                Status status = Status.valueOf(resultSet.getString("Status"));
-                Team team = Team.valueOf(resultSet.getString("Assigned_Team"));
-                String assignedModerator = resultSet.getString("Assigned_Moderator");
-                String dateCreated = resultSet.getString("Date_Created");
-                String dateCleared = resultSet.getString("Date_Cleared");
-                String location = resultSet.getString("Location");
-                String info = resultSet.getString("Initial_Request");
-                Boolean adminFlag = resultSet.getBoolean("Admin_Flag");
-                ticketList.add(new Ticket(this.plugin, id, playerName, status, team, assignedModerator, dateCreated, dateCleared,
-                        location, info, adminFlag));
+                Ticket ticket = makeTicket(resultSet);
+
+                ticketList.add(ticket);
 
             }
 
@@ -261,4 +286,47 @@ public class ConcreteDatabase extends Database
 
         return null;
     }
+
+    @Override
+    public void removeTicket(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM " + TICKET_TABLE_NAME +
+                    " WHERE id = '" + uuid + "';");
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+    private Ticket makeTicket(ResultSet resultSet) throws SQLException
+    {
+        String id = resultSet.getString("id");
+        String playerName = resultSet.getString("Player");
+        Status status = Status.valueOf(resultSet.getString("Status"));
+        Team team = Team.valueOf(resultSet.getString("Assigned_Team"));
+        String assignedModerator = resultSet.getString("Assigned_Moderator");
+        String dateCreated = resultSet.getString("Date_Created");
+        String dateCleared = resultSet.getString("Date_Cleared");
+        String location = resultSet.getString("Location");
+        String info = resultSet.getString("Initial_Request");
+        Boolean adminFlag = resultSet.getBoolean("Admin_Flag");
+
+        return new Ticket(this.plugin, id, playerName, status, team, assignedModerator, dateCreated, dateCleared,
+                location, info, adminFlag);
+    }
+
 }

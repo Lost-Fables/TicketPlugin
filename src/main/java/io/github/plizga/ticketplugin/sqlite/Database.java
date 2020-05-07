@@ -3,6 +3,7 @@ package io.github.plizga.ticketplugin.sqlite;
 import io.github.plizga.ticketplugin.commands.BaseCommand;
 import io.github.plizga.ticketplugin.enums.Status;
 
+import io.github.plizga.ticketplugin.enums.Team;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -91,9 +92,13 @@ public abstract class Database extends BaseCommand
     }
 
     //todo will need to be updated when enum status is a thing!!
-    public abstract void createNewTicket(Player player, Status status, String ticketData, boolean adminFlag);
+    public abstract void createNewTicket(Player player, Status status, Team team, String ticketData, boolean adminFlag);
 
     public abstract List getOpenTickets();
+
+    public abstract List getPlayerOpenTickets(String playerName);
+
+    public abstract void removeTicket(String uuid);
 
 
 }

@@ -55,13 +55,29 @@ public class Ticket
                 plugin.PREFIX + "\nDate Created: " + plugin.ALT_COLOR+ dateCreated +
                 plugin.PREFIX + "\nDate Cleared: " + plugin.ALT_COLOR+ dateCleared +
                 plugin.PREFIX +  "\nLocation: " + plugin.ALT_COLOR+ location +
-                plugin.PREFIX + "\nNeeds Administrator Support: " + plugin.ALT_COLOR+ adminFlag
+                plugin.PREFIX + "\nNeeds ADMINISTRATOR Support: " + plugin.ALT_COLOR+ adminFlag
                 ;
+        return str;
+    }
+
+    public String toBasicInfo()
+    {
+        String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
+                plugin.PREFIX + " Info: " + plugin.ALT_COLOR + info +
+                plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
+        return str;
+    }
+
+    public String toPlayerInfo()
+    {
+        String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
+                plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
         return str;
     }
 
 
     //a fuckin heap of mutators and accessors below
+
     public String getId()
     {
         return id;

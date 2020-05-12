@@ -8,16 +8,43 @@ import java.util.List;
 
 public enum Team
 {
-    ADMINISTRATOR, MODERATOR, EVENT, TECH, LORE, BUILD, NONE;
+    Admin, Moderator, Event, Tech, Lore, Build, Global, Design;
 
-    public static boolean isTeam(String name)
+    /*public static boolean isTeam(String name) //this method's fuckin poopy
     {
-        return(name.equalsIgnoreCase(MODERATOR.toString()) ||
-                name.equalsIgnoreCase(EVENT.toString()) || name.equalsIgnoreCase(TECH.toString()) ||
-                name.equalsIgnoreCase(LORE.toString()) || name.equalsIgnoreCase(BUILD.toString()));
+        return(name.equalsIgnoreCase(Moderator.toString()) ||
+                name.equalsIgnoreCase(Event.toString()) || name.equalsIgnoreCase(Tech.toString()) ||
+                name.equalsIgnoreCase(Lore.toString()) || name.equalsIgnoreCase(Build.toString()));
 
 
 
+    }*/
+
+
+
+    public static String getPermission(Team team)
+    {
+
+        switch(team)
+        {
+            case Admin:
+                return ".admin";
+            case Moderator:
+                return ".mod";
+            case Event:
+                return ".event";
+            case Tech:
+                return ".dev";
+            case Lore:
+                return ".lore";
+            case Build:
+                return ".build";
+            case Design:
+                return ".design";
+            case Global:
+                return ".staff";
+        }
+        return null;
     }
 
     public static List<String> getAvailable(Sender player)

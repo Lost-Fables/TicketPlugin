@@ -3,6 +3,7 @@ package io.github.plizga.ticketplugin;
 import co.lotc.core.bukkit.command.Commands;
 import io.github.plizga.ticketplugin.commands.UserCommands;
 import io.github.plizga.ticketplugin.enums.Team;
+import io.github.plizga.ticketplugin.enums.TicketViewOptions;
 import io.github.plizga.ticketplugin.sqlite.ConcreteDatabase;
 import io.github.plizga.ticketplugin.sqlite.Database;
 import org.bukkit.ChatColor;
@@ -14,10 +15,13 @@ public final class TicketPlugin extends JavaPlugin
     private Database database;
 
     /** all of these static final strings be defining stuff.*/
-    public static final String PERMISSION_START = "req";
+    public static final String PERMISSION_START = "ticketplugin";
     public final String PREFIX = ChatColor.DARK_AQUA + "";
     public final String ALT_COLOR = ChatColor.DARK_PURPLE + "";
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
+
+
+
 
     private static TicketPlugin ticketPluginInstance;
 
@@ -64,12 +68,20 @@ public final class TicketPlugin extends JavaPlugin
         return this.database;
     }
 
+
+
     private void registerParameters()
     {
         Commands.defineArgumentType(Team.class)
                 .defaultName("Team")
                 .completer((s,$) ->  Team.getAvailable(s))
                 .mapperWithSender(((sender, type) -> Team.getByName(type)))
+                .register();
+
+        Commands.defineArgumentType(TicketViewOptions.class)
+                .defaultName("Ticket_Options")
+                .completer((s,$) -> TicketViewOptions.getAvailable(s))
+                .mapperWithSender(((sender, type) -> TicketViewOptions.getByName(type)))
                 .register();
     }
 }

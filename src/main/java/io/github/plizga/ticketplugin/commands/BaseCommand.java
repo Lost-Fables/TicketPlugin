@@ -1,9 +1,14 @@
 package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.CommandTemplate;
+import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.sqlite.Database;
 import io.github.plizga.ticketplugin.sqlite.Ticket;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 
 import java.util.List;
 
@@ -20,16 +25,21 @@ public abstract class BaseCommand extends CommandTemplate
     void readTicketsBasic(CommandSender sender, List ticketList)
     {
         int index = 1; //omg an index!!!!
+
         for(Object o : ticketList)
         {
             sender.sendMessage("Ticket " + index + ":");
             Ticket ticket = (Ticket) o;
             sender.sendMessage(plugin.PREFIX + ticket.toBasicInfo());
-            sender.sendMessage("\n\n");
+            BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/request staff expandTicket " + ticket.getId());
+            sender.spigot().sendMessage(cmdButton);
+            sender.sendMessage("\n");
             index++;
 
         }
     }
+
+
 
     /**
      * Helper method that reads and prints the tickets in a ticket list back out to the sender in BASIC FORM
@@ -44,10 +54,72 @@ public abstract class BaseCommand extends CommandTemplate
             sender.sendMessage("Ticket " + index + ":");
             Ticket ticket = (Ticket) o;
             sender.sendMessage(plugin.PREFIX + ticket.toPlayerInfo());
+
             sender.sendMessage("\n\n");
             index++;
 
         }
+
+    }
+
+    protected int getTotalPagesForPagination(int size, int contentPerPage)
+    {
+        int totalPageCount;
+        if((size % contentPerPage) == 0)
+        {
+            totalPageCount = size / contentPerPage;
+        }
+        else
+        {
+            totalPageCount = (size / contentPerPage) + 1;
+        }
+
+        return totalPageCount;
+    }
+
+    /**
+     * Helper method to assist in pagination of data given a list of values.
+     *
+     * PRECONDITION: the parameter list has a size > 0.
+     *
+     * @param sender    the person who the data is going to
+     * @param list  the list being paginated
+     * @param page  the page number
+     * @param contentPerPage    amount of content to be shown per page.
+     */
+    protected void paginate(CommandSender sender, List list, int page, int totalPageCount, int contentPerPage)
+    {
+
+        if(page <= totalPageCount)
+        {
+            String paginatedFirstLine = String.valueOf(page) + "/" + String.valueOf(totalPageCount);
+            sender.sendMessage(paginatedFirstLine);
+
+            //begin a line
+            int index = 0, subIndex = 0;
+            page--;
+
+            for(Object object : list)
+            {
+                index++;
+                if((((page * contentPerPage) + subIndex + 1) == index) &&
+                        (index != ((page * contentPerPage) + contentPerPage + 1)))
+                {
+                    subIndex++;
+                    sender.sendMessage((String) object);
+                }
+            }
+
+            //end of a line
+        }
+        else
+        {
+            sender.sendMessage(plugin.PREFIX + "There are only " + plugin.ALT_COLOR + totalPageCount + plugin.PREFIX + "pages.");
+        }
+
+
+
+
     }
 
 

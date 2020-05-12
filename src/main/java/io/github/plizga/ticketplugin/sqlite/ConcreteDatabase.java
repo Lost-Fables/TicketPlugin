@@ -25,7 +25,8 @@ public class ConcreteDatabase extends Database
     private String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS " + TICKET_TABLE_NAME + " (" +
             "`id` varchar(36) NOT NULL," + //unique id of ticket
             "`Player` varchar(32) NOT NULL," + //player who gen'd the ticket
-            "`Status` varchar(32) NOT NULL," + //status of the ticket (OPEN, CLAIMED, CLOSED)
+            "`Status` varchar" +
+            "(32) NOT NULL," + //status of the ticket (OPEN, CLAIMED, CLOSED)
             "`Assigned_Team` varchar(32)," + //team assigned to the ticket, may be nobody
             "`Assigned_Moderator` varchar(32)," + //moderator working on the ticket
             "`Date_Created` varchar(32) NOT NULL," + //date the ticket was created
@@ -220,7 +221,7 @@ public class ConcreteDatabase extends Database
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        List<Ticket> ticketList = new ArrayList<Ticket>();
+        List<Ticket> ticketList = new ArrayList<>();
 
         try
         {
@@ -250,7 +251,44 @@ public class ConcreteDatabase extends Database
         return null;
     }
 
-    public List getOpenTickets()
+    @Override
+    public List getTicketsByTeam(String team)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Ticket> ticketList = new ArrayList<>();
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + " WHERE Assigned_Team = '" +
+                    team + "' AND Status = '" + Status.OPEN.name() +
+                    "' ORDER BY 'Date_Created';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Ticket ticket = makeTicket(resultSet);
+
+                ticketList.add(ticket);
+            }
+            return ticketList;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet);
+        }
+        return null;
+
+    }
+
+    public List getAllOpenTickets()
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -288,6 +326,41 @@ public class ConcreteDatabase extends Database
     }
 
     @Override
+    public Ticket getTicketByUUID(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        Ticket ticket = null;
+
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
+                    " WHERE id = '" + uuid + "';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                ticket = makeTicket(resultSet);
+            }
+
+            return ticket;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet);
+        }
+        return null;
+    }
+
+    @Override
     public void removeTicketByUUID(String uuid)
     {
         Connection connection = null;
@@ -297,8 +370,9 @@ public class ConcreteDatabase extends Database
         try
         {
             connection = getSqlConnection();
-            preparedStatement = connection.prepareStatement("DELETE FROM " + TICKET_TABLE_NAME +
-                    " WHERE id = '" + uuid + "';");
+            preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
+                    " SET Status = '" + Status.CANCELLED.name() +
+                    "' WHERE id = '" + uuid + "';");
 
             preparedStatement.executeUpdate();
         }

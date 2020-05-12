@@ -30,7 +30,7 @@ public class UserCommands extends BaseCommand
         this.staffCommands = new StaffCommands();
     }
 
-    @Cmd(value="Moderator access to tickets.", permission="ticket.staff")
+    @Cmd(value="Moderator access to tickets.", permission=TicketPlugin.PERMISSION_START + ".staff")
     public BaseCommand staff()
     {
         return staffCommands;

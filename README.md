@@ -18,7 +18,7 @@ Staff:
 
 DONE: Still able to see one's open tickets
 
-You are able to check any tickets assigned to the appropriate team(s) you're part of.
+DONE: You are able to check any tickets assigned to the appropriate team(s) you're part of.
 
 Leave comments for Staff-Only or for the Player
 
@@ -29,6 +29,8 @@ Unclaim in case you need to let it sit.
 Re-assign to another team.
 
 Able to mark oneself as on or off duty. If off duty you don't get alerts about new tickets.
+
+Alert on-duty players when a ticket associated with their team(s) is created.
 
 Stats:
 

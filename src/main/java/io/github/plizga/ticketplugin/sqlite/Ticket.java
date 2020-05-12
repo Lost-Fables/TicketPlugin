@@ -11,7 +11,7 @@ import java.util.UUID;
  * Represents a ticket as a Java object.
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
-public class Ticket
+public class Ticket implements Comparable
 {
     private String id;
     private String playerName;
@@ -55,7 +55,7 @@ public class Ticket
                 plugin.PREFIX + "\nDate Created: " + plugin.ALT_COLOR+ dateCreated +
                 plugin.PREFIX + "\nDate Cleared: " + plugin.ALT_COLOR+ dateCleared +
                 plugin.PREFIX +  "\nLocation: " + plugin.ALT_COLOR+ location +
-                plugin.PREFIX + "\nNeeds ADMINISTRATOR Support: " + plugin.ALT_COLOR+ adminFlag
+                plugin.PREFIX + "\nNeeds Admin Support: " + plugin.ALT_COLOR+ adminFlag
                 ;
         return str;
     }
@@ -63,14 +63,16 @@ public class Ticket
     public String toBasicInfo()
     {
         String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
-                plugin.PREFIX + " Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
+                plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
+                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
+                plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
         return str;
     }
 
     public String toPlayerInfo()
     {
         String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
+                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
                 plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
         return str;
     }
@@ -176,5 +178,16 @@ public class Ticket
     public void setAdminFlag(boolean adminFlag)
     {
         this.adminFlag = adminFlag;
+    }
+
+    @Override
+    public int compareTo(Object o)
+    {
+        if(o instanceof Ticket)
+        {
+            String str = ((Ticket) o).getDateCreated();
+            return this.getDateCreated().compareTo(str);
+        }
+        return -1;
     }
 }

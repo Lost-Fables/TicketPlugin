@@ -27,7 +27,7 @@ public class ConcreteDatabase extends Database
             "`Player` varchar(32) NOT NULL," + //player who gen'd the ticket
             "`Status` varchar" +
             "(32) NOT NULL," + //status of the ticket (OPEN, CLAIMED, CLOSED)
-            "`Assigned_Team` varchar(32)," + //team assigned to the ticket, may be nobody
+            "`Assigned_Team` varchar(32) NOT NULL," + //team assigned to the ticket
             "`Assigned_Moderator` varchar(32)," + //moderator working on the ticket
             "`Date_Created` varchar(32) NOT NULL," + //date the ticket was created
             "`Date_Cleared` varchar(32)," + //date the ticket was completed
@@ -144,7 +144,7 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(4, team.name());
 
-            preparedStatement.setString(5, null);
+            preparedStatement.setString(5, "None");
 
             //create a date for the next one.
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -210,7 +210,7 @@ public class ConcreteDatabase extends Database
         }
         finally
         {
-            close(preparedStatement, resultSet);
+            close(preparedStatement, resultSet, connection);
         }
 
         return null;
@@ -246,7 +246,7 @@ public class ConcreteDatabase extends Database
         }
         finally
         {
-            close(preparedStatement, resultSet);
+            close(preparedStatement, resultSet, connection);
         }
         return null;
     }
@@ -282,7 +282,7 @@ public class ConcreteDatabase extends Database
         }
         finally
         {
-            close(preparedStatement, resultSet);
+            close(preparedStatement, resultSet, connection);
         }
         return null;
 
@@ -319,7 +319,7 @@ public class ConcreteDatabase extends Database
         }
         finally
         {
-            close(preparedStatement, resultSet);
+            close(preparedStatement, resultSet, connection);
         }
 
         return null;
@@ -355,13 +355,13 @@ public class ConcreteDatabase extends Database
         }
         finally
         {
-            close(preparedStatement, resultSet);
+            close(preparedStatement, resultSet, connection);
         }
         return null;
     }
 
     @Override
-    public void removeTicketByUUID(String uuid)
+    public void cancelTicketByUUID(String uuid)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -387,7 +387,7 @@ public class ConcreteDatabase extends Database
     }
 
     @Override
-    public void removeTicketByPlayer(String player)
+    public void cancelTicketByPlayer(String player)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -395,13 +395,73 @@ public class ConcreteDatabase extends Database
         try
         {
             connection = getSqlConnection();
-            preparedStatement = connection.prepareStatement("DELETE FROM " + TICKET_TABLE_NAME +
-                    " WHERE Player ='" + player + "';");
+            preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
+                    " Set Status ='" + Status.CANCELLED.name() +
+                    "' WHERE Player = '" + player + "';");
             preparedStatement.executeUpdate();
         }
         catch(SQLException e)
         {
          plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+
+    /**
+     * Claims a ticket.
+     * PRECONDITION: The ticket's claimability should be checked using the method {isClaimable} prior to this method
+     * being called. This method will override the ticket's current claimer otherwise. This could be applicable for admins,
+     * however it should not be used otherwise.
+     * @param uuid  uuid of the ticket
+     * @param player    name of the player attempting to claim
+     */
+    @Override
+    public void claimTicket(String uuid, String player)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
+                    " Set Assigned_Moderator = '" + player +
+                    "', Status = '" + Status.CLAIMED +
+                    "' WHERE id = '" + uuid + "';");
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+    @Override
+    public void unClaimTicket(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
+                    " Set Assigned_Moderator = '" + "None" +
+                    "', Status = '" + Status.OPEN.name() +
+                    "' WHERE id = '" + uuid + "';");
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         }
         finally
         {

@@ -19,6 +19,8 @@ public abstract class BaseCommand extends CommandTemplate
 
     /**
      * Provides for a means of accessing tickets and gathering their basic info for an easily parsed through list.
+     * This is for staff use.
+     * Additional info: Creates a button which allows the staff to expand tickets.
      * @param sender    the command sender such as a player
      * @param ticketList    the ticket list being passed to print out
      */

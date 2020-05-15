@@ -1,10 +1,13 @@
 package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.annotate.Cmd;
+import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.sqlite.Database;
 import io.github.plizga.ticketplugin.sqlite.Ticket;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -67,7 +70,7 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="look at the list of all available tickets for the staff member initiating the command.")
     public void viewAll(CommandSender sender)
     {
-       ArrayList<Ticket> openTickets = new ArrayList<>();
+       List openTickets = new ArrayList<Ticket>();
 
         if(sender instanceof Player)
         {
@@ -144,20 +147,87 @@ public class StaffCommands extends BaseCommand
 
     }
 
+    @Cmd(value="allows a staff member to claim or unclaim a ticket, based upon whether they have currently claimed it or not.")
+    public void claim(CommandSender sender, String uuid)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            try
+            {
+                Database database = plugin.getDatabase();
+                Ticket ticket = database.getTicketByUUID(uuid);
+
+                String assignedModerator = ticket.getAssignedModerator();
+
+                if(ticket.getStatus() == Status.OPEN)
+                {
+                    database.claimTicket(ticket.getId(), player.getName());
+                    sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n");
+                    expandTicket(sender, uuid);
+                }
+                else if(assignedModerator.equalsIgnoreCase(player.getName()))
+                {
+                    database.unClaimTicket(uuid);
+                    sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "unclaimed.\n");
+                    expandTicket(sender, uuid);
+                }
+                else
+                {
+                    sender.sendMessage(plugin.PREFIX + "This ticket has been claimed by " + plugin.ALT_COLOR +
+                            ticket.getAssignedModerator() + plugin.PREFIX + ".");
+                }
+            }
+            catch(NullPointerException e)
+            {
+                sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
+                        plugin.ALT_COLOR + "Method: claim");
+            }
+        }
+        else
+        {
+            sender.sendMessage("Only players may claim tickets dude. " +
+                    "If a console claimed a ticket, what do you think would happen? Seriously, what would happen? " +
+                    "Tell me. I'd like to know.");
+        }
+
+    }
+
     @Cmd(value="expands a ticket from a list of tickets. You could theoretically enter the entire uuid but this is called from the expand buttons.")
     public void expandTicket(CommandSender sender, String uuid)
     {
-        try
+        if(sender instanceof Player)
         {
-            Database database = plugin.getDatabase();
-            Ticket ticket =  database.getTicketByUUID(uuid);
-            sender.sendMessage(plugin.PREFIX + "Ticket Information: \n" + ticket.toString());
-            sender.sendMessage("\n");
+            Player player = (Player) sender;
+            try
+            {
+                Database database = plugin.getDatabase();
+                Ticket ticket =  database.getTicketByUUID(uuid);
+                sender.sendMessage(plugin.PREFIX + "Ticket Information: \n" + ticket.toString());
+                if(ticket.getStatus() == Status.OPEN)
+                {
+                    BaseComponent cmdButton = MessageUtil.CommandButton("Claim This Ticket", "/request staff claim " + ticket.getId());
+                    sender.spigot().sendMessage(cmdButton);
+                }
+                else if(ticket.getAssignedModerator().equalsIgnoreCase(player.getName()))
+                {
+                    BaseComponent cmdButton = MessageUtil.CommandButton("Unclaim This Ticket", "/request staff claim " + ticket.getId());
+                    sender.spigot().sendMessage(cmdButton);
+                }
+                sender.sendMessage("\n");
+            }
+            catch(NullPointerException e)
+            {
+                sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
+                        plugin.ALT_COLOR + "Method: claim");
+            }
         }
-        catch(NullPointerException e)
+        else
         {
-            sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur.");
+            sender.sendMessage("Only players may expand tickets dude.");
         }
+
 
     }
 

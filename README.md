@@ -22,9 +22,11 @@ DONE: You are able to check any tickets assigned to the appropriate team(s) you'
 
 Leave comments for Staff-Only or for the Player
 
-Claim a ticket so other staff know who's working on it actively
+DONE: Claim a ticket so other staff know who's working on it actively
 
-Unclaim in case you need to let it sit.
+DONE: Unclaim in case you need to let it sit.
+
+View Claimed Tickets
 
 Re-assign to another team.
 

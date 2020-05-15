@@ -106,7 +106,7 @@ public class UserCommands extends BaseCommand
             {
                 if(num.equals("all"))
                 {
-                    database.removeTicketByPlayer(player.getName().toLowerCase());
+                    database.cancelTicketByPlayer(player.getName().toLowerCase());
                     sender.sendMessage(plugin.PREFIX +  "All of your open tickets have been cancelled.");
                 }
                 else
@@ -124,7 +124,7 @@ public class UserCommands extends BaseCommand
                         return;
                     }
                     Ticket ticket = (Ticket) openTickets.get(numAsInt);
-                    database.removeTicketByUUID(ticket.getId());
+                    database.cancelTicketByUUID(ticket.getId());
                     sender.sendMessage(plugin.PREFIX + "Ticket " + plugin.ALT_COLOR + num + plugin.PREFIX + " has been deleted.");
                 }
 

@@ -91,6 +91,31 @@ public abstract class Database extends BaseCommand
         }
     }
 
+    void close(PreparedStatement preparedStatement, ResultSet resultSet, Connection connection)
+    {
+        try
+        {
+            if(preparedStatement != null)
+            {
+                preparedStatement.close();
+            }
+            if(resultSet != null)
+            {
+                preparedStatement.close();
+            }
+            if(connection != null)
+            {
+                connection.close();
+            }
+        }
+        catch (SQLException e)
+        {
+
+            Error.close(plugin, e);
+        }
+    }
+
+
     //todo will need to be updated when enum status is a thing!!
     public abstract void createNewTicket(Player player, Status status, Team team, String ticketData, boolean adminFlag);
 
@@ -98,13 +123,17 @@ public abstract class Database extends BaseCommand
 
     public abstract List getPlayerOpenTickets(String playerName);
 
-    public abstract void removeTicketByUUID(String uuid);
+    public abstract void cancelTicketByUUID(String uuid);
 
-    public abstract void removeTicketByPlayer(String player);
+    public abstract void cancelTicketByPlayer(String player);
 
     public abstract List getTicketsByTeam(String team);
 
     public abstract Ticket getTicketByUUID(String uuid);
+
+    public abstract void claimTicket(String uuid, String player);
+
+    public abstract void unClaimTicket(String uuid);
 
     public List getAllClaimedTickets(Player player)
     {

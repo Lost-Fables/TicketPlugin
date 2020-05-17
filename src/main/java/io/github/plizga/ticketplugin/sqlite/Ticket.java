@@ -22,13 +22,11 @@ public class Ticket implements Comparable
     private String dateCleared;
     private String location;
     private String info;
-    private boolean adminFlag;
 
     private TicketPlugin plugin;
 
     public Ticket(JavaPlugin plugin, String id, String playerName, Status status, Team team, String assignedModerator,
-                  String dateCreated, String dateCleared, String location, String info,
-                  boolean adminFlag)
+                  String dateCreated, String dateCleared, String location, String info)
     {
         this.plugin = (TicketPlugin) plugin;
         this.id = id;
@@ -40,7 +38,6 @@ public class Ticket implements Comparable
         this.dateCleared = dateCleared;
         this.location = location;
         this.info = info;
-        this.adminFlag = adminFlag;
     }
 
     @Override
@@ -54,8 +51,7 @@ public class Ticket implements Comparable
                 plugin.PREFIX +  "\nAssigned Staff Member: " + plugin.ALT_COLOR+ assignedModerator +
                 plugin.PREFIX + "\nDate Created: " + plugin.ALT_COLOR+ dateCreated +
                 plugin.PREFIX + "\nDate Cleared: " + plugin.ALT_COLOR+ dateCleared +
-                plugin.PREFIX +  "\nLocation: " + plugin.ALT_COLOR+ location +
-                plugin.PREFIX + "\nNeeds Admin Support: " + plugin.ALT_COLOR+ adminFlag
+                plugin.PREFIX +  "\nLocation: " + plugin.ALT_COLOR+ location
                 ;
         return str;
     }
@@ -170,15 +166,7 @@ public class Ticket implements Comparable
         this.info = info;
     }
 
-    public boolean isAdminFlag()
-    {
-        return adminFlag;
-    }
 
-    public void setAdminFlag(boolean adminFlag)
-    {
-        this.adminFlag = adminFlag;
-    }
 
     @Override
     public int compareTo(Object o)

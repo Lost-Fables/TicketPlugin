@@ -18,11 +18,19 @@ import java.util.List;
 public class StaffCommands extends BaseCommand
 {
     private Database database;
+    private ReassignCommands reassignCommands;
     public StaffCommands()
     {
         this.database = plugin.getDatabase();
+        this.reassignCommands = new ReassignCommands();
+
     }
 
+    @Cmd(value ="Internally used to reassign tickets to various teams.")
+    public BaseCommand reassign()
+    {
+        return this.reassignCommands;
+    }
     @Cmd(value="look at the list of tickets for a specific team")
     public void view(CommandSender sender, Team team)
     {
@@ -194,7 +202,56 @@ public class StaffCommands extends BaseCommand
 
     }
 
-    @Cmd(value="expands a ticket from a list of tickets. You could theoretically enter the entire uuid but this is called from the expand buttons.")
+    @Cmd(value="Allows staff members to view all of their currently claimed tickets.")
+    public void getClaimed(CommandSender sender)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            try
+            {
+                Database database = plugin.getDatabase();
+                List<Ticket> claimedTickets = database.getClaimedTickets(player.getName());
+
+                Collections.sort(claimedTickets);
+
+                if(claimedTickets.size() == 0)
+                {
+                    sender.sendMessage(plugin.PREFIX + "You have no currently claimed tickets!");
+                    return;
+                }
+
+                sender.sendMessage( plugin.PREFIX +"Viewing your claimed tickets:");
+                readTicketsBasic(sender, claimedTickets);
+
+
+
+            }
+            catch(NullPointerException e)
+            {
+                sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
+                        plugin.ALT_COLOR + "Method: getClaimed");
+            }
+        }
+        else
+        {
+            sender.sendMessage("Only players may view their claimed tickets because you can't claim tickets dude you're a console.");
+        }
+    }
+
+    @Cmd(value="Allows for tickets to be reassigned to other teams. Can be called from a button after viewing your claimed tickets or the tickets available to your teams.")
+    public void reassignTicket(CommandSender sender, String uuid)
+    {
+        for(Team t: Team.values())
+        {
+            BaseComponent cmdButton = MessageUtil.CommandButton("Reassign to " + t.name(),
+                    "/request staff reassign " + t.name().toLowerCase() + " " + uuid);
+            sender.spigot().sendMessage(cmdButton);
+        }
+    }
+
+    @Cmd(value="Allows for the expansion of tickets. Called from an 'expand ticket' button.")
     public void expandTicket(CommandSender sender, String uuid)
     {
         if(sender instanceof Player)
@@ -215,6 +272,8 @@ public class StaffCommands extends BaseCommand
                     BaseComponent cmdButton = MessageUtil.CommandButton("Unclaim This Ticket", "/request staff claim " + ticket.getId());
                     sender.spigot().sendMessage(cmdButton);
                 }
+                BaseComponent cmdButton2 = MessageUtil.CommandButton("Reassign This Ticket", "/request staff reassignTicket " + ticket.getId());
+                sender.spigot().sendMessage(cmdButton2);
                 sender.sendMessage("\n");
             }
             catch(NullPointerException e)

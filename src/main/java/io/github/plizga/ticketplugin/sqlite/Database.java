@@ -117,7 +117,7 @@ public abstract class Database extends BaseCommand
 
 
     //todo will need to be updated when enum status is a thing!!
-    public abstract void createNewTicket(Player player, Status status, Team team, String ticketData, boolean adminFlag);
+    public abstract void createNewTicket(Player player, Status status, Team team, String ticketData);
 
     public abstract List getAllOpenTickets();
 
@@ -134,6 +134,10 @@ public abstract class Database extends BaseCommand
     public abstract void claimTicket(String uuid, String player);
 
     public abstract void unClaimTicket(String uuid);
+
+    public abstract List<Ticket> getClaimedTickets(String player);
+
+    public abstract void setTeam(String uuid, String team);
 
     public List getAllClaimedTickets(Player player)
     {

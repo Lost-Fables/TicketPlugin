@@ -17,6 +17,8 @@ public abstract class BaseCommand extends CommandTemplate
 {
     protected TicketPlugin plugin = TicketPlugin.getTicketPluginInstance();
 
+    private final String TICKET_BORDER = "~~~~~~~~~~~~~~~";
+
     /**
      * Provides for a means of accessing tickets and gathering their basic info for an easily parsed through list.
      * This is for staff use.
@@ -30,12 +32,14 @@ public abstract class BaseCommand extends CommandTemplate
 
         for(Object o : ticketList)
         {
-            sender.sendMessage("Ticket " + index + ":");
+            sender.sendMessage(plugin.PREFIX + "\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
             sender.sendMessage(plugin.PREFIX + ticket.toBasicInfo());
             BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/request staff expandTicket " + ticket.getId());
+
             sender.spigot().sendMessage(cmdButton);
-            sender.sendMessage("\n");
+
+            sender.sendMessage(plugin.ALT_COLOR + TICKET_BORDER + "\n");
             index++;
 
         }
@@ -53,11 +57,11 @@ public abstract class BaseCommand extends CommandTemplate
         int index = 1; //omg an index!!!!
         for(Object o : ticketList)
         {
-            sender.sendMessage("Ticket " + index + ":");
+            sender.sendMessage("\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            sender.sendMessage(plugin.PREFIX + ticket.toPlayerInfo());
+            sender.sendMessage(ticket.toPlayerInfo());
 
-            sender.sendMessage("\n\n");
+            sender.sendMessage(plugin.PREFIX + TICKET_BORDER + "\n\n");
             index++;
 
         }

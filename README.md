@@ -26,7 +26,7 @@ DONE: Claim a ticket so other staff know who's working on it actively
 
 DONE: Unclaim in case you need to let it sit.
 
-View Claimed Tickets
+DONE: View Claimed Tickets
 
 Re-assign to another team.
 

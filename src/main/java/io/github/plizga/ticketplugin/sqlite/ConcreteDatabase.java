@@ -33,7 +33,6 @@ public class ConcreteDatabase extends Database
             "`Date_Cleared` varchar(32)," + //date the ticket was completed
             "`Location` varchar(32) NOT NULL," + //location where the ticket was originally generated.
             "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
-            "`Admin_Flag` bool NOT NULL," + //admin flag, applied by a mod to a ticket that needs an admin to look at it.
             "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
 
@@ -120,10 +119,9 @@ public class ConcreteDatabase extends Database
      * @param player    the player filing the ticket
      * @param status    the status of the ticket upon creation
      * @param ticketData    the string representation of the ticket.
-     * @param adminFlag represents whether this is a request that needs admin attention or not. (0 false, 1 true)
      */
     @Override
-    public void createNewTicket(Player player, Status status, Team team, String ticketData, boolean adminFlag)
+    public void createNewTicket(Player player, Status status, Team team, String ticketData)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -133,7 +131,7 @@ public class ConcreteDatabase extends Database
             //BELOW - The question marks need to match the amount of columns. Don't ask me why
             preparedStatement = connection.prepareStatement("REPLACE INTO " + TICKET_TABLE_NAME +
                     " (id,Player,Status,Assigned_Team,Assigned_Moderator,Date_Created," +
-                    "Date_Cleared,Location,Initial_Request,Admin_Flag) VALUES(?,?,?,?,?,?,?,?,?,?)");
+                    "Date_Cleared,Location,Initial_Request) VALUES(?,?,?,?,?,?,?,?,?)");
             //SetString requires an index associated with the column being changed. For this default dance ticket, we will modify some core details that cannot be null.
             //NOTE!! Index is 1-based here, not 0. don't fucking zero index it. that's so silly dude imagine using the number 0 in literally anything.
             preparedStatement.setString(1, UUID.randomUUID().toString());
@@ -157,14 +155,6 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(9, ticketData);
 
-            if(adminFlag) //set to 1 if true, 0 otherwise.
-            {
-                preparedStatement.setString(10, "1");
-            }
-            else
-            {
-                preparedStatement.setString(10, "0");
-            }
 
             preparedStatement.executeUpdate();
 
@@ -469,6 +459,69 @@ public class ConcreteDatabase extends Database
         }
     }
 
+    @Override
+    public List<Ticket> getClaimedTickets(String player)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Ticket> ticketList = new ArrayList<Ticket>();
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
+                    " WHERE Status = '" + Status.CLAIMED.name() +
+            "' AND Assigned_Moderator = '" + player + "';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Ticket ticket = makeTicket(resultSet);
+
+                ticketList.add(ticket);
+
+            }
+
+            return ticketList;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet, connection);
+        }
+        return ticketList;
+    }
+
+    @Override
+    public void setTeam(String uuid, String team)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
+                    " Set Assigned_Team = '" + team +
+                    "', Status = '" + Status.OPEN.name() +
+                    "', Assigned_Moderator = '" + "NONE" +
+                    "' WHERE id = '" + uuid + "';");
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
     private Ticket makeTicket(ResultSet resultSet) throws SQLException
     {
         String id = resultSet.getString("id");
@@ -480,10 +533,9 @@ public class ConcreteDatabase extends Database
         String dateCleared = resultSet.getString("Date_Cleared");
         String location = resultSet.getString("Location");
         String info = resultSet.getString("Initial_Request");
-        Boolean adminFlag = resultSet.getBoolean("Admin_Flag");
 
         return new Ticket(this.plugin, id, playerName, status, team, assignedModerator, dateCreated, dateCleared,
-                location, info, adminFlag);
+                location, info);
     }
 
 }

@@ -16,6 +16,7 @@ public final class TicketPlugin extends JavaPlugin
 
     /** all of these static final strings be defining stuff.*/
     public static final String PERMISSION_START = "ticketplugin";
+    public final String COMMAND_START = "request";
     public final String PREFIX = ChatColor.DARK_AQUA + "";
     public final String ALT_COLOR = ChatColor.DARK_PURPLE + "";
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
@@ -43,7 +44,7 @@ public final class TicketPlugin extends JavaPlugin
 
 
         registerParameters();
-        Commands.build(getCommand("request"), UserCommands::new);
+        Commands.build(getCommand(COMMAND_START), UserCommands::new);
         //this.getCommand("ticket").setExecutor(new UserCommands(this));
 
 

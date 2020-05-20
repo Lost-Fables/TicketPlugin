@@ -2,6 +2,8 @@ package io.github.plizga.ticketplugin.sqlite;
 
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
+import io.github.plizga.ticketplugin.helpers.Comment;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,6 +37,16 @@ public class ConcreteDatabase extends Database
             "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
             "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
+
+    private String SQLiteCreateCommentsTable = "CREATE TABLE IF NOT EXISTS " + COMMENT_TABLE_NAME + " (" +
+            "`id` varchar(36) NOT NULL," + //unique id of comment
+            "`ticket_id` varchar(36) NOT NULL," +
+            "`author` varchar(32) NOT NULL," +
+            "`comment` varchar(100) NOT NULL," +
+            "`date_created` varchar(32) NOT NULL," +
+            "`staff_only` varchar(6) NOT NULL," +
+            "PRIMARY KEY (`id`)" +
+            ");";
 
 
     /**
@@ -103,6 +115,7 @@ public class ConcreteDatabase extends Database
         {
             Statement s = connection.createStatement();
             s.executeUpdate(SQLiteCreateTokensTable);
+            s.executeUpdate(SQLiteCreateCommentsTable);
             s.close();
         }
         catch(SQLException e )
@@ -168,6 +181,53 @@ public class ConcreteDatabase extends Database
             close(preparedStatement, connection);
         }
     }
+
+    @Override
+    public void createNewComment(String player, String text, String ticketUUID, boolean isStaffOnly)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("REPLACE INTO " + COMMENT_TABLE_NAME +
+                    " (id,ticket_id,author,comment,date_created) VALUES(?,?,?,?,?,?)");
+
+            preparedStatement.setString(1, UUID.randomUUID().toString());
+
+            preparedStatement.setString(2, ticketUUID);
+
+            preparedStatement.setString(3, player);
+
+            preparedStatement.setString(4, text);
+
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            preparedStatement.setString(5,dateFormat.format(date)) ;
+
+            if(isStaffOnly)
+            {
+                preparedStatement.setString(6, "true");
+            }
+            else
+            {
+                preparedStatement.setString(6, "false");
+            }
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+
+    }
+
 
     /**
      * Returns the STRING of the player associated with a ticket.
@@ -522,6 +582,81 @@ public class ConcreteDatabase extends Database
         }
     }
 
+    @Override
+    public List<Comment> getAllComments(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Comment> commentList = new ArrayList<Comment>();
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + COMMENT_TABLE_NAME +
+                    " WHERE ticket_id = '" + uuid +
+                    "' ORDER BY 'date_created';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Comment comment = makeComment(resultSet);
+
+                commentList.add(comment);
+
+            }
+
+            return commentList;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet, connection);
+        }
+        return commentList;
+    }
+
+    @Override
+    public List<Comment> getCommentsForPlayer(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Comment> commentList = new ArrayList<Comment>();
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + COMMENT_TABLE_NAME +
+                    " WHERE ticket_id = '" + uuid +
+                    "' AND staff_only = 'false'" +
+                    "' ORDER BY 'date_created';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Comment comment = makeComment(resultSet);
+
+                commentList.add(comment);
+
+            }
+
+            return commentList;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet, connection);
+        }
+        return commentList;
+    }
+
     private Ticket makeTicket(ResultSet resultSet) throws SQLException
     {
         String id = resultSet.getString("id");
@@ -536,6 +671,27 @@ public class ConcreteDatabase extends Database
 
         return new Ticket(this.plugin, id, playerName, status, team, assignedModerator, dateCreated, dateCleared,
                 location, info);
+    }
+
+    private Comment makeComment(ResultSet resultSet) throws SQLException
+    {
+        String id = resultSet.getString("id");
+        String ticketId = resultSet.getString("ticket_id");
+        String author = resultSet.getString("author");
+        String comment = resultSet.getString("comment");
+        String dateCreated = resultSet.getString("date_created");
+        String staff_only = resultSet.getString("staff_only");
+        Boolean isStaffOnly;
+        if(staff_only.equalsIgnoreCase("true"))
+        {
+            isStaffOnly = true;
+        }
+        else
+        {
+            isStaffOnly = false;
+        }
+
+        return new Comment(this.plugin, id, ticketId, author, comment, dateCreated, isStaffOnly);
     }
 
 }

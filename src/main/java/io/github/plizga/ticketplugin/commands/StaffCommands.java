@@ -1,15 +1,20 @@
 package io.github.plizga.ticketplugin.commands;
 
+import co.lotc.core.bukkit.util.BookUtil;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
+import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.sqlite.Database;
-import io.github.plizga.ticketplugin.sqlite.Ticket;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +36,8 @@ public class StaffCommands extends BaseCommand
     {
         return this.reassignCommands;
     }
+
+
     @Cmd(value="look at the list of tickets for a specific team")
     public void view(CommandSender sender, Team team)
     {
@@ -149,6 +156,7 @@ public class StaffCommands extends BaseCommand
                 return;
             }
             sender.sendMessage(plugin.PREFIX + "Viewing tickets for your teams:");
+
             readTicketsBasic(sender, openTickets);
 
         }
@@ -173,13 +181,13 @@ public class StaffCommands extends BaseCommand
                 {
                     database.claimTicket(ticket.getId(), player.getName());
                     sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n");
-                    expandTicket(sender, uuid);
+
                 }
                 else if(assignedModerator.equalsIgnoreCase(player.getName()))
                 {
                     database.unClaimTicket(uuid);
                     sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "unclaimed.\n");
-                    expandTicket(sender, uuid);
+
                 }
                 else
                 {
@@ -190,7 +198,7 @@ public class StaffCommands extends BaseCommand
             catch(NullPointerException e)
             {
                 sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                        plugin.ALT_COLOR + "Method: claim");
+                        plugin.ALT_COLOR + " Method: claim");
             }
         }
         else
@@ -203,7 +211,7 @@ public class StaffCommands extends BaseCommand
     }
 
     @Cmd(value="Allows staff members to view all of their currently claimed tickets.")
-    public void getClaimed(CommandSender sender)
+    public void viewClaimed(CommandSender sender)
     {
         if(sender instanceof Player)
         {
@@ -218,6 +226,8 @@ public class StaffCommands extends BaseCommand
 
                 if(claimedTickets.size() == 0)
                 {
+
+                    msg(plugin.PREFIX + "You have no currently claimed tickets!");
                     sender.sendMessage(plugin.PREFIX + "You have no currently claimed tickets!");
                     return;
                 }
@@ -231,7 +241,7 @@ public class StaffCommands extends BaseCommand
             catch(NullPointerException e)
             {
                 sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                        plugin.ALT_COLOR + "Method: getClaimed");
+                        plugin.ALT_COLOR + " Method: viewClaimed");
             }
         }
         else
@@ -240,14 +250,15 @@ public class StaffCommands extends BaseCommand
         }
     }
 
-    @Cmd(value="Allows for tickets to be reassigned to other teams. Can be called from a button after viewing your claimed tickets or the tickets available to your teams.")
+    @Cmd(value="Allows for tickets to be reassigned to other teams.")
     public void reassignTicket(CommandSender sender, String uuid)
     {
+        msg("\n" + plugin.PREFIX + "Choose a team to reassign to:");
         for(Team t: Team.values())
         {
             BaseComponent cmdButton = MessageUtil.CommandButton("Reassign to " + t.name(),
-                    "/request staff reassign " + t.name().toLowerCase() + " " + uuid);
-            sender.spigot().sendMessage(cmdButton);
+                    "/" + plugin.COMMAND_START +" staff reassign " + t.name().toLowerCase() + " " + uuid);
+            msg(cmdButton);
         }
     }
 
@@ -264,16 +275,20 @@ public class StaffCommands extends BaseCommand
                 sender.sendMessage(plugin.PREFIX + "Ticket Information: \n" + ticket.toString());
                 if(ticket.getStatus() == Status.OPEN)
                 {
-                    BaseComponent cmdButton = MessageUtil.CommandButton("Claim This Ticket", "/request staff claim " + ticket.getId());
-                    sender.spigot().sendMessage(cmdButton);
+                    BaseComponent cmdButton = MessageUtil.CommandButton("Claim This Ticket", "/" + plugin.COMMAND_START +" staff claim " + ticket.getId());
+                    msg(cmdButton);
                 }
                 else if(ticket.getAssignedModerator().equalsIgnoreCase(player.getName()))
                 {
-                    BaseComponent cmdButton = MessageUtil.CommandButton("Unclaim This Ticket", "/request staff claim " + ticket.getId());
-                    sender.spigot().sendMessage(cmdButton);
+                    BaseComponent cmdButton = MessageUtil.CommandButton("Unclaim This Ticket", "/" + plugin.COMMAND_START + " staff claim " + ticket.getId());
+                    msg(cmdButton);
+                    BaseComponent commentButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
+                    BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId());
+                    msg(commentButton);
+                    msg(addCommentsButton);
                 }
-                BaseComponent cmdButton2 = MessageUtil.CommandButton("Reassign This Ticket", "/request staff reassignTicket " + ticket.getId());
-                sender.spigot().sendMessage(cmdButton2);
+                BaseComponent cmdButton2 = MessageUtil.CommandButton("Reassign This Ticket", "/" + plugin.COMMAND_START + " staff reassignTicket " + ticket.getId());
+                msg(cmdButton2);
                 sender.sendMessage("\n");
             }
             catch(NullPointerException e)
@@ -288,6 +303,54 @@ public class StaffCommands extends BaseCommand
         }
 
 
+    }
+
+    @Cmd(value="access the comments section of a ticket.")
+    public void comment(CommandSender sender, String uuid)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+
+            BookMeta bookMeta = (BookMeta) book.getItemMeta();
+            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
+            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
+
+            ArrayList<String> pages = new ArrayList<String>();
+
+            List<Comment> comments = database.getAllComments(uuid);
+
+            if(!comments.isEmpty())
+            {
+                for(Comment c : comments)
+                {
+                    pages.add(c.toString());
+                }
+            }
+            else
+            {
+                pages.add("There are no comments for this ticket!");
+            }
+            bookMeta.setPages(pages);
+            book.setItemMeta(bookMeta);
+
+
+            player.getInventory().addItem(book);
+
+
+        }
+        else
+        {
+            msg("Only players may access and modify comments.");
+        }
+    }
+
+    @Cmd(value="add a comment to a ticket.")
+    public void addComment(CommandSender sender, String uuid)
+    {
+        
     }
 
 }

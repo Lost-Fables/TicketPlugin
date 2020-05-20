@@ -2,12 +2,12 @@ package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.CommandTemplate;
 import co.lotc.core.util.MessageUtil;
+import com.google.common.collect.Lists;
 import io.github.plizga.ticketplugin.TicketPlugin;
-import io.github.plizga.ticketplugin.sqlite.Database;
-import io.github.plizga.ticketplugin.sqlite.Ticket;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 
 import java.util.List;
@@ -28,23 +28,23 @@ public abstract class BaseCommand extends CommandTemplate
      */
     void readTicketsBasic(CommandSender sender, List ticketList)
     {
-        int index = 1; //omg an index!!!!
+        //int index = 1; //omg an index!!!!
+
 
         for(Object o : ticketList)
         {
-            sender.sendMessage(plugin.PREFIX + "\nTicket " + index + ":");
+            //msg(plugin.PREFIX + "\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            sender.sendMessage(plugin.PREFIX + ticket.toBasicInfo());
-            BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/request staff expandTicket " + ticket.getId());
+            msg(plugin.PREFIX + ticket.toBasicInfo());
+            BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/" + plugin.COMMAND_START + " staff expandTicket " + ticket.getId());
 
-            sender.spigot().sendMessage(cmdButton);
+            msg(cmdButton);
 
-            sender.sendMessage(plugin.ALT_COLOR + TICKET_BORDER + "\n");
-            index++;
+            msg(plugin.ALT_COLOR + TICKET_BORDER + "\n");
+            //index++;
 
         }
     }
-
 
 
     /**

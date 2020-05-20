@@ -28,7 +28,7 @@ DONE: Unclaim in case you need to let it sit.
 
 DONE: View Claimed Tickets
 
-Re-assign to another team.
+DONE: Re-assign to another team.
 
 Able to mark oneself as on or off duty. If off duty you don't get alerts about new tickets.
 

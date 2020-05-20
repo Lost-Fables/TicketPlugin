@@ -4,6 +4,8 @@ import io.github.plizga.ticketplugin.commands.BaseCommand;
 import io.github.plizga.ticketplugin.enums.Status;
 
 import io.github.plizga.ticketplugin.enums.Team;
+import io.github.plizga.ticketplugin.helpers.Comment;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +31,9 @@ public abstract class Database extends BaseCommand
     /** The name of the table to be established in the database. */
     protected final String TICKET_TABLE_NAME = "ticket_table";
 
+    /** The name of the table to be used for comments. */
+    protected final String COMMENT_TABLE_NAME = "comment_table";
+
     /**
      * The Constructor for the abstract class Database. Simply takes in the plugin.
      * @param plugin    the JavaPlugin associated with this database.
@@ -48,8 +53,6 @@ public abstract class Database extends BaseCommand
     public void initialize()
     {
         connection = getSqlConnection();
-
-
     }
 
      void close(PreparedStatement preparedStatement, ResultSet resultSet)
@@ -119,6 +122,8 @@ public abstract class Database extends BaseCommand
     //todo will need to be updated when enum status is a thing!!
     public abstract void createNewTicket(Player player, Status status, Team team, String ticketData);
 
+    public abstract void createNewComment(String player, String text, String ticketUUID, boolean isStaffOnly);
+
     public abstract List getAllOpenTickets();
 
     public abstract List getPlayerOpenTickets(String playerName);
@@ -138,6 +143,10 @@ public abstract class Database extends BaseCommand
     public abstract List<Ticket> getClaimedTickets(String player);
 
     public abstract void setTeam(String uuid, String team);
+
+    public abstract List<Comment> getAllComments(String uuid);
+
+    public abstract List<Comment> getCommentsForPlayer(String uuid);
 
     public List getAllClaimedTickets(Player player)
     {

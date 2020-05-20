@@ -8,7 +8,7 @@ import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.sqlite.Database;
-import io.github.plizga.ticketplugin.sqlite.Ticket;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

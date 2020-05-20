@@ -1,4 +1,4 @@
-package io.github.plizga.ticketplugin.sqlite;
+package io.github.plizga.ticketplugin.helpers;
 
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;

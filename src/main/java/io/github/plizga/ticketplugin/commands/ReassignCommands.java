@@ -3,7 +3,6 @@ package io.github.plizga.ticketplugin.commands;
 import co.lotc.core.command.annotate.Cmd;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.sqlite.Database;
-import io.github.plizga.ticketplugin.sqlite.Ticket;
 import org.bukkit.command.CommandSender;
 
 public class ReassignCommands extends BaseCommand

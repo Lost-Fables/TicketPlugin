@@ -7,13 +7,18 @@ import co.lotc.core.command.annotate.Cmd;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
+import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.sqlite.Database;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -68,7 +73,7 @@ public class UserCommands extends BaseCommand
         if(sender instanceof Player)
         {
             Player player = (Player) sender;
-            List openTickets = database.getPlayerOpenTickets(player.getName().toLowerCase());
+            List openTickets = database.getPlayerOpenTickets(player.getName());
 
             if(openTickets.size() == 0)
             {
@@ -95,7 +100,7 @@ public class UserCommands extends BaseCommand
         if(sender instanceof Player)
         {
             Player player = (Player) sender;
-            List openTickets = database.getPlayerOpenTickets(player.getName().toLowerCase());
+            List openTickets = database.getPlayerOpenTickets(player.getName());
             if(openTickets.size() == 0)
             {
                 sender.sendMessage(plugin.PREFIX + "No open tickets to cancel!");
@@ -106,7 +111,7 @@ public class UserCommands extends BaseCommand
             {
                 if(num.equals("all"))
                 {
-                    database.cancelTicketByPlayer(player.getName().toLowerCase());
+                    database.cancelTicketByPlayer(player.getName());
                     sender.sendMessage(plugin.PREFIX +  "All of your open tickets have been cancelled.");
                 }
                 else
@@ -148,8 +153,44 @@ public class UserCommands extends BaseCommand
         }
     }
 
+    @Cmd(value="access the comments section of a ticket.")
+    public void comment(CommandSender sender, String uuid)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+
+            BookMeta bookMeta = (BookMeta) book.getItemMeta();
+            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
+            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
+
+            ArrayList<String> pages = new ArrayList<String>();
+
+            List<Comment> comments = database.getCommentsForPlayer(uuid);
+
+            if (!comments.isEmpty())
+            {
+                for (Comment c : comments)
+                {
+                    pages.add(c.toString());
+                }
+            } else
+            {
+                pages.add("There are no comments for this ticket!");
+            }
+            bookMeta.setPages(pages);
+            book.setItemMeta(bookMeta);
 
 
+            player.getInventory().addItem(book);
 
+        }
+        else
+        {
+            msg("Only players may access and modify comments.");
+        }
+    }
 
 }

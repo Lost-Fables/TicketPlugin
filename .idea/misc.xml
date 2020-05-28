@@ -11,6 +11,8 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan-master/pom.xml" />
+        <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/pom.xml" />
+        <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/.flattened-pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
@@ -20,6 +22,9 @@
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan-master/tythan-bungee/pom.xml" />
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan-master/tythan-common/pom.xml" />
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan-master/tythan-dist/pom.xml" />
+        <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/pom.xml" />
+        <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/tythan-bungee/pom.xml" />
+        <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/tythan-common/pom.xml" />
       </set>
     </option>
   </component>

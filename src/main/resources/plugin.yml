@@ -1,5 +1,6 @@
 name: TicketPlugin
 version: 0.01
+api-version: "1.13"
 main: io.github.plizga.ticketplugin.TicketPlugin
 authors: [Plizga]
 description: A Ticket Plugin for Spigot that allows users to submit tickets, and allows moderators to answer said tickets.

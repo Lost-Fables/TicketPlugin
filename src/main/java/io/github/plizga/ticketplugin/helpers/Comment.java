@@ -30,7 +30,7 @@ public class Comment implements Comparable
    {
        return plugin.PREFIX + "Comment Author: " + plugin.ALT_COLOR + author
                + plugin.PREFIX +"\nComment: " + plugin.ALT_COLOR + comment
-               + plugin.PREFIX + "\nDate EnteredL " + plugin.ALT_COLOR + dateCreated
+               + plugin.PREFIX + "\nDate Entered: " + plugin.ALT_COLOR + dateCreated
                + "\n";
    }
 

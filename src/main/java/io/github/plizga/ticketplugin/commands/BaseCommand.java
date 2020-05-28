@@ -2,12 +2,13 @@ package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.CommandTemplate;
 import co.lotc.core.util.MessageUtil;
-import com.google.common.collect.Lists;
 import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 
 import java.util.List;
@@ -18,6 +19,8 @@ public abstract class BaseCommand extends CommandTemplate
     protected TicketPlugin plugin = TicketPlugin.getTicketPluginInstance();
 
     private final String TICKET_BORDER = "~~~~~~~~~~~~~~~";
+//todo here
+    private OfflineStorage offlineStorage = new OfflineStorage(plugin);
 
     /**
      * Provides for a means of accessing tickets and gathering their basic info for an easily parsed through list.
@@ -57,14 +60,29 @@ public abstract class BaseCommand extends CommandTemplate
         int index = 1; //omg an index!!!!
         for(Object o : ticketList)
         {
-            sender.sendMessage("\nTicket " + index + ":");
+            msg("\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            sender.sendMessage(ticket.toPlayerInfo());
-
-            sender.sendMessage(plugin.PREFIX + TICKET_BORDER + "\n\n");
+            msg(ticket.toPlayerInfo());
+            BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + ticket.getId());
+            msg(cmdButton);
+            msg(plugin.PREFIX + TICKET_BORDER + "\n\n");
             index++;
 
         }
+
+    }
+
+    protected void sendReassignMessage(Ticket ticket, String team)
+    {
+        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+
+        if(player != null)
+        {
+            player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
+                    ticket.getInfo() + plugin.PREFIX + ",\" has been reassigned to the " + plugin.ALT_COLOR +
+                    team + plugin.PREFIX + " team!");
+        }
+
 
     }
 

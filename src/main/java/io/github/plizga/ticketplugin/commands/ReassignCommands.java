@@ -2,8 +2,11 @@ package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.annotate.Cmd;
 import io.github.plizga.ticketplugin.enums.Team;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.sqlite.Database;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class ReassignCommands extends BaseCommand
 {
@@ -20,8 +23,14 @@ public class ReassignCommands extends BaseCommand
     public void admin(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Admin.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Admin.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Admin.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Admin.name());
+
+
     }
 
 
@@ -29,8 +38,12 @@ public class ReassignCommands extends BaseCommand
     public void moderator(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Moderator.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Moderator.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Moderator.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Moderator.name());
     }
 
 
@@ -38,8 +51,12 @@ public class ReassignCommands extends BaseCommand
     public void event(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Event.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Event.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Event.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Event.name());
     }
 
 
@@ -47,8 +64,12 @@ public class ReassignCommands extends BaseCommand
     public void tech(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Tech.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Tech.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Tech.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Tech.name());
     }
 
 
@@ -56,8 +77,12 @@ public class ReassignCommands extends BaseCommand
     public void lore(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Lore.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Lore.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Lore.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Lore.name());
     }
 
 
@@ -65,8 +90,12 @@ public class ReassignCommands extends BaseCommand
     public void build(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Build.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Build.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Build.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Build.name());
     }
 
 
@@ -74,8 +103,12 @@ public class ReassignCommands extends BaseCommand
     public void design(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Design.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Design.name()
+        msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + Team.Design.name()
                 + plugin.PREFIX + " team.");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Design.name());
     }
 
 
@@ -83,7 +116,11 @@ public class ReassignCommands extends BaseCommand
     public void global(CommandSender sender, String uuid)
     {
         database.setTeam(uuid, Team.Global.name());
-        sender.sendMessage(plugin.PREFIX + "Ticket has been reassigned to " + plugin.ALT_COLOR + Team.Global.name()
-                + plugin.PREFIX + " .");
+        msg(plugin.PREFIX + "Ticket has been reassigned to " + plugin.ALT_COLOR + Team.Global.name()
+                + plugin.PREFIX + ".");
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+
+        sendReassignMessage(ticket, Team.Global.name());
     }
 }

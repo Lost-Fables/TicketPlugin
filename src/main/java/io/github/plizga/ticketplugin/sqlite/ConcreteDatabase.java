@@ -20,6 +20,14 @@ import java.util.logging.Level;
 
 public class ConcreteDatabase extends Database
 {
+    private final String DATABASE_NAME = "s938_Plizga_Testing";
+    private final String USERNAME = "u938_VlXZtynBoA";
+    private final String PASSWORD = "e=wRAareADIK86^kxwgYJhcQ";
+    private final String HOST = "64.227.3.126";
+    private final int PORT = 3306;
+    private final String CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME;
+
+
     /** The name of the database as provided by the config of the plugin. */
     private String databaseName;
     /** This is the String that represents the creation of this sql table. IMPORTANT!!! If changes are made here,
@@ -33,7 +41,7 @@ public class ConcreteDatabase extends Database
             "`Assigned_Moderator` varchar(32)," + //moderator working on the ticket
             "`Date_Created` varchar(32) NOT NULL," + //date the ticket was created
             "`Date_Cleared` varchar(32)," + //date the ticket was completed
-            "`Location` varchar(32) NOT NULL," + //location where the ticket was originally generated.
+            "`Location` varchar(255) NOT NULL," + //location where the ticket was originally generated.
             "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
             "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
@@ -44,7 +52,7 @@ public class ConcreteDatabase extends Database
             "`author` varchar(32) NOT NULL," +
             "`comment` varchar(100) NOT NULL," +
             "`date_created` varchar(32) NOT NULL," +
-            "`staff_only` varchar(6) NOT NULL," +
+            "`staff_only` varchar(8) NOT NULL," +
             "PRIMARY KEY (`id`)" +
             ");";
 
@@ -69,7 +77,7 @@ public class ConcreteDatabase extends Database
     @Override
     protected Connection getSqlConnection()
     {
-        File data = new File(plugin.getDataFolder(), databaseName+".db");
+        /*File data = new File(plugin.getDataFolder(), databaseName+".db");
         if(!data.exists())
         {
             try
@@ -100,6 +108,26 @@ public class ConcreteDatabase extends Database
             plugin.getLogger().log(Level.SEVERE, "ConcreteDatabase JDBC library is required for TicketPlugin.");
         }
         //really shouldn't reach this...
+        return null;*/
+        try
+        {
+            if (connection != null && !connection.isClosed())
+            {
+                return connection;
+            }
+            Class.forName("com.mysql.jdbc.Driver");
+            connection = DriverManager.getConnection(CONNECTION_STRING, USERNAME, PASSWORD);
+            System.out.println("Connected to the mySQL database.");
+            return connection;
+        }
+        catch (SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, "Error initializing mySQL database in method getSQLConnection.");
+        }
+        catch (ClassNotFoundException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, "Unable to find jdbc library for mySQL connection in method getSqlConnection.");
+        }
         return null;
     }
 
@@ -149,7 +177,7 @@ public class ConcreteDatabase extends Database
             //NOTE!! Index is 1-based here, not 0. don't fucking zero index it. that's so silly dude imagine using the number 0 in literally anything.
             preparedStatement.setString(1, UUID.randomUUID().toString());
 
-            preparedStatement.setString(2, player.getName().toLowerCase());
+            preparedStatement.setString(2, player.getName());
 
             preparedStatement.setString(3, status.name());
 
@@ -165,6 +193,8 @@ public class ConcreteDatabase extends Database
             preparedStatement.setString(7, null);
 
             preparedStatement.setString(8, player.getLocation().toString());
+            String location = player.getLocation().toString();
+            System.out.println(location.length());
 
             preparedStatement.setString(9, ticketData);
 
@@ -192,7 +222,7 @@ public class ConcreteDatabase extends Database
         {
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("REPLACE INTO " + COMMENT_TABLE_NAME +
-                    " (id,ticket_id,author,comment,date_created) VALUES(?,?,?,?,?,?)");
+                    " (id,ticket_id,author,comment,date_created,staff_only) VALUES(?,?,?,?,?,?)");
 
             preparedStatement.setString(1, UUID.randomUUID().toString());
 
@@ -277,8 +307,9 @@ public class ConcreteDatabase extends Database
         {
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
-                    " WHERE Player = '" + playerName + "' AND Status = '" + Status.OPEN.name() +
-                    "' ORDER BY 'Date_Created';");
+                    " WHERE Player = '" + playerName + "' AND (Status = '" + Status.OPEN.name() +
+                    "' OR Status = '" + Status.CLAIMED.name() +
+                    "') ORDER BY 'Date_Created';");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -594,7 +625,7 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + COMMENT_TABLE_NAME +
                     " WHERE ticket_id = '" + uuid +
-                    "' ORDER BY 'date_created';");
+                    "' ORDER BY 'date_created' DESC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -632,7 +663,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("SELECT * FROM " + COMMENT_TABLE_NAME +
                     " WHERE ticket_id = '" + uuid +
                     "' AND staff_only = 'false'" +
-                    "' ORDER BY 'date_created';");
+                    " ORDER BY 'date_created' DESC;");
 
             resultSet = preparedStatement.executeQuery();
 

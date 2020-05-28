@@ -69,6 +69,7 @@ public class Ticket implements Comparable
     {
         String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
                 plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
+                plugin.PREFIX + ", Staff Member: " + plugin.ALT_COLOR + assignedModerator +
                 plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
         return str;
     }

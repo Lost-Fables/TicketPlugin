@@ -1,5 +1,6 @@
 package io.github.plizga.ticketplugin.commands;
 
+import co.lotc.core.bukkit.book.BookStream;
 import co.lotc.core.bukkit.util.BookUtil;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.util.MessageUtil;
@@ -282,11 +283,15 @@ public class StaffCommands extends BaseCommand
                 {
                     BaseComponent cmdButton = MessageUtil.CommandButton("Unclaim This Ticket", "/" + plugin.COMMAND_START + " staff claim " + ticket.getId());
                     msg(cmdButton);
-                    BaseComponent commentButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
-                    BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId());
-                    msg(commentButton);
+
+                    BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true");
+                    BaseComponent addCommentsButton2 = MessageUtil.CommandButton("Add Player and Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false");
+
                     msg(addCommentsButton);
+                    msg(addCommentsButton2);
                 }
+                BaseComponent commentButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
+                msg(commentButton);
                 BaseComponent cmdButton2 = MessageUtil.CommandButton("Reassign This Ticket", "/" + plugin.COMMAND_START + " staff reassignTicket " + ticket.getId());
                 msg(cmdButton2);
                 sender.sendMessage("\n");
@@ -348,9 +353,43 @@ public class StaffCommands extends BaseCommand
     }
 
     @Cmd(value="add a comment to a ticket.")
-    public void addComment(CommandSender sender, String uuid)
+    public void addComment(CommandSender sender, String uuid, boolean isStaffComment)
     {
-        
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
+
+            BookMeta bookMeta = (BookMeta) book.getItemMeta();
+            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
+            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket:  " + uuid);
+
+
+
+            BookStream stream = new BookStream(player, book, plugin.PREFIX + "Add your comment!")
+            {
+                @Override
+                public void onBookClose()
+                {
+
+                    BookMeta meta = getMeta();
+                    String info = BookUtil.getPagesAsString(meta);
+                    database.createNewComment(player.getName(), info, uuid, isStaffComment);
+
+                }
+            };
+
+            stream.open(player);
+
+            //player.getInventory().addItem(book);
+
+
+        }
+        else
+        {
+            msg("Only players may access and modify comments.");
+        }
     }
 
 }

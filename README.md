@@ -11,7 +11,7 @@ DONE: See any staff comments left for you
 
 DONE: Ability to cancel your tickets
 
-Leave simple review on completed tickets
+DONE: Leave simple review on completed tickets
 
 DONE: show staff member who has claimed your ticket
 

@@ -325,7 +325,6 @@ public class StaffCommands extends BaseCommand
                 {
 
                     msg(plugin.PREFIX + "You have no currently claimed tickets!");
-                    msg(plugin.PREFIX + "You have no currently claimed tickets!");
                     return;
                 }
 
@@ -492,6 +491,31 @@ public class StaffCommands extends BaseCommand
         else
         {
             msg("Only players may access and modify comments.");
+        }
+    }
+
+    @Cmd(value="Allows a staff member to close a given ticket.")
+    public void closeTicket(CommandSender sender, String ticketUUID)
+    {
+        if(sender instanceof Player)
+        {
+            try
+            {
+                database.closeTicket(ticketUUID);
+
+                sendCompletedMessage(database.getTicketByUUID(ticketUUID));
+
+                msg(plugin.PREFIX + "Ticket has been closed.");
+            }
+            catch(NullPointerException e)
+            {
+                msg("Ticket does not exist. Contact a developer if this continues to occur.");
+            }
+
+        }
+        else
+        {
+            msg("Only players may close tickets.");
         }
     }
 

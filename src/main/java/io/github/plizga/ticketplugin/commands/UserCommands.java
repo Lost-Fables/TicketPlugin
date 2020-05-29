@@ -4,6 +4,7 @@ package io.github.plizga.ticketplugin.commands;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 
+import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
@@ -11,6 +12,7 @@ import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.sqlite.Database;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -27,12 +29,14 @@ public class UserCommands extends BaseCommand
 
     private Database database;
     private StaffCommands staffCommands;
+    private ReviewCommands reviewCommands;
 
 
     public UserCommands()
     {
         this.database = plugin.getDatabase();
         this.staffCommands = new StaffCommands();
+        this.reviewCommands = new ReviewCommands();
     }
 
     @Cmd(value="Moderator access to tickets.", permission=TicketPlugin.PERMISSION_START + ".staff")
@@ -40,6 +44,9 @@ public class UserCommands extends BaseCommand
     {
         return staffCommands;
     }
+
+    @Cmd(value="Allows access to reviews.")
+    public BaseCommand review() {return reviewCommands;}
 
 
     @Cmd(value="Create a new ticket.", permission=TicketPlugin.PERMISSION_START + ".create")
@@ -193,4 +200,51 @@ public class UserCommands extends BaseCommand
         }
     }
 
+    @Cmd(value="Allows a plyer to view their completed tickets.")
+    public void viewCompleted(CommandSender sender)
+    {
+        if(sender instanceof  Player)
+        {
+            Player player = (Player) sender;
+            List completedTickets = database.getCompletedPlayerTickets(player.getUniqueId().toString());
+
+            if(completedTickets.size() == 0)
+            {
+                sender.sendMessage(plugin.PREFIX + "No completed tickets to view!");
+                return;
+            }
+
+            readPlayerCompletedTickets(sender, completedTickets);
+        }
+        else
+        {
+            msg(plugin.ERROR_COLOR + "Only players may view their completed tickets.");
+        }
+    }
+
+    @Cmd(value="[Button] Allows a player to write a review for a ticket.")
+    public void addReview(CommandSender sender, String ticketUUID)
+    {
+        if(sender instanceof  Player)
+        {
+            Player player = (Player) sender;
+
+            msg(plugin.PREFIX + "Please leave a review below, where 1 is the worst, and 5 is the best.\n");
+            BaseComponent oneStarButton = MessageUtil.CommandButton("*", "/" + plugin.COMMAND_START + " review one " + ticketUUID);
+            BaseComponent twoStarButton = MessageUtil.CommandButton("* *", "/" + plugin.COMMAND_START + " review two " + ticketUUID);
+            BaseComponent threeStarButton = MessageUtil.CommandButton("* * *", "/" + plugin.COMMAND_START + " review three " + ticketUUID);
+            BaseComponent fourStarButton = MessageUtil.CommandButton("* * * *", "/" + plugin.COMMAND_START + " review four " + ticketUUID);
+            BaseComponent fiveStarButton = MessageUtil.CommandButton("* * * * *", "/" + plugin.COMMAND_START + " review five " + ticketUUID);
+            msg(plugin.PREFIX + "Review Rating: ");
+            msg(oneStarButton);
+            msg(twoStarButton);
+            msg(threeStarButton);
+            msg(fourStarButton);
+            msg(fiveStarButton);
+        }
+        else
+        {
+            msg(plugin.ERROR_COLOR + "Only players may leave reviews on their tickets.");
+        }
+    }
 }

@@ -3,12 +3,11 @@ package io.github.plizga.ticketplugin.sqlite;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
+import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,7 +31,7 @@ public class ConcreteDatabase extends Database
     private String databaseName;
     /** This is the String that represents the creation of this sql table. IMPORTANT!!! If changes are made here,
      * please ensure you make the necessary changes in the CreateNewTicket function as well. */
-    private String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS " + TICKET_TABLE_NAME + " (" +
+    private String mySQLTicketTable = "CREATE TABLE IF NOT EXISTS " + TICKET_TABLE_NAME + " (" +
             "`id` varchar(36) NOT NULL," + //unique id of ticket
             "`Player` varchar(32) NOT NULL," +
             "`player_id` varchar(36) NOT NULL," +//player who gen'd the ticket
@@ -46,13 +45,19 @@ public class ConcreteDatabase extends Database
             "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
 
-    private String SQLiteCreateCommentsTable = "CREATE TABLE IF NOT EXISTS " + COMMENT_TABLE_NAME + " (" +
+    private String mySQLCommentsTable = "CREATE TABLE IF NOT EXISTS " + COMMENT_TABLE_NAME + " (" +
             "`id` varchar(36) NOT NULL," + //unique id of comment
             "`ticket_id` varchar(36) NOT NULL," +
             "`author` varchar(32) NOT NULL," +
             "`comment` varchar(100) NOT NULL," +
             "`date_created` varchar(32) NOT NULL," +
             "`staff_only` varchar(8) NOT NULL," +
+            "PRIMARY KEY (`id`)" +
+            ");";
+
+    private String mySQLReviewTable = "CREATE TABLE IF NOT EXISTS " + REVIEW_TABLE_NAME + " (" +
+            "`id` varchar(36) NOT NULL," +
+            "`rating` tinyint NOT NULL," +
             "PRIMARY KEY (`id`)" +
             ");";
 
@@ -77,38 +82,6 @@ public class ConcreteDatabase extends Database
     @Override
     protected Connection getSqlConnection()
     {
-        /*File data = new File(plugin.getDataFolder(), databaseName+".db");
-        if(!data.exists())
-        {
-            try
-            {
-                data.createNewFile();
-            }
-            catch(IOException e)
-            {
-                plugin.getLogger().log(Level.SEVERE, "Error writing file:" + databaseName + ".db");
-            }
-        }
-        try
-        {
-            if(connection != null && !connection.isClosed())
-            {
-                return connection;
-            }
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + data);
-            return connection;
-        }
-        catch(SQLException e)
-        {
-            plugin.getLogger().log(Level.SEVERE, "Error initializing SQlite database in method getSQLConnection.");
-        }
-        catch(ClassNotFoundException e)
-        {
-            plugin.getLogger().log(Level.SEVERE, "ConcreteDatabase JDBC library is required for TicketPlugin.");
-        }
-        //really shouldn't reach this...
-        return null;*/
         try
         {
             if (connection != null && !connection.isClosed())
@@ -142,8 +115,9 @@ public class ConcreteDatabase extends Database
         try
         {
             Statement s = connection.createStatement();
-            s.executeUpdate(SQLiteCreateTokensTable);
-            s.executeUpdate(SQLiteCreateCommentsTable);
+            s.executeUpdate(mySQLTicketTable);
+            s.executeUpdate(mySQLCommentsTable);
+            s.executeUpdate(mySQLReviewTable);
             s.close();
         }
         catch(SQLException e )
@@ -259,33 +233,62 @@ public class ConcreteDatabase extends Database
 
     }
 
+    @Override
+    public void createNewReview(String ticketUUID, int rating)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
 
-    /**
-     * Returns the STRING of the player associated with a ticket.
-     * @param id    the ticket id associated with the player being requested.
-     * @return  the STRING representation of the player associated with the ticket.
-     */
-    public String getPlayer(int id)
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("REPLACE INTO " + REVIEW_TABLE_NAME +
+                    " (id,rating) VALUES(?,?)");
+
+            preparedStatement.setString(1, ticketUUID);
+
+
+            preparedStatement.setInt(2, rating);
+
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+    @Override
+    public Review getReview(String ticketUUID)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
+
         try
         {
             connection = getSqlConnection();
-            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + " WHERE id = '" +
-                    id + "';");
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + REVIEW_TABLE_NAME + " WHERE id = '" +
+                    ticketUUID +
+                    "';");
 
             resultSet = preparedStatement.executeQuery();
 
             while(resultSet.next())
             {
-                if(resultSet.getInt("id") == id)
-                {
-                    return resultSet.getString("Player");
-                }
+               Review review = makeReview(resultSet);
+
+                return review;
             }
-        } catch (SQLException e)
+
+                return null;
+        }
+        catch(SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
         }
@@ -293,9 +296,12 @@ public class ConcreteDatabase extends Database
         {
             close(preparedStatement, resultSet, connection);
         }
-
         return null;
+
     }
+
+
+
 
     public List getPlayerOpenTickets(String playerName)
     {
@@ -382,6 +388,46 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Status = '" + Status.OPEN.name() +
                     "' ORDER BY `Date_Created` DESC;");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Ticket ticket = makeTicket(resultSet);
+
+                ticketList.add(ticket);
+
+            }
+
+            return ticketList;
+
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet, connection);
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Ticket> getCompletedPlayerTickets(String playerUUID)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Ticket> ticketList = new ArrayList<Ticket>();
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
+                    " WHERE Status = '" + Status.CLOSED.name() +
+                    "' AND player_id = '" + playerUUID +
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -731,6 +777,31 @@ public class ConcreteDatabase extends Database
     }
 
     @Override
+    public void closeTicket(String ticketUUID)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
+                    " Set Status = '" + Status.CLOSED.name() +
+                    " WHERE id = '" + ticketUUID +
+                    "';");
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+    @Override
     public List<Comment> getCommentsForPlayer(String uuid)
     {
         Connection connection = null;
@@ -804,6 +875,15 @@ public class ConcreteDatabase extends Database
         }
 
         return new Comment(this.plugin, id, ticketId, author, comment, dateCreated, isStaffOnly);
+    }
+
+
+    public Review makeReview(ResultSet resultSet) throws SQLException
+    {
+        String id = resultSet.getString("id");
+        int rating = resultSet.getInt("rating");
+
+        return new Review(this.plugin, id, rating);
     }
 
 }

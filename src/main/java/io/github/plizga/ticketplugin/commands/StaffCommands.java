@@ -49,7 +49,7 @@ public class StaffCommands extends BaseCommand
             if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(team)) ||
             player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Admin)))
             {
-                List openTickets = database.getTicketsByTeam(team.name());
+                List openTickets = database.getOpenTicketsByTeam(team.name());
 
                 if(openTickets.size() == 0)
                 {
@@ -68,7 +68,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            List openTickets = database.getTicketsByTeam(team.name());
+            List openTickets = database.getOpenTicketsByTeam(team.name());
 
             if(openTickets.size() == 0)
             {
@@ -94,57 +94,44 @@ public class StaffCommands extends BaseCommand
 
             if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Admin)))
             {
-                sender.sendMessage("DEV: Player has admin permission.");
 
-                openTickets.addAll(database.getTicketsByTeam(Team.Admin.name()));
-
-                openTickets.addAll(database.getTicketsByTeam(Team.Tech.name()));
-
-                openTickets.addAll(database.getTicketsByTeam(Team.Build.name()));
-
-                openTickets.addAll(database.getTicketsByTeam(Team.Design.name()));
-
-                openTickets.addAll(database.getTicketsByTeam(Team.Event.name()));
-
-                openTickets.addAll(database.getTicketsByTeam(Team.Lore.name()));
-
-                openTickets.addAll(database.getTicketsByTeam(Team.Moderator.name()));
+                openTickets.addAll(database.getAllOpenTickets());
             }
             else
             {
                 if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Tech)))
                 {
-                    openTickets.addAll(database.getTicketsByTeam(Team.Tech.name()));
-                    sender.sendMessage("DEV Player has dev permission.");
+                    openTickets.addAll(database.getOpenTicketsByTeam(Team.Tech.name()));
+
                 }
                 if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Moderator)))
                 {
-                    openTickets.addAll(database.getTicketsByTeam(Team.Moderator.name()));
-                    sender.sendMessage("DEV Player has mod permission.");
+                    openTickets.addAll(database.getOpenTicketsByTeam(Team.Moderator.name()));
+
                 }
                 if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Event)))
                 {
-                    openTickets.addAll(database.getTicketsByTeam(Team.Event.name()));
-                    sender.sendMessage("DEV Player has event permission.");
+                    openTickets.addAll(database.getOpenTicketsByTeam(Team.Event.name()));
+
                 }
                 if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Lore)))
                 {
-                    openTickets.addAll(database.getTicketsByTeam(Team.Lore.name()));
-                    sender.sendMessage("DEV Player has lore permission.");
+                    openTickets.addAll(database.getOpenTicketsByTeam(Team.Lore.name()));
+
                 }
                 if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Build)))
                 {
-                    openTickets.addAll(database.getTicketsByTeam(Team.Build.name()));
-                    sender.sendMessage("DEV Player has build permission.");
+                    openTickets.addAll(database.getOpenTicketsByTeam(Team.Build.name()));
+
                 }
                 if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Design)))
                 {
-                    openTickets.addAll(database.getTicketsByTeam(Team.Design.name()));
-                    sender.sendMessage("DEV Player has design permission.");
+                    openTickets.addAll(database.getOpenTicketsByTeam(Team.Design.name()));
+
                 }
 
 
-                openTickets.addAll(database.getTicketsByTeam(Team.Global.name()));
+                openTickets.addAll(database.getOpenTicketsByTeam(Team.Global.name()));
 
 
             }
@@ -211,8 +198,117 @@ public class StaffCommands extends BaseCommand
 
     }
 
-    @Cmd(value="Allows staff members to view all of their currently claimed tickets.")
+    @Cmd(value="Allows staff to view currently claimed tickets for all of their teams.")
     public void viewClaimed(CommandSender sender)
+    {
+        List openTickets = new ArrayList<Ticket>();
+
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Admin)))
+            {
+
+                openTickets.addAll(database.getAllClaimedTickets());
+            }
+            else
+            {
+                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Tech)))
+                {
+                    openTickets.addAll(database.getTeamClaimedTickets(Team.Tech.name()));
+
+                }
+                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Moderator)))
+                {
+                    openTickets.addAll(database.getTeamClaimedTickets(Team.Moderator.name()));
+
+                }
+                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Event)))
+                {
+                    openTickets.addAll(database.getTeamClaimedTickets(Team.Event.name()));
+
+                }
+                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Lore)))
+                {
+                    openTickets.addAll(database.getTeamClaimedTickets(Team.Lore.name()));
+
+                }
+                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Build)))
+                {
+                    openTickets.addAll(database.getTeamClaimedTickets(Team.Build.name()));
+
+                }
+                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Design)))
+                {
+                    openTickets.addAll(database.getTeamClaimedTickets(Team.Design.name()));
+
+                }
+
+
+                openTickets.addAll(database.getTeamClaimedTickets(Team.Global.name()));
+
+
+            }
+
+            Collections.sort(openTickets);
+
+            if (openTickets.size() == 0)
+            {
+                sender.sendMessage(plugin.PREFIX + "There are no claimed tickets for any teams you are a part of.");
+                return;
+            }
+            sender.sendMessage(plugin.PREFIX + "Viewing claimed tickets for your teams:");
+
+            readTicketsBasic(sender, openTickets);
+        }
+    }
+
+    @Cmd(value="Allows staff members to view claimed tickets for a specified team.")
+    public void viewClaimed(CommandSender sender, Team team)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(team)) ||
+                    player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Admin)))
+            {
+                List openTickets = database.getTeamClaimedTickets(team.name());
+
+                if(openTickets.size() == 0)
+                {
+                    sender.sendMessage(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                            plugin.PREFIX + " team.");
+                    return;
+                }
+                sender.sendMessage(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                        plugin.PREFIX + " team:");
+                readTicketsBasic(sender, openTickets);
+            }
+            else
+            {
+                sender.sendMessage(plugin.ERROR_COLOR + "You do not have permission to view that team's claimed tickets!");
+            }
+        }
+        else
+        {
+            List openTickets = database.getOpenTicketsByTeam(team.name());
+
+            if(openTickets.size() == 0)
+            {
+                sender.sendMessage(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                        plugin.PREFIX + " team.");
+                return;
+            }
+            sender.sendMessage(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                    plugin.PREFIX + " team:");
+            readTicketsBasic(sender, openTickets);
+        }
+    }
+
+    @Cmd(value="Allows staff members to view all of their currently claimed tickets.")
+    public void viewMyClaimed(CommandSender sender)
     {
         if(sender instanceof Player)
         {
@@ -229,11 +325,11 @@ public class StaffCommands extends BaseCommand
                 {
 
                     msg(plugin.PREFIX + "You have no currently claimed tickets!");
-                    sender.sendMessage(plugin.PREFIX + "You have no currently claimed tickets!");
+                    msg(plugin.PREFIX + "You have no currently claimed tickets!");
                     return;
                 }
 
-                sender.sendMessage( plugin.PREFIX +"Viewing your claimed tickets:");
+                msg( plugin.PREFIX +"Viewing your claimed tickets:");
                 readTicketsBasic(sender, claimedTickets);
 
 
@@ -241,13 +337,13 @@ public class StaffCommands extends BaseCommand
             }
             catch(NullPointerException e)
             {
-                sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                        plugin.ALT_COLOR + " Method: viewClaimed");
+                msg(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
+                        plugin.ALT_COLOR + " Method: viewMyClaimed");
             }
         }
         else
         {
-            sender.sendMessage("Only players may view their claimed tickets because you can't claim tickets dude you're a console.");
+            msg("Only players may view their claimed tickets because you can't claim tickets dude you're a console.");
         }
     }
 
@@ -375,7 +471,14 @@ public class StaffCommands extends BaseCommand
 
                     BookMeta meta = getMeta();
                     String info = BookUtil.getPagesAsString(meta);
-                    database.createNewComment(player.getName(), info, uuid, isStaffComment);
+                    if(info.length() <= 205)
+                    {
+                        database.createNewComment(player.getName(), info, uuid, isStaffComment);
+                    }
+                    else
+                    {
+                        msg(plugin.ERROR_COLOR + "Please limit your comment to under 205 characters.");
+                    }
 
                 }
             };

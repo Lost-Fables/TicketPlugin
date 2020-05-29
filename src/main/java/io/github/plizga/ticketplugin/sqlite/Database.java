@@ -126,13 +126,15 @@ public abstract class Database extends BaseCommand
 
     public abstract List getAllOpenTickets();
 
+    public abstract List<Ticket> getAllClaimedTickets();
+
     public abstract List getPlayerOpenTickets(String playerName);
 
     public abstract void cancelTicketByUUID(String uuid);
 
     public abstract void cancelTicketByPlayer(String player);
 
-    public abstract List getTicketsByTeam(String team);
+    public abstract List getOpenTicketsByTeam(String team);
 
     public abstract Ticket getTicketByUUID(String uuid);
 
@@ -147,6 +149,8 @@ public abstract class Database extends BaseCommand
     public abstract List<Comment> getAllComments(String uuid);
 
     public abstract List<Comment> getCommentsForPlayer(String uuid);
+
+    public abstract List<Ticket> getTeamClaimedTickets(String team);
 
     public List getAllClaimedTickets(Player player)
     {

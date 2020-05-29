@@ -38,7 +38,14 @@ public abstract class BaseCommand extends CommandTemplate
         {
             //msg(plugin.PREFIX + "\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            msg(plugin.PREFIX + ticket.toBasicInfo());
+            if(ticket.getAssignedModerator().equals("None"))
+            {
+                msg(plugin.PREFIX + ticket.toBasicInfo());
+            }
+            else
+            {
+                msg(plugin.PREFIX + ticket.toBasicInfoClaimed());
+            }
             BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/" + plugin.COMMAND_START + " staff expandTicket " + ticket.getId());
 
             msg(cmdButton);

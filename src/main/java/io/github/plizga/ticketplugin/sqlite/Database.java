@@ -5,6 +5,7 @@ import io.github.plizga.ticketplugin.enums.Status;
 
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
+import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,19 +27,21 @@ public abstract class Database extends BaseCommand
     /** The Java Plugin which will be associated with this database. */
     protected JavaPlugin plugin;
 
-    protected Connection connection;
+    Connection connection;
 
     /** The name of the table to be established in the database. */
-    protected final String TICKET_TABLE_NAME = "ticket_table";
+     final String TICKET_TABLE_NAME = "ticket_table";
 
     /** The name of the table to be used for comments. */
-    protected final String COMMENT_TABLE_NAME = "comment_table";
+    final String COMMENT_TABLE_NAME = "comment_table";
+
+    final String REVIEW_TABLE_NAME = "review_table";
 
     /**
      * The Constructor for the abstract class Database. Simply takes in the plugin.
      * @param plugin    the JavaPlugin associated with this database.
      */
-    public Database(JavaPlugin plugin)
+    Database(JavaPlugin plugin)
     {
         this.plugin = plugin;
     }
@@ -126,13 +129,15 @@ public abstract class Database extends BaseCommand
 
     public abstract List getAllOpenTickets();
 
+    public abstract List<Ticket> getAllClaimedTickets();
+
     public abstract List getPlayerOpenTickets(String playerName);
 
     public abstract void cancelTicketByUUID(String uuid);
 
     public abstract void cancelTicketByPlayer(String player);
 
-    public abstract List getTicketsByTeam(String team);
+    public abstract List getOpenTicketsByTeam(String team);
 
     public abstract Ticket getTicketByUUID(String uuid);
 
@@ -147,6 +152,16 @@ public abstract class Database extends BaseCommand
     public abstract List<Comment> getAllComments(String uuid);
 
     public abstract List<Comment> getCommentsForPlayer(String uuid);
+
+    public abstract List<Ticket> getTeamClaimedTickets(String team);
+
+    public abstract List<Ticket> getCompletedPlayerTickets(String player);
+
+    public abstract void createNewReview(String ticketUUID, int rating);
+
+    public abstract Review getReview(String ticketUUID);
+
+    public abstract void closeTicket(String ticketUUID);
 
     public List getAllClaimedTickets(Player player)
     {

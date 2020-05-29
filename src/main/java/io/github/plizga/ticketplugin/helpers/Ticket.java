@@ -22,10 +22,11 @@ public class Ticket implements Comparable
     private String dateCleared;
     private String location;
     private String info;
+    private String playerID;
 
     private TicketPlugin plugin;
 
-    public Ticket(JavaPlugin plugin, String id, String playerName, Status status, Team team, String assignedModerator,
+    public Ticket(JavaPlugin plugin, String id, String playerName, String playerID, Status status, Team team, String assignedModerator,
                   String dateCreated, String dateCleared, String location, String info)
     {
         this.plugin = (TicketPlugin) plugin;
@@ -38,6 +39,7 @@ public class Ticket implements Comparable
         this.dateCleared = dateCleared;
         this.location = location;
         this.info = info;
+        this.playerID = playerID;
     }
 
     @Override
@@ -61,6 +63,16 @@ public class Ticket implements Comparable
         String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
                 plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
                 plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
+                plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
+        return str;
+    }
+
+    public String toBasicInfoClaimed()
+    {
+        String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
+                plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
+                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
+                plugin.PREFIX + ", Claimed by: " + plugin.ALT_COLOR + assignedModerator +
                 plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
         return str;
     }

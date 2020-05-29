@@ -5,6 +5,7 @@ import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
+import io.github.plizga.ticketplugin.sqlite.Database;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -33,12 +34,31 @@ public abstract class BaseCommand extends CommandTemplate
     {
         //int index = 1; //omg an index!!!!
 
+        Player player = null;
+        if(sender instanceof  Player)
+        {
+            player = (Player) sender;
+        }
 
         for(Object o : ticketList)
         {
             //msg(plugin.PREFIX + "\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            msg(plugin.PREFIX + ticket.toBasicInfo());
+            if(ticket.getAssignedModerator().equals("None"))
+            {
+                msg(plugin.PREFIX + ticket.toBasicInfo());
+            }
+            else
+            {
+                msg(plugin.PREFIX + ticket.toBasicInfoClaimed());
+
+                if(player != null && ticket.getAssignedModerator().equals(player.getName()))
+                {
+                    BaseComponent cmdButton = MessageUtil.CommandButton("Close this Ticket", "/" + plugin.COMMAND_START + " staff closeTicket " + ticket.getId());
+                    msg(cmdButton);
+                }
+
+            }
             BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/" + plugin.COMMAND_START + " staff expandTicket " + ticket.getId());
 
             msg(cmdButton);
@@ -72,7 +92,31 @@ public abstract class BaseCommand extends CommandTemplate
 
     }
 
-    protected void sendReassignMessage(Ticket ticket, String team)
+    void readPlayerCompletedTickets(CommandSender sender, List<Ticket> completedTickets)
+    {
+        int index = 1;
+
+        for(Ticket t : completedTickets)
+        {
+            msg("\nTicket " + index + ":");
+            msg(t.toPlayerInfo());
+            BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + t.getId());
+            msg(cmdButton);
+
+            Database database = plugin.getDatabase();
+
+            if(database.getReview(t.getId()) == null)
+            {
+                BaseComponent cmdButton2 = MessageUtil.CommandButton("Add Review", "/" + plugin.COMMAND_START + " addReview " + t.getId());
+                msg(cmdButton2);
+            }
+
+            index++;
+
+        }
+    }
+
+    void sendReassignMessage(Ticket ticket, String team)
     {
         Player player = Bukkit.getPlayer(ticket.getPlayerName());
 
@@ -84,6 +128,17 @@ public abstract class BaseCommand extends CommandTemplate
         }
 
 
+    }
+
+    void sendCompletedMessage(Ticket ticket)
+    {
+        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+
+        if(player != null)
+        {
+            player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
+                    ticket.getInfo() + plugin.PREFIX + ",\" has been completed!");
+        }
     }
 
     protected int getTotalPagesForPagination(int size, int contentPerPage)

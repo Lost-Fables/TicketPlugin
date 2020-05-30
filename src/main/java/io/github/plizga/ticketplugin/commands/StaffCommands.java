@@ -519,4 +519,52 @@ public class StaffCommands extends BaseCommand
         }
     }
 
+    @Cmd(value="Sets a staff-member off-duty.")
+    public void offDuty(CommandSender sender)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            String playerUUID = player.getUniqueId().toString();
+            if(plugin.getStaffOnDuty().contains(playerUUID))
+            {
+                plugin.getStaffOnDuty().remove(playerUUID);
+                msg(plugin.PREFIX + "You are now off-duty and will not receive notifications regarding new tickets.");
+            }
+            else
+            {
+                msg(plugin.ERROR_COLOR + "You are already off-duty!");
+            }
+
+
+        }
+        else
+        {
+            msg("Only players can go off-duty!");
+        }
+    }
+
+    @Cmd(value="Sets a staff-member on-duty.")
+    public void onDuty(CommandSender sender)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+            String playerUUID = player.getUniqueId().toString();
+            if(!plugin.getStaffOnDuty().contains(playerUUID))
+            {
+                plugin.getStaffOnDuty().add(playerUUID);
+                msg(plugin.PREFIX + "You are now on-duty and will receive notifications regarding new tickets.");
+            }
+            else
+            {
+                msg(plugin.ERROR_COLOR + "You are already on-duty!");
+            }
+        }
+        else
+        {
+            msg("Only players can go on-duty!");
+        }
+    }
+
 }

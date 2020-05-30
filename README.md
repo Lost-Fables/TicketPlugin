@@ -32,9 +32,9 @@ DONE: View Claimed Tickets
 
 DONE: Re-assign to another team.
 
-Able to mark oneself as on or off duty. If off duty you don't get alerts about new tickets.
+DONE:Able to mark oneself as on or off duty. If off duty you don't get alerts about new tickets.
 
-Alert on-duty players when a ticket associated with their team(s) is created.
+DONE: Alert on-duty players when a ticket associated with their team(s) is created.
 
 DONE: allow staff to view tickets assigned to their team that have been claimed
 

@@ -1,7 +1,7 @@
 package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.annotate.Cmd;
-import io.github.plizga.ticketplugin.sqlite.Database;
+import io.github.plizga.ticketplugin.database.Database;
 import org.bukkit.command.CommandSender;
 
 public class ReviewCommands extends BaseCommand

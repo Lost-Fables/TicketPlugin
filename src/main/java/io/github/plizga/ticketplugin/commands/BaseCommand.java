@@ -5,7 +5,7 @@ import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
-import io.github.plizga.ticketplugin.sqlite.Database;
+import io.github.plizga.ticketplugin.database.Database;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

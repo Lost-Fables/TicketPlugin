@@ -1,4 +1,4 @@
-package io.github.plizga.ticketplugin.sqlite;
+package io.github.plizga.ticketplugin.database;
 
 import io.github.plizga.ticketplugin.commands.BaseCommand;
 import io.github.plizga.ticketplugin.enums.Status;
@@ -18,23 +18,20 @@ import java.util.List;
 
 /**
  * Abstract class for the database. Defines the table name to be used in the ConcreteDatabase, and handles some basic
- * information about the database that can be abstracted here. This is especially cool because I used SQLite like
- * a dingus so when all that has to be replaced, abstraction should make it a bit easier.
+ * information about the database that can be abstracted here.
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
 public abstract class Database extends BaseCommand
 {
     /** The Java Plugin which will be associated with this database. */
     protected JavaPlugin plugin;
-
+    /** The SQL Connection reference.*/
     Connection connection;
-
     /** The name of the table to be established in the database. */
      final String TICKET_TABLE_NAME = "ticket_table";
-
     /** The name of the table to be used for comments. */
     final String COMMENT_TABLE_NAME = "comment_table";
-
+    /** The name of the tabel to be used for reviews. */
     final String REVIEW_TABLE_NAME = "review_table";
 
     /**
@@ -46,18 +43,22 @@ public abstract class Database extends BaseCommand
         this.plugin = plugin;
     }
 
-    protected abstract Connection getSqlConnection();
 
-    public abstract void load();
 
     /**
-     * Handles initialization of the database following other pieces of setup.
+     * Handles initialization of the database by establishing the connection.
      */
     public void initialize()
     {
         connection = getSqlConnection();
     }
 
+
+    /**
+     * First of the overloaded close methods. Closes a {PreparedStatement} and a {ResultSet}
+     * @param preparedStatement The PreparedStatement being closed.
+     * @param resultSet The ResultSet being closed.
+     */
      void close(PreparedStatement preparedStatement, ResultSet resultSet)
     {
         try
@@ -77,6 +78,12 @@ public abstract class Database extends BaseCommand
             Error.close(plugin, e);
         }
     }
+
+    /**
+     * Second of the overloaded close methods. Closes a {PreparedStatement} and a {Connection}
+     * @param preparedStatement     The PreparedStatement being closed.
+     * @param connection    The Connection being closed.
+     */
      void close(PreparedStatement preparedStatement, Connection connection)
     {
         try
@@ -97,6 +104,12 @@ public abstract class Database extends BaseCommand
         }
     }
 
+    /**
+     * Third of the overloaded close methods. Closes a {PreparedStatement} and a {ResultSet}
+     * @param preparedStatement     The PreparedStatement being closed.
+     * @param resultSet     The ResultSet being closed.
+     * @param connection    The Connection being closed.
+     */
     void close(PreparedStatement preparedStatement, ResultSet resultSet, Connection connection)
     {
         try
@@ -122,7 +135,11 @@ public abstract class Database extends BaseCommand
     }
 
 
-    //todo will need to be updated when enum status is a thing!!
+
+    protected abstract Connection getSqlConnection();
+
+    public abstract void load();
+
     public abstract void createNewTicket(Player player, Status status, Team team, String ticketData);
 
     public abstract void createNewComment(String player, String text, String ticketUUID, boolean isStaffOnly);
@@ -163,15 +180,6 @@ public abstract class Database extends BaseCommand
 
     public abstract void closeTicket(String ticketUUID);
 
-    public List getAllClaimedTickets(Player player)
-    {
-        return null;
-    }
-
-    public List getAllAccessibleTickets(Player player)
-    {
-        return null;
-    }
 
 
 

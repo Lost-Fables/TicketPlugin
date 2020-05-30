@@ -8,7 +8,7 @@ import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
-import io.github.plizga.ticketplugin.sqlite.Database;
+import io.github.plizga.ticketplugin.database.Database;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Material;

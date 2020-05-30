@@ -66,6 +66,8 @@ public class UserCommands extends BaseCommand
             sender.sendMessage(plugin.PREFIX + "Your ticket, with the description: " +  plugin.ALT_COLOR +
                     infoMessage + plugin.PREFIX + " has been created!");
 
+            plugin.notifyOnDutyStaff(team);
+
         }
         else
         {

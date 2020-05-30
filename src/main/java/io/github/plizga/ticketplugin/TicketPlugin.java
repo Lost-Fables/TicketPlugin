@@ -4,10 +4,22 @@ import co.lotc.core.bukkit.command.Commands;
 import io.github.plizga.ticketplugin.commands.UserCommands;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.enums.TicketViewOptions;
+import io.github.plizga.ticketplugin.helpers.Ticket;
+import io.github.plizga.ticketplugin.listeners.TicketPlayerListener;
 import io.github.plizga.ticketplugin.sqlite.ConcreteDatabase;
 import io.github.plizga.ticketplugin.sqlite.Database;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 public final class TicketPlugin extends JavaPlugin
@@ -20,6 +32,9 @@ public final class TicketPlugin extends JavaPlugin
     public final String PREFIX = ChatColor.DARK_AQUA + "";
     public final String ALT_COLOR = ChatColor.DARK_PURPLE + "";
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
+
+
+    private ArrayList<String> staffOnDuty = new ArrayList<String>();
 
 
 
@@ -45,7 +60,10 @@ public final class TicketPlugin extends JavaPlugin
 
         registerParameters();
         Commands.build(getCommand(COMMAND_START), UserCommands::new);
-        //this.getCommand("ticket").setExecutor(new UserCommands(this));
+
+        PluginManager pluginManager = getServer().getPluginManager();
+        TicketPlayerListener listener = new TicketPlayerListener(this);
+        pluginManager.registerEvents(listener, this);
 
 
     }
@@ -69,6 +87,22 @@ public final class TicketPlugin extends JavaPlugin
         return this.database;
     }
 
+    public void notifyOnDutyStaff(Team team)
+    {
+        for(String uuid : staffOnDuty)
+        {
+            Player player = Bukkit.getPlayer(UUID.fromString(uuid));
+
+
+            if(player != null && player.hasPermission(PERMISSION_START + Team.getPermission(team)))
+            {
+                player.sendMessage(PREFIX + "A player ticket has been assigned to the " +
+                        ALT_COLOR + team.name() + PREFIX + " team.");
+
+            }
+        }
+    }
+
 
 
     private void registerParameters()
@@ -84,5 +118,10 @@ public final class TicketPlugin extends JavaPlugin
                 .completer((s,$) -> TicketViewOptions.getAvailable(s))
                 .mapperWithSender(((sender, type) -> TicketViewOptions.getByName(type)))
                 .register();
+    }
+
+    public ArrayList<String> getStaffOnDuty()
+    {
+        return staffOnDuty;
     }
 }

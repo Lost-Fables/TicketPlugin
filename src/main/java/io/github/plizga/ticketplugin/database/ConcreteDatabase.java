@@ -786,7 +786,7 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
                     " Set Status = '" + Status.CLOSED.name() +
-                    " WHERE id = '" + ticketUUID +
+                    "' WHERE id = '" + ticketUUID +
                     "';");
 
             preparedStatement.executeUpdate();

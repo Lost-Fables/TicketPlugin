@@ -154,6 +154,7 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="allows a staff member to claim or unclaim a ticket, based upon whether they have currently claimed it or not.")
     public void claim(CommandSender sender, String uuid)
     {
+        //todo: allow managers to claim tickets even if they are already claimed.
         if(sender instanceof Player)
         {
             Player player = (Player) sender;

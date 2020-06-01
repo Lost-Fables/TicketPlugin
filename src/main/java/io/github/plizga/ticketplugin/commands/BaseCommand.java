@@ -7,6 +7,7 @@ import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public abstract class BaseCommand extends CommandTemplate
     void readTicketsBasic(CommandSender sender, List ticketList)
     {
         //int index = 1; //omg an index!!!!
-
+        /*
         Player player = null;
         if(sender instanceof  Player)
         {
@@ -64,7 +65,18 @@ public abstract class BaseCommand extends CommandTemplate
             msg(cmdButton);
 
             msg(plugin.ALT_COLOR + TICKET_BORDER + "\n");
-            //index++;
+            //index++;*/
+
+        int index = 1;
+
+        for(Object o: ticketList)
+        {
+            Ticket ticket = (Ticket) o;
+            ComponentBuilder componentBuilder = ticket.toBasicInfo();
+
+            sender.spigot().sendMessage(componentBuilder.create());
+
+            index++;
 
         }
     }

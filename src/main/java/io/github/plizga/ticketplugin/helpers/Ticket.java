@@ -3,8 +3,13 @@ package io.github.plizga.ticketplugin.helpers;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -13,6 +18,7 @@ import java.util.UUID;
  */
 public class Ticket implements Comparable
 {
+    private static final int MINI_DESCRIPTION_LENGTH = 25;
     private String id;
     private String playerName;
     private Status status;
@@ -23,6 +29,7 @@ public class Ticket implements Comparable
     private String location;
     private String info;
     private String playerID;
+
 
     private TicketPlugin plugin;
 
@@ -58,13 +65,98 @@ public class Ticket implements Comparable
         return str;
     }
 
-    public String toBasicInfo()
+    public ComponentBuilder toBasicInfo()
     {
-        String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
+        /*String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
                 plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
                 plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
                 plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
-        return str;
+        return str;*/
+
+        TextComponent[] textComponents = new TextComponent[5];
+        //Set the team
+        TextComponent teamPrefix = new TextComponent(plugin.PREFIX + "[" + plugin.ALT_COLOR + team.toString().charAt(0) +
+                plugin.PREFIX + "] ");
+        teamPrefix.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+
+        textComponents[0] = teamPrefix;
+
+        //Set the player
+        TextComponent username = new TextComponent(plugin.ALT_COLOR + "" + playerName + plugin.PREFIX + ": ");
+        username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName));
+
+        textComponents[1] = username;
+
+
+        //Set the description
+        String shortDescription;
+        if(info.length() > MINI_DESCRIPTION_LENGTH)
+        {
+            shortDescription = info.substring(0, MINI_DESCRIPTION_LENGTH -1);
+            shortDescription = shortDescription.concat("...");
+        }
+        else
+        {
+            shortDescription = info;
+        }
+
+        TextComponent description = new TextComponent(plugin.ALT_COLOR + shortDescription + " ");
+        description.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START + " staff expandTicket " + this.getId()));
+
+        textComponents[2] = description;
+
+
+        //Get the time between the ticket's creation and now.
+        Date currentDate = new Date();
+        Date ticketDate = null;
+
+        try
+        {
+            ticketDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(dateCreated);
+        }
+        catch(ParseException e)
+        {
+            e.printStackTrace();
+        }
+
+        long difference = currentDate.getTime() - ticketDate.getTime();
+        long differenceHours = difference / (60 * 60 * 1000) % 24;
+        long differenceMinutes = difference / (60 * 1000) % 60;
+
+        TextComponent timeSinceCreated = new TextComponent(plugin.PREFIX + " | " + plugin.ALT_COLOR + differenceHours +
+                plugin.PREFIX + "H, " +plugin.ALT_COLOR+ differenceMinutes +plugin.PREFIX + "M | ");
+        timeSinceCreated.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
+
+        textComponents[3] = timeSinceCreated;
+
+
+        //get the claimer
+        TextComponent claimer;
+
+        if(this.assignedModerator.equals("None"))
+        {
+            claimer = new TextComponent(plugin.ALT_COLOR +"UNCLAIMED");
+        }
+        else
+        {
+            claimer = new TextComponent(plugin.ALT_COLOR +assignedModerator);
+        }
+        claimer.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START +" staff claim " + this.id));
+
+        textComponents[4] = claimer;
+
+        ComponentBuilder componentBuilder = new ComponentBuilder("");
+        componentBuilder.append(textComponents);
+
+        //todo fix event
+        componentBuilder.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+
+        return componentBuilder;
+
     }
 
     public String toBasicInfoClaimed()

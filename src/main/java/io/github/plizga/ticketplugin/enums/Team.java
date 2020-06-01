@@ -8,17 +8,8 @@ import java.util.List;
 
 public enum Team
 {
+
     Admin, Moderator, Event, Tech, Lore, Build, Global, Design;
-
-    /*public static boolean isTeam(String name) //this method's fuckin poopy
-    {
-        return(name.equalsIgnoreCase(Moderator.toString()) ||
-                name.equalsIgnoreCase(Event.toString()) || name.equalsIgnoreCase(Tech.toString()) ||
-                name.equalsIgnoreCase(Lore.toString()) || name.equalsIgnoreCase(Build.toString()));
-
-
-
-    }*/
 
 
 

@@ -16,9 +16,11 @@ permissions:
 ticketplugin.create:
   default: true
   description: create a new request ticket for the staff to answer.
+
   ticketplugin.view:
     default: true
     description: allows a player to view their currently open tickets.
+
   ticketplugin.cancel:
     default: true
     description: allows a player to cancel 1 or all of their tickets.
@@ -30,37 +32,52 @@ ticketplugin.create:
     default: op
     description: Answers tickets flagged for admins and may view any team's tickets
 
-
   ticketplugin.dev:
     default: op
     description: Answers tickets flagged for devs
-
 
   ticketplugin.mod:
     default: op
     description: Answers tickets assigned to the moderation team.
 
-
   ticketplugin.event:
     default: op
     description: Answers tickets assigned to the event team.
-
-
 
   ticketplugin.lore:
     default: op
     description: Answers tickets assigned to the lore team.
 
-
-
   ticketplugin.build:
     default: op
     description: Answers tickets assigned to the build team.
 
-
-
   ticketplugin.design:
     default: op
     description: Answers tickets assigned to the design team.
+
+  ticketplugin.dev.manager:
+    default: false
+    description: manager for dev team.
+
+  ticketplugin.mod.manager:
+    default: false
+    description: manager for mod team.
+
+  ticketplugin.event.manager:
+    default: false
+    description: manager for event team.
+
+  ticketplugin.lore.manager:
+    default: false
+    description: manager for lore team.
+
+  ticketplugin.build.manager:
+    default: false
+    description: manager for build team.
+
+  ticketplugin.design.manager:
+    default: false
+    description: manager for design team.
 
 

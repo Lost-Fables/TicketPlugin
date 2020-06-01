@@ -41,7 +41,7 @@ public class ConcreteDatabase extends Database
             "`Date_Created` varchar(32) NOT NULL," + //date the ticket was created
             "`Date_Cleared` varchar(32)," + //date the ticket was completed
             "`Location` varchar(255) NOT NULL," + //location where the ticket was originally generated.
-            "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
+            "`Initial_Request` varchar(255) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
             "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
 
@@ -171,6 +171,10 @@ public class ConcreteDatabase extends Database
             String location = player.getLocation().toString();
             System.out.println(location.length());
 
+            if(ticketData.length() > 255)
+            {
+                ticketData = ticketData.substring(0,254);
+            }
             preparedStatement.setString(10, ticketData);
 
 

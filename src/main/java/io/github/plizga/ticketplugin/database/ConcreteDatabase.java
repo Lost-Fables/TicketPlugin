@@ -5,6 +5,7 @@ import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Ticket;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -167,9 +168,12 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(8, null);
 
-            preparedStatement.setString(9, player.getLocation().toString());
-            String location = player.getLocation().toString();
-            System.out.println(location.length());
+            Location location = player.getLocation();
+            String locationString = location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," +
+                    location.getZ();
+
+            preparedStatement.setString(9, locationString);
+
 
             if(ticketData.length() > 255)
             {
@@ -785,11 +789,16 @@ public class ConcreteDatabase extends Database
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        String dateFormatted = dateFormat.format(date);
         try
         {
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
                     " Set Status = '" + Status.CLOSED.name() +
+                    "', Date_Cleared = '" + dateFormatted +
                     "' WHERE id = '" + ticketUUID +
                     "';");
 

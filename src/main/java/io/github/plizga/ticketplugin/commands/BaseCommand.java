@@ -76,6 +76,7 @@ public abstract class BaseCommand extends CommandTemplate
 
             sender.spigot().sendMessage(componentBuilder.create());
 
+
             index++;
 
         }

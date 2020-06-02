@@ -5,11 +5,14 @@ import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -72,17 +75,107 @@ public class Ticket implements Comparable
 
     public ComponentBuilder toExpandedInfo()
     {
-        return null;
+        ArrayList<TextComponent> textComponents = new ArrayList<>();
+
+        //id
+        TextComponent ticketID = new TextComponent(plugin.PREFIX + "Ticket ID: " + plugin.ALT_COLOR + id + "\n");
+        textComponents.add(ticketID);
+
+        //Player
+        TextComponent username = new TextComponent(plugin.PREFIX + "Player: " + plugin.ALT_COLOR + playerName + "\n");
+        username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
+        username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to message this player.").create()));
+
+        textComponents.add(username);
+
+        //Info
+        TextComponent infoText = new TextComponent(plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info + "\n");
+
+        textComponents.add(infoText);
+
+        //Status
+        TextComponent statusText = new TextComponent(plugin.PREFIX + "Status: " + plugin.ALT_COLOR + status + "\n");
+        if(status.equals(Status.CLAIMED) || status.equals(Status.OPEN))
+        {
+            statusText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/" + plugin.COMMAND_START +" staff claim " + this.id));
+            statusText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("Click to attempt to claim this ticket.").create()));
+        }
+
+        textComponents.add(statusText);
+
+        //Team
+
+        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + Team.getColor(team) + team.name() + "\n");
+        teamText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+        teamText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("Click to reassign this ticket to another team.").create()));
+
+        textComponents.add(teamText);
+
+
+        //Assigned Staff Member
+        TextComponent assignedStaffText = new TextComponent(plugin.PREFIX + "Assigned Staff: " + plugin.ALT_COLOR + assignedModerator + "\n");
+        assignedStaffText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
+        assignedStaffText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to message this staff member.").create()));
+
+        textComponents.add(assignedStaffText);
+
+        //Date Created and Date Cleared
+        TextComponent dateText = new TextComponent(plugin.PREFIX + "Date Created: " + plugin.ALT_COLOR + dateCreated + "\n" +
+                plugin.PREFIX + "Date Cleared: " + plugin.ALT_COLOR + dateCleared + "\n");
+        dateText.setHoverEvent(null);
+
+        textComponents.add(dateText);
+
+
+        //Location - There will be 4 items in the String array due to being hard-coded into the SQL database
+        TextComponent locationText;
+        if(location.contains(","))
+        {
+            String[] locationArray = this.location.split(",");
+
+            String worldName = locationArray[0];
+
+            Double x = Double.parseDouble(locationArray[1]);
+
+            Double y = Double.parseDouble(locationArray[2]);
+
+            Double z = Double.parseDouble(locationArray[3]);
+
+            locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +
+                    ": X:" + x.shortValue() + " Y:" + y.shortValue() + " Z:" + z.shortValue());
+            locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/" + plugin.COMMAND_START + " staff ticketTP "+ worldName + " " + x.intValue() + " " + y.intValue() + " " + z.intValue()));
+            locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to teleport to this location.").create()));
+
+        }
+        else
+        {
+            locationText = new TextComponent(plugin.ERROR_COLOR +
+                    "The following location information is from an erroneous or out-dated format. Please contact a developer if this persists. \n" +
+                    plugin.PREFIX + "Location: " + plugin.ALT_COLOR + location);
+        }
+
+        textComponents.add(locationText);
+
+        ComponentBuilder componentBuilder = new ComponentBuilder("");
+
+        for(TextComponent textComponent : textComponents)
+        {
+            componentBuilder.append(textComponent);
+
+        }
+
+        return componentBuilder;
+
     }
 
 
     public ComponentBuilder toBasicInfo()
     {
-        /*String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
-                plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
-                plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
-        return str;*/
 
         TextComponent[] textComponents = new TextComponent[5];
         //Set the team
@@ -143,7 +236,15 @@ public class Ticket implements Comparable
         TextComponent timeSinceCreated;
         if(differenceHours == 0)
         {
-            timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
+            if(differenceMinutes == 0)
+            {
+                timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+            }
+            else
+            {
+                timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
+            }
+
         }
         else
         {
@@ -187,15 +288,6 @@ public class Ticket implements Comparable
 
     }
 
-    public String toBasicInfoClaimed()
-    {
-        String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
-                plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
-                plugin.PREFIX + ", Claimed by: " + plugin.ALT_COLOR + assignedModerator +
-                plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
-        return str;
-    }
 
     public String toPlayerInfo()
     {
@@ -203,6 +295,11 @@ public class Ticket implements Comparable
                 plugin.PREFIX + ", Team: " + Team.getColor(team) + team +
                 plugin.PREFIX + ", Staff Member: " + plugin.ALT_COLOR + assignedModerator +
                 plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
+
+        if(dateCleared != null)
+        {
+            str = str.concat(plugin.PREFIX + " Cleared: " + plugin.ALT_COLOR + dateCleared);
+        }
         return str;
     }
 

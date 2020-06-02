@@ -4,6 +4,7 @@ import co.lotc.core.bukkit.book.BookStream;
 import co.lotc.core.bukkit.util.BookUtil;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.util.MessageUtil;
+import com.comphenix.protocol.PacketType;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
@@ -11,7 +12,9 @@ import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.database.Database;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -369,28 +372,22 @@ public class StaffCommands extends BaseCommand
             {
                 Database database = plugin.getDatabase();
                 Ticket ticket =  database.getTicketByUUID(uuid);
-                sender.sendMessage(plugin.PREFIX + "Ticket Information: \n" + ticket.toString());
-                if(ticket.getStatus() == Status.OPEN)
-                {
-                    BaseComponent cmdButton = MessageUtil.CommandButton("Claim This Ticket", "/" + plugin.COMMAND_START +" staff claim " + ticket.getId());
-                    msg(cmdButton);
-                }
-                else if(ticket.getAssignedModerator().equalsIgnoreCase(player.getName()))
-                {
-                    BaseComponent cmdButton = MessageUtil.CommandButton("Unclaim This Ticket", "/" + plugin.COMMAND_START + " staff claim " + ticket.getId());
-                    msg(cmdButton);
+                msg(plugin.PREFIX + "Ticket Information: ");
+                sender.spigot().sendMessage(ticket.toExpandedInfo().create());
+                BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true");
+                BaseComponent addCommentsButton2 = MessageUtil.CommandButton("Add Player and Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false");
+                BaseComponent viewCommentsButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
 
-                    BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true");
-                    BaseComponent addCommentsButton2 = MessageUtil.CommandButton("Add Player and Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false");
+                msg(addCommentsButton);
+                msg(addCommentsButton2);
+                msg(viewCommentsButton);
 
-                    msg(addCommentsButton);
-                    msg(addCommentsButton2);
+                if(ticket.getAssignedModerator().equals(player.getName()))
+                {
+                    BaseComponent closeButton = MessageUtil.CommandButton("Close this Ticket", "/" + plugin.COMMAND_START + " staff closeTicket " + ticket.getId());
+                    msg(closeButton);
                 }
-                BaseComponent commentButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
-                msg(commentButton);
-                BaseComponent cmdButton2 = MessageUtil.CommandButton("Reassign This Ticket", "/" + plugin.COMMAND_START + " staff reassignTicket " + ticket.getId());
-                msg(cmdButton2);
-                sender.sendMessage("\n");
+
             }
             catch(NullPointerException e)
             {
@@ -565,6 +562,21 @@ public class StaffCommands extends BaseCommand
         else
         {
             msg("Only players can go on-duty!");
+        }
+    }
+
+    @Cmd(value="Allows a staff member to teleport to a location given by a ticket.")
+    public void ticketTP(CommandSender sender, String worldName, int x, int y, int z)
+    {
+        if(sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            World world = plugin.getServer().getWorld(worldName);
+
+            Location location = new Location(world, x, y, z);
+
+            player.teleport(location);
         }
     }
 

@@ -2,6 +2,7 @@ package io.github.plizga.ticketplugin.enums;
 
 
 import co.lotc.core.agnostic.Sender;
+import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,34 @@ public enum Team
                 return ".design";
             case Global:
                 return ".staff";
+            default:
+                return null;
         }
-        return null;
+    }
+
+    public static String getColor(Team team)
+    {
+        switch(team)
+        {
+            case Admin:
+                return ChatColor.DARK_RED + "";
+            case Moderator:
+                return ChatColor.BLUE +"";
+            case Event:
+                return ChatColor.GREEN + "";
+            case Tech:
+                return ChatColor.DARK_AQUA + "";
+            case Lore:
+                return ChatColor.DARK_GREEN +"";
+            case Build:
+                return ChatColor.GOLD + "";
+            case Design:
+                return ChatColor.DARK_PURPLE + "";
+            case Global:
+                return ChatColor.WHITE + "";
+            default:
+                return null;
+        }
     }
 
     public static List<String> getAvailable(Sender player)

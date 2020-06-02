@@ -97,7 +97,7 @@ public abstract class BaseCommand extends CommandTemplate
             msg(ticket.toPlayerInfo());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + ticket.getId());
             msg(cmdButton);
-            msg(plugin.PREFIX + TICKET_BORDER + "\n\n");
+            msg(plugin.PREFIX + TICKET_BORDER + "\n");
             index++;
 
         }

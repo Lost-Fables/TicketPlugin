@@ -9,6 +9,7 @@ import io.github.plizga.ticketplugin.database.ConcreteDatabase;
 import io.github.plizga.ticketplugin.database.Database;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,8 +39,10 @@ public final class TicketPlugin extends JavaPlugin
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
     /** Keeps track of any staff currently on duty. Will empty out upon plugin restart or shutdown. */
     private ArrayList<String> staffOnDuty = new ArrayList<String>();
-    /**Represents an instance of the ticket plugin. */
+    /** Represents an instance of the ticket plugin. */
     private static TicketPlugin ticketPluginInstance;
+    /** Represents the config file. */
+    public static FileConfiguration config;
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
@@ -58,12 +61,13 @@ public final class TicketPlugin extends JavaPlugin
     public void onEnable()
     {
         ticketPluginInstance = this;
-        getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "TicketPlugin V1 Enabled!");
+        getServer().getConsoleSender().sendMessage("TicketPlugin V1 Enabled!");
         loadConfig();
 
-        this.database = new ConcreteDatabase(this);
+        establishDatabase();
+
         this.database.load();
-        getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "TicketPlugin database established properly.");
+        getServer().getConsoleSender().sendMessage("TicketPlugin database established properly.");
 
 
         registerParameters();
@@ -93,6 +97,7 @@ public final class TicketPlugin extends JavaPlugin
     {
         getConfig().options().copyDefaults(true);
         saveConfig();
+        config = getConfig();
     }
 
 
@@ -143,6 +148,21 @@ public final class TicketPlugin extends JavaPlugin
                 .completer((s,$) -> TicketViewOptions.getAvailable(s))
                 .mapperWithSender(((sender, type) -> TicketViewOptions.getByName(type)))
                 .register();
+    }
+
+    /**
+     * Establishes the mySQL database connection through the use of the config file.
+     * PRECONDITION: {loadConfig} must have been called prior.
+     */
+    private void establishDatabase()
+    {
+        String host = config.getString("mysql.host");
+        String username = config.getString("mysql.username");
+        String password = config.getString("mysql.password");
+        String databaseName = config.getString("mysql.database");
+        int port = config.getInt("mysql.port");
+
+        this.database = new ConcreteDatabase(this, host, username, password, databaseName, port);
     }
 
     /**

@@ -181,6 +181,12 @@ public class StaffCommands extends BaseCommand
                     sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "unclaimed.\n");
 
                 }
+                else if(player.hasPermission(plugin.PERMISSION_START + "." + ticket.getTeam().name() + ".manager"))
+                {
+                    database.unClaimTicket(uuid);
+                    database.claimTicket(uuid, player.getName());
+                    msg(plugin.PREFIX + "You have used your manager permissions to claim this ticket.");
+                }
                 else
                 {
                     sender.sendMessage(plugin.PREFIX + "This ticket has been claimed by " + plugin.ALT_COLOR +

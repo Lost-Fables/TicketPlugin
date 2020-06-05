@@ -1,10 +1,11 @@
-package io.github.plizga.ticketplugin.sqlite;
+package io.github.plizga.ticketplugin.database;
 
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Ticket;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -41,7 +42,7 @@ public class ConcreteDatabase extends Database
             "`Date_Created` varchar(32) NOT NULL," + //date the ticket was created
             "`Date_Cleared` varchar(32)," + //date the ticket was completed
             "`Location` varchar(255) NOT NULL," + //location where the ticket was originally generated.
-            "`Initial_Request` varchar(100) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
+            "`Initial_Request` varchar(255) NOT NULL," + //request string associated with the ticket. Basically wtf is going on in the ticket.
             "PRIMARY KEY (`id`)" + //The primary key of our table is going to be the ID of ticket because that's the id of the ticket and that's the ID of the ticket.
             ");"; //this is a closing parenthesis.
 
@@ -167,10 +168,17 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(8, null);
 
-            preparedStatement.setString(9, player.getLocation().toString());
-            String location = player.getLocation().toString();
-            System.out.println(location.length());
+            Location location = player.getLocation();
+            String locationString = location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," +
+                    location.getZ();
 
+            preparedStatement.setString(9, locationString);
+
+
+            if(ticketData.length() > 255)
+            {
+                ticketData = ticketData.substring(0,254);
+            }
             preparedStatement.setString(10, ticketData);
 
 
@@ -781,12 +789,17 @@ public class ConcreteDatabase extends Database
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        String dateFormatted = dateFormat.format(date);
         try
         {
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
                     " Set Status = '" + Status.CLOSED.name() +
-                    " WHERE id = '" + ticketUUID +
+                    "', Date_Cleared = '" + dateFormatted +
+                    "' WHERE id = '" + ticketUUID +
                     "';");
 
             preparedStatement.executeUpdate();

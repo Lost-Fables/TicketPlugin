@@ -5,8 +5,9 @@ import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
-import io.github.plizga.ticketplugin.sqlite.Database;
+import io.github.plizga.ticketplugin.database.Database;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public abstract class BaseCommand extends CommandTemplate
     void readTicketsBasic(CommandSender sender, List ticketList)
     {
         //int index = 1; //omg an index!!!!
-
+        /*
         Player player = null;
         if(sender instanceof  Player)
         {
@@ -64,7 +65,19 @@ public abstract class BaseCommand extends CommandTemplate
             msg(cmdButton);
 
             msg(plugin.ALT_COLOR + TICKET_BORDER + "\n");
-            //index++;
+            //index++;*/
+
+        int index = 1;
+
+        for(Object o: ticketList)
+        {
+            Ticket ticket = (Ticket) o;
+            ComponentBuilder componentBuilder = ticket.toBasicInfo();
+
+            sender.spigot().sendMessage(componentBuilder.create());
+
+
+            index++;
 
         }
     }
@@ -82,10 +95,10 @@ public abstract class BaseCommand extends CommandTemplate
         {
             msg("\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            msg(ticket.toPlayerInfo());
+            sender.spigot().sendMessage(ticket.toPlayerInfo().create());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + ticket.getId());
             msg(cmdButton);
-            msg(plugin.PREFIX + TICKET_BORDER + "\n\n");
+            msg(plugin.PREFIX + TICKET_BORDER + "\n");
             index++;
 
         }
@@ -99,7 +112,7 @@ public abstract class BaseCommand extends CommandTemplate
         for(Ticket t : completedTickets)
         {
             msg("\nTicket " + index + ":");
-            msg(t.toPlayerInfo());
+            sender.spigot().sendMessage(t.toPlayerInfo().create());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + t.getId());
             msg(cmdButton);
 

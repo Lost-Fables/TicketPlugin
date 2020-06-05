@@ -3,8 +3,17 @@ package io.github.plizga.ticketplugin.helpers;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
+import net.md_5.bungee.api.chat.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -13,6 +22,11 @@ import java.util.UUID;
  */
 public class Ticket implements Comparable
 {
+    private static final int MINI_DESCRIPTION_LENGTH = 25;
+    private static final String USERNAME_COLOR = ChatColor.DARK_AQUA + "";
+    private static final String TEXT_COLOR = ChatColor.GRAY + "";
+    private static final String TIME_COLOR = ChatColor.YELLOW + "";
+    private static final String CLAIMED_COLOR = ChatColor.AQUA + "";
     private String id;
     private String playerName;
     private Status status;
@@ -23,6 +37,7 @@ public class Ticket implements Comparable
     private String location;
     private String info;
     private String playerID;
+
 
     private TicketPlugin plugin;
 
@@ -58,32 +73,241 @@ public class Ticket implements Comparable
         return str;
     }
 
-    public String toBasicInfo()
+    public ComponentBuilder toExpandedInfo()
     {
-        String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
-                plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
-                plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
-        return str;
+        ArrayList<TextComponent> textComponents = new ArrayList<>();
+
+        //id
+        TextComponent ticketID = new TextComponent(plugin.PREFIX + "Ticket ID: " + plugin.ALT_COLOR + id + "\n");
+        textComponents.add(ticketID);
+
+        //Player
+        TextComponent username = new TextComponent(plugin.PREFIX + "Player: " + plugin.ALT_COLOR + playerName + "\n");
+        username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
+        username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to message this player.").create()));
+
+        textComponents.add(username);
+
+        //Info
+        TextComponent infoText = new TextComponent(plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info + "\n");
+
+        textComponents.add(infoText);
+
+        //Status
+        TextComponent statusText = new TextComponent(plugin.PREFIX + "Status: " + plugin.ALT_COLOR + status + "\n");
+        if(status.equals(Status.CLAIMED) || status.equals(Status.OPEN))
+        {
+            statusText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/" + plugin.COMMAND_START +" staff claim " + this.id));
+            statusText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("Click to attempt to claim this ticket.").create()));
+        }
+
+        textComponents.add(statusText);
+
+        //Team
+
+        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + Team.getColor(team) + team.name() + "\n");
+        teamText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+        teamText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("Click to reassign this ticket to another team.").create()));
+
+        textComponents.add(teamText);
+
+
+        //Assigned Staff Member
+        TextComponent assignedStaffText = new TextComponent(plugin.PREFIX + "Assigned Staff: " + plugin.ALT_COLOR + assignedModerator + "\n");
+        assignedStaffText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
+        assignedStaffText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to message this staff member.").create()));
+
+        textComponents.add(assignedStaffText);
+
+        //Date Created and Date Cleared
+        TextComponent dateText = new TextComponent(plugin.PREFIX + "Date Created: " + plugin.ALT_COLOR + dateCreated + "\n" +
+                plugin.PREFIX + "Date Cleared: " + plugin.ALT_COLOR + dateCleared + "\n");
+        dateText.setHoverEvent(null);
+
+        textComponents.add(dateText);
+
+
+        //Location - There will be 4 items in the String array due to being hard-coded into the SQL database
+        TextComponent locationText;
+        if(location.contains(","))
+        {
+            String[] locationArray = this.location.split(",");
+
+            String worldName = locationArray[0];
+
+            Double x = Double.parseDouble(locationArray[1]);
+
+            Double y = Double.parseDouble(locationArray[2]);
+
+            Double z = Double.parseDouble(locationArray[3]);
+
+            locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +
+                    ": X:" + x.shortValue() + " Y:" + y.shortValue() + " Z:" + z.shortValue());
+            locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/" + plugin.COMMAND_START + " staff ticketTP "+ worldName + " " + x.intValue() + " " + y.intValue() + " " + z.intValue()));
+            locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to teleport to this location.").create()));
+
+        }
+        else
+        {
+            locationText = new TextComponent(plugin.ERROR_COLOR +
+                    "The following location information is from an erroneous or out-dated format. Please contact a developer if this persists. \n" +
+                    plugin.PREFIX + "Location: " + plugin.ALT_COLOR + location);
+        }
+
+        textComponents.add(locationText);
+
+        ComponentBuilder componentBuilder = new ComponentBuilder("");
+
+        for(TextComponent textComponent : textComponents)
+        {
+            componentBuilder.append(textComponent);
+
+        }
+
+        return componentBuilder;
+
     }
 
-    public String toBasicInfoClaimed()
+
+    public ComponentBuilder toBasicInfo()
     {
-        String str = plugin.PREFIX + "User: " + plugin.ALT_COLOR + playerName +
-                plugin.PREFIX + ", Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
-                plugin.PREFIX + ", Claimed by: " + plugin.ALT_COLOR + assignedModerator +
-                plugin.PREFIX + ", Date: " + plugin.ALT_COLOR + dateCreated;
-        return str;
+
+        TextComponent[] textComponents = new TextComponent[5];
+        //Set the team
+        TextComponent teamPrefix = new TextComponent(Team.getColor(team) + "[" + team.toString().charAt(0) +
+                "] ");
+        teamPrefix.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+        teamPrefix.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+
+        textComponents[0] = teamPrefix;
+
+        //Set the player
+        TextComponent username = new TextComponent(USERNAME_COLOR + "" + playerName + ChatColor.DARK_GRAY + ": ");
+        username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
+        username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+
+        textComponents[1] = username;
+
+
+        //Set the description
+        String shortDescription;
+        if(info.length() > MINI_DESCRIPTION_LENGTH)
+        {
+            shortDescription = info.substring(0, MINI_DESCRIPTION_LENGTH -1);
+            shortDescription = shortDescription.concat("...");
+        }
+        else
+        {
+            shortDescription = info;
+        }
+
+        TextComponent description = new TextComponent(TEXT_COLOR + shortDescription + " ");
+        description.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START + " staff expandTicket " + this.getId()));
+        description.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+
+
+        textComponents[2] = description;
+
+
+        //Get the time between the ticket's creation and now.
+        Date currentDate = new Date();
+        Date ticketDate = null;
+
+        try
+        {
+            ticketDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(dateCreated);
+        }
+        catch(ParseException e)
+        {
+            e.printStackTrace();
+        }
+
+        long difference = currentDate.getTime() - ticketDate.getTime();
+        long differenceHours = difference / (60 * 60 * 1000) % 24;
+        long differenceMinutes = difference / (60 * 1000) % 60;
+
+        TextComponent timeSinceCreated;
+        if(differenceHours == 0)
+        {
+            if(differenceMinutes == 0)
+            {
+                timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+            }
+            else
+            {
+                timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
+            }
+
+        }
+        else
+        {
+            timeSinceCreated = new TextComponent(TIME_COLOR + differenceHours +
+                    "H, " + differenceMinutes + "M ");
+
+        }
+        timeSinceCreated.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
+        timeSinceCreated.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+
+
+
+        textComponents[3] = timeSinceCreated;
+
+
+        //get the claimer
+        TextComponent claimer;
+
+        if(this.assignedModerator.equals("None"))
+        {
+            claimer = new TextComponent(CLAIMED_COLOR +"UNCLAIMED");
+        }
+        else
+        {
+            claimer = new TextComponent(CLAIMED_COLOR +assignedModerator);
+        }
+        claimer.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/" + plugin.COMMAND_START +" staff claim " + this.id));
+        claimer.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+
+        textComponents[4] = claimer;
+
+        ComponentBuilder componentBuilder = new ComponentBuilder("");
+        componentBuilder.append(textComponents);
+
+
+
+
+        return componentBuilder;
+
     }
 
-    public String toPlayerInfo()
+
+    public ComponentBuilder toPlayerInfo()
     {
         String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + plugin.ALT_COLOR + team +
+                plugin.PREFIX + ", Team: " + Team.getColor(team) + team +
                 plugin.PREFIX + ", Staff Member: " + plugin.ALT_COLOR + assignedModerator +
                 plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
-        return str;
+
+        if(dateCleared != null)
+        {
+            str = str.concat(plugin.PREFIX + " Cleared: " + plugin.ALT_COLOR + dateCleared);
+        }
+
+        TextComponent playerInfo = new TextComponent(str);
+        if(!this.assignedModerator.equals("None"))
+        {
+            playerInfo.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
+            playerInfo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to message the assigned staff member.").create()));
+        }
+        return new ComponentBuilder(playerInfo);
     }
 
 

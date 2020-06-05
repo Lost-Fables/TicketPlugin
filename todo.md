@@ -52,9 +52,3 @@ Average review score for tickets done.
 
 Filtering by teams
 Per person and by team
-
-Extra todo: 
-
-move completed tickets to their own table
-
-separate completed tickets by month 

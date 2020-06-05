@@ -20,16 +20,14 @@ import java.util.logging.Level;
 
 public class ConcreteDatabase extends Database
 {
-    private final String DATABASE_NAME = "s938_Plizga_Testing";
-    private final String USERNAME = "u938_VlXZtynBoA";
-    private final String PASSWORD = "e=wRAareADIK86^kxwgYJhcQ";
-    private final String HOST = "64.227.3.126";
-    private final int PORT = 3306;
-    private final String CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME;
+    private final String DATABASE_NAME;
+    private final String USERNAME;
+    private final String PASSWORD;
+    private final String HOST;
+    private final int PORT;
+    private final String CONNECTION_STRING;
 
 
-    /** The name of the database as provided by the config of the plugin. */
-    private String databaseName;
     /** This is the String that represents the creation of this sql table. IMPORTANT!!! If changes are made here,
      * please ensure you make the necessary changes in the CreateNewTicket function as well. */
     private String mySQLTicketTable = "CREATE TABLE IF NOT EXISTS " + TICKET_TABLE_NAME + " (" +
@@ -68,10 +66,16 @@ public class ConcreteDatabase extends Database
      * database.
      * @param plugin    the JavaPlugin being attached to this ConcreteDatabase database.
      */
-    public ConcreteDatabase(JavaPlugin plugin)
+    public ConcreteDatabase(JavaPlugin plugin, String host, String username, String password, String database, int port)
     {
         super(plugin);
-        databaseName = plugin.getConfig().getString("ConcreteDatabase.Filename", TICKET_TABLE_NAME);
+        this.HOST = host;
+        this.USERNAME = username;
+        this.PASSWORD = password;
+        this.PORT = port;
+        this.DATABASE_NAME = database;
+        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME;
+
     }
 
 

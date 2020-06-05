@@ -12,7 +12,7 @@ import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.database.Database;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -232,17 +232,28 @@ public class UserCommands extends BaseCommand
             Player player = (Player) sender;
 
             msg(plugin.PREFIX + "Please leave a review below, where 1 is the worst, and 5 is the best.\n");
-            BaseComponent oneStarButton = MessageUtil.CommandButton("*", "/" + plugin.COMMAND_START + " review one " + ticketUUID);
-            BaseComponent twoStarButton = MessageUtil.CommandButton("* *", "/" + plugin.COMMAND_START + " review two " + ticketUUID);
-            BaseComponent threeStarButton = MessageUtil.CommandButton("* * *", "/" + plugin.COMMAND_START + " review three " + ticketUUID);
-            BaseComponent fourStarButton = MessageUtil.CommandButton("* * * *", "/" + plugin.COMMAND_START + " review four " + ticketUUID);
-            BaseComponent fiveStarButton = MessageUtil.CommandButton("* * * * *", "/" + plugin.COMMAND_START + " review five " + ticketUUID);
+            TextComponent oneStarButton = new TextComponent("[ * ");
+            oneStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review one " + ticketUUID));
+            oneStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("1").create()));
+
+            TextComponent twoStarButton = new TextComponent("* ");
+            twoStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review two " + ticketUUID));
+            twoStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("2").create()));
+
+            TextComponent threeStarButton = new TextComponent("* ");
+            threeStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review three " + ticketUUID));
+            threeStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("3").create()));
+
+            TextComponent fourStarButton = new TextComponent("* ");
+            fourStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review four " + ticketUUID));
+            fourStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("4").create()));
+
+            TextComponent fiveStarButton = new TextComponent("* ]");
+            fiveStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review five " + ticketUUID));
+            fiveStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("5").create()));
             msg(plugin.PREFIX + "Review Rating: ");
-            msg(oneStarButton);
-            msg(twoStarButton);
-            msg(threeStarButton);
-            msg(fourStarButton);
-            msg(fiveStarButton);
+            ComponentBuilder componentBuilder = new ComponentBuilder("").append(oneStarButton).append(twoStarButton).append(threeStarButton).append(fourStarButton).append(fiveStarButton);
+            sender.spigot().sendMessage(componentBuilder.create());
         }
         else
         {

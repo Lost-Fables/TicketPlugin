@@ -43,7 +43,7 @@
 - /request staff viewClaimed &lt;Team&gt;
     - Allows a staff member to view all currently-claimed tickets for a specified team.
     
--/request staff viewMyClaimed
+- /request staff viewMyClaimed
     - Allows a staff member to view their currently claimed tickets.
     
 ### Example of Workflow

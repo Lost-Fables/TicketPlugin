@@ -150,7 +150,8 @@ public abstract class BaseCommand extends CommandTemplate
         if(player != null)
         {
             player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                    ticket.getInfo() + plugin.PREFIX + ",\" has been completed!");
+                    ticket.getInfo() + plugin.PREFIX + ",\" has been completed! Use " + plugin.ALT_COLOR + "\"/" +
+                    plugin.COMMAND_START + " viewCompleted\"" + plugin.PREFIX + "to add a review!");
         }
     }
 

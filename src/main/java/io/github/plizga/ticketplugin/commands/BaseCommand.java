@@ -95,7 +95,7 @@ public abstract class BaseCommand extends CommandTemplate
         {
             msg("\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            msg(ticket.toPlayerInfo());
+            sender.spigot().sendMessage(ticket.toPlayerInfo().create());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + ticket.getId());
             msg(cmdButton);
             msg(plugin.PREFIX + TICKET_BORDER + "\n");
@@ -112,7 +112,7 @@ public abstract class BaseCommand extends CommandTemplate
         for(Ticket t : completedTickets)
         {
             msg("\nTicket " + index + ":");
-            msg(t.toPlayerInfo());
+            sender.spigot().sendMessage(t.toPlayerInfo().create());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + t.getId());
             msg(cmdButton);
 

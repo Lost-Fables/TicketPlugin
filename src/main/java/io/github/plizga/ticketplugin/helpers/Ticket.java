@@ -289,7 +289,7 @@ public class Ticket implements Comparable
     }
 
 
-    public String toPlayerInfo()
+    public ComponentBuilder toPlayerInfo()
     {
         String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
                 plugin.PREFIX + ", Team: " + Team.getColor(team) + team +
@@ -300,7 +300,14 @@ public class Ticket implements Comparable
         {
             str = str.concat(plugin.PREFIX + " Cleared: " + plugin.ALT_COLOR + dateCleared);
         }
-        return str;
+
+        TextComponent playerInfo = new TextComponent(str);
+        if(!this.assignedModerator.equals("None"))
+        {
+            playerInfo.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
+            playerInfo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to message the assigned staff member.").create()));
+        }
+        return new ComponentBuilder(playerInfo);
     }
 
 

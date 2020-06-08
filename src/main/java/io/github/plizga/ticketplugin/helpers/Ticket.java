@@ -230,10 +230,12 @@ public class Ticket implements Comparable
         }
 
         long difference = currentDate.getTime() - ticketDate.getTime();
+        long differenceDays = difference / (60 * 60 * 24 * 1000);
         long differenceHours = difference / (60 * 60 * 1000) % 24;
         long differenceMinutes = difference / (60 * 1000) % 60;
 
         TextComponent timeSinceCreated;
+
         if(differenceHours == 0)
         {
             if(differenceMinutes == 0)
@@ -248,8 +250,17 @@ public class Ticket implements Comparable
         }
         else
         {
-            timeSinceCreated = new TextComponent(TIME_COLOR + differenceHours +
-                    "H, " + differenceMinutes + "M ");
+            if (differenceDays == 0)
+            {
+                timeSinceCreated = new TextComponent(TIME_COLOR + differenceHours +
+                        "H, " + differenceMinutes + "M ");
+            }
+            else
+            {
+                timeSinceCreated = new TextComponent(TIME_COLOR + differenceDays +
+                        "D, " + differenceHours +
+                        "H, " + differenceMinutes + "M ");
+            }
 
         }
         timeSinceCreated.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,

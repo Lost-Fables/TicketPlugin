@@ -172,8 +172,10 @@ public class UserCommands extends BaseCommand
             ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 
             BookMeta bookMeta = (BookMeta) book.getItemMeta();
+
             bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
             bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
+
 
             ArrayList<String> pages = new ArrayList<String>();
 

@@ -1,6 +1,7 @@
 package io.github.plizga.ticketplugin.listeners;
 
 import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.helpers.Staff;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventException;
@@ -32,8 +33,12 @@ public class TicketPlayerListener implements Listener
         Player player = event.getPlayer();
         String uuid = player.getUniqueId().toString();
 
-        if(plugin.getStaffOnDuty().contains(uuid))
-            plugin.getStaffOnDuty().remove(uuid);
+        Staff staff = plugin.getStaffOnDuty(uuid);
+
+        if(staff != null && !staff.isPersistent())
+        {
+            plugin.getDatabase().removeStaffFromOnDuty(uuid);
+        }
 
     }
 

@@ -16,7 +16,7 @@
     - Allows a player to cancel all of their current requests.
     
 ## Staff Commands:
-- /request staff onDuty
+- /request staff persistent
     - Allows a staff member to set themselves to "on duty." This means that the staff member will receive
     a notification whenever a new ticket is created for their team, or when a ticket is assigned to their team.
 
@@ -26,7 +26,7 @@
     
     
     ```
-    Note for onDuty and offDuty: A staff member is set to off-duty automatically upon leaving the server,
+    Note for persistent and offDuty: A staff member is set to off-duty automatically upon leaving the server,
     and must manually go back on-duty when logging back on.
     ```
     

@@ -2,7 +2,9 @@ package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.bukkit.book.BookStream;
 import co.lotc.core.bukkit.util.BookUtil;
+import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
+import co.lotc.core.command.annotate.Default;
 import co.lotc.core.util.MessageUtil;
 import com.comphenix.protocol.PacketType;
 import io.github.plizga.ticketplugin.TicketPlugin;
@@ -10,8 +12,13 @@ import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.database.Database;
+import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -530,10 +537,11 @@ public class StaffCommands extends BaseCommand
         {
             Player player = (Player) sender;
             String playerUUID = player.getUniqueId().toString();
-            if(plugin.getStaffOnDuty().contains(playerUUID))
+            if(plugin.getStaffUUIDsOnDuty().contains(playerUUID))
             {
-                plugin.getStaffOnDuty().remove(playerUUID);
-                msg(plugin.PREFIX + "You are now off-duty and will not receive notifications regarding new tickets.");
+                plugin.getDatabase().removeStaffFromOnDuty(playerUUID);
+                msg(plugin.PREFIX + "You are now " + ChatColor.RED + "off-duty " +
+                        plugin.PREFIX +"and will no longer receive notifications regarding new tickets.");
             }
             else
             {
@@ -549,21 +557,76 @@ public class StaffCommands extends BaseCommand
     }
 
     @Cmd(value="Sets a staff-member on-duty.")
-    public void onDuty(CommandSender sender)
+    public void onDuty(CommandSender sender, @Default("") String persistent)
     {
         if(sender instanceof Player)
         {
             Player player = (Player) sender;
-            String playerUUID = player.getUniqueId().toString();
-            if(!plugin.getStaffOnDuty().contains(playerUUID))
+            Staff staff = database.getStaff(((Player) sender).getUniqueId().toString());
+
+            switch(persistent)
             {
-                plugin.getStaffOnDuty().add(playerUUID);
-                msg(plugin.PREFIX + "You are now on-duty and will receive notifications regarding new tickets.");
+                case "true":
+                    if(staff == null)
+                    {
+                        database.staffOnDuty(player.getUniqueId().toString(), true);
+                    }
+                    else
+                    {
+                        database.updateStaffOnDuty(player.getUniqueId().toString(), true);
+                    }
+                    msg(plugin.PREFIX + "You are now marked as " + ChatColor.GREEN + "on-duty.");
+                    break;
+
+                case "false":
+                    if(staff == null)
+                    {
+                        database.staffOnDuty(player.getUniqueId().toString(), false);
+                    }
+                    else
+                    {
+                        database.updateStaffOnDuty(player.getUniqueId().toString(), false);
+                    }
+                    msg(plugin.PREFIX + "You are now marked as " + ChatColor.GREEN + "on-duty.");
+                    break;
+
+                default:
+                    TextComponent question;
+                    if(staff == null)
+                    {
+                        question = new TextComponent(plugin.PREFIX + "You are currently " +
+                                ChatColor.DARK_RED + "off-duty" + plugin.PREFIX + ". " +
+                                "Would you like to stay on-duty " + plugin.PREFIX + "while logged off? ");
+                    }
+                    else if(staff.isPersistent())
+                    {
+                        question = new TextComponent(plugin.PREFIX + "You are currently " +
+                                ChatColor.GREEN + "on-duty" + plugin.PREFIX + ", and will stay on-duty after " + plugin.PREFIX + "logging off. Would you like to stay on-duty while logged off? ");
+                    }
+                    else
+                    {
+                        question = new TextComponent(plugin.PREFIX + "You are currently " +
+                                ChatColor.GREEN + "on-duty" + plugin.PREFIX + ", and will be taken off-duty upon " + plugin.PREFIX + "logging off. Would you like to stay on-duty while logged off? ");
+                    }
+
+                    TextComponent yesButton = new TextComponent(ChatColor.GREEN + "[YES]");
+                    yesButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/" + plugin.COMMAND_START +" staff onDuty " + "true"));
+                    TextComponent slashMark = new TextComponent(ChatColor.DARK_GRAY+ "/");
+                    TextComponent noButton = new TextComponent(ChatColor.RED + "[NO]");
+                    noButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/" + plugin.COMMAND_START + " staff onDuty " + "false"));
+
+                    ComponentBuilder componentBuilder = new ComponentBuilder("").append(question)
+                            .append(yesButton)
+                            .append(slashMark)
+                            .append(noButton);
+
+                    sender.spigot().sendMessage(componentBuilder.create());
+                    break;
             }
-            else
-            {
-                msg(plugin.ERROR_COLOR + "You are already on-duty!");
-            }
+
+
         }
         else
         {

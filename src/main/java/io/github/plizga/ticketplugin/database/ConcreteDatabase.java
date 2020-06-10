@@ -4,6 +4,7 @@ import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.Review;
+import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -25,6 +26,9 @@ public class ConcreteDatabase extends Database
     private final String PASSWORD;
     private final String HOST;
     private final int PORT;
+
+
+
     private final String CONNECTION_STRING;
 
 
@@ -59,6 +63,13 @@ public class ConcreteDatabase extends Database
             "`rating` tinyint NOT NULL," +
             "PRIMARY KEY (`id`)" +
             ");";
+
+    private String mySqlOnDutyTable = "CREATE TABLE IF NOT EXISTS " + DUTY_TABLE_NAME + " (" +
+            "`id` varchar(36) NOT NULL," +
+            "`duty_status` tinyint NOT NULL," +
+            "PRIMARY KEY (`id`)" +
+            ");";
+
 
 
     /**
@@ -95,12 +106,14 @@ public class ConcreteDatabase extends Database
             }
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(CONNECTION_STRING, USERNAME, PASSWORD);
+
             System.out.println("Connected to the mySQL database.");
             return connection;
         }
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "Error initializing mySQL database in method getSQLConnection.");
+            System.out.println("Debug: " + PASSWORD);
         }
         catch (ClassNotFoundException e)
         {
@@ -123,6 +136,7 @@ public class ConcreteDatabase extends Database
             s.executeUpdate(mySQLTicketTable);
             s.executeUpdate(mySQLCommentsTable);
             s.executeUpdate(mySQLReviewTable);
+            s.executeUpdate(mySqlOnDutyTable);
             s.close();
         }
         catch(SQLException e )
@@ -819,6 +833,172 @@ public class ConcreteDatabase extends Database
     }
 
     @Override
+    public void staffOnDuty(String playerUUID, boolean onDuty)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("REPLACE INTO " + DUTY_TABLE_NAME +
+                    " (id,duty_status) VALUES(?,?)");
+
+            preparedStatement.setString(1, playerUUID);
+
+            if(onDuty)
+            {
+                preparedStatement.setInt(2, 1);
+            }
+            else
+            {
+                preparedStatement.setInt(2, 0);
+            }
+
+
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+    @Override
+    public List<Staff> getStaff()
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Staff> staffList = new ArrayList<>();
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + DUTY_TABLE_NAME +
+                    ";");
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next())
+            {
+                Staff staff = makeStaff(resultSet);
+
+                staffList.add(staff);
+
+            }
+
+            return staffList;
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet, connection);
+        }
+        return staffList;
+    }
+
+    @Override
+    public Staff getStaff(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("SELECT * FROM " + DUTY_TABLE_NAME +
+                    " WHERE id ='" + uuid +
+                    "';");
+
+            resultSet = preparedStatement.executeQuery();
+
+            Staff staff;
+
+            while(resultSet.next())
+            {
+                staff = makeStaff(resultSet);
+                return staff;
+            }
+
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, resultSet, connection);
+        }
+
+        return null;
+    }
+
+    @Override
+    public void updateStaffOnDuty(String playerUUID, boolean onDuty)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        int onDutyAsInt = 0;
+
+        if(onDuty)
+        {
+            onDutyAsInt++;
+        }
+
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("UPDATE " + DUTY_TABLE_NAME +
+                    " Set duty_status = '" + onDutyAsInt +
+                    "' WHERE id = '" + playerUUID + "';");
+
+            preparedStatement.executeUpdate();
+
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+
+    }
+
+    public void removeStaffFromOnDuty(String uuid)
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try
+        {
+            connection = getSqlConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM " + DUTY_TABLE_NAME +
+                    " WHERE id = '" + uuid + "';");
+
+            preparedStatement.executeUpdate();
+
+        }
+        catch(SQLException e)
+        {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), e);
+        }
+        finally
+        {
+            close(preparedStatement, connection);
+        }
+    }
+
+
+    @Override
     public List<Comment> getCommentsForPlayer(String uuid)
     {
         Connection connection = null;
@@ -895,12 +1075,28 @@ public class ConcreteDatabase extends Database
     }
 
 
-    public Review makeReview(ResultSet resultSet) throws SQLException
+    private Review makeReview(ResultSet resultSet) throws SQLException
     {
         String id = resultSet.getString("id");
         int rating = resultSet.getInt("rating");
 
         return new Review(this.plugin, id, rating);
+    }
+
+    private Staff makeStaff(ResultSet resultSet) throws SQLException
+    {
+        String id = resultSet.getString("id");
+        boolean onDuty;
+        if(resultSet.getInt("duty_status") == 0)
+        {
+            onDuty = false;
+        }
+        else
+        {
+            onDuty = true;
+        }
+
+        return new Staff(id, onDuty);
     }
 
 }

@@ -6,6 +6,7 @@ import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.Review;
+import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,9 +33,10 @@ public abstract class Database extends BaseCommand
      final String TICKET_TABLE_NAME = "ticket_table";
     /** The name of the table to be used for comments. */
     final String COMMENT_TABLE_NAME = "comment_table";
-    /** The name of the tabel to be used for reviews. */
+    /** The name of the table to be used for reviews. */
     final String REVIEW_TABLE_NAME = "review_table";
-
+    /** The name of the table to be used for tracking duty. */
+    final String DUTY_TABLE_NAME = "duty_table";
     /**
      * The Constructor for the abstract class Database. Simply takes in the plugin.
      * @param plugin    the JavaPlugin associated with this database.
@@ -179,6 +182,16 @@ public abstract class Database extends BaseCommand
     public abstract Review getReview(String ticketUUID);
 
     public abstract void closeTicket(String ticketUUID);
+
+    public abstract void staffOnDuty(String playerUUID, boolean onDuty);
+
+    public abstract List<Staff> getStaff();
+
+    public abstract Staff getStaff(String staff);
+
+    public abstract void removeStaffFromOnDuty(String uuid);
+
+    public abstract void updateStaffOnDuty(String playerUUID, boolean onDuty);
 
 
 

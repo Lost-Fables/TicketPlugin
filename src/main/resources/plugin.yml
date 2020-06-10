@@ -10,6 +10,7 @@ commands:
   request:
     description: Allows a player to create a new ticket.
     usage: /<command>
+    aliases: [modreq]
 
 permissions:
 

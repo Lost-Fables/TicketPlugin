@@ -72,6 +72,7 @@ public class TicketPlayerListener implements Listener
             {
                 if(((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
                 {
+                    event.setCancelled(true);
                     itemStack.setAmount(0);
                 }
             }

@@ -4,6 +4,7 @@ import co.lotc.core.bukkit.command.Commands;
 import io.github.plizga.ticketplugin.commands.UserCommands;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.enums.TicketViewOptions;
+import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.listeners.TicketPlayerListener;
 import io.github.plizga.ticketplugin.database.ConcreteDatabase;
 import io.github.plizga.ticketplugin.database.Database;
@@ -15,6 +16,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -38,7 +40,7 @@ public final class TicketPlugin extends JavaPlugin
     /** Defines the common error color used in the plugin. */
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
     /** Keeps track of any staff currently on duty. Will empty out upon plugin restart or shutdown. */
-    private ArrayList<String> staffOnDuty = new ArrayList<String>();
+    private List<Staff> staffOnDuty = new ArrayList<Staff>();
     /** Represents an instance of the ticket plugin. */
     private static TicketPlugin ticketPluginInstance;
     /** Represents the config file. */
@@ -95,8 +97,7 @@ public final class TicketPlugin extends JavaPlugin
      */
     public void loadConfig()
     {
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        saveDefaultConfig();
         config = getConfig();
     }
 
@@ -108,26 +109,6 @@ public final class TicketPlugin extends JavaPlugin
     public Database getDatabase()
     {
         return this.database;
-    }
-
-    /**
-     * Handles notifying any on-duty staff about new tickets or ticket reassignments.
-     * @param team  the team whose members need to be notified (if they are on-duty).
-     */
-    public void notifyOnDutyStaff(Team team)
-    {
-        for(String uuid : staffOnDuty)
-        {
-            Player player = Bukkit.getPlayer(UUID.fromString(uuid));
-
-
-            if(player != null && player.hasPermission(PERMISSION_START + Team.getPermission(team)))
-            {
-                player.sendMessage(PREFIX + "A player ticket has been assigned to the " +
-                        ALT_COLOR + team.name() + PREFIX + " team.");
-
-            }
-        }
     }
 
 
@@ -166,11 +147,65 @@ public final class TicketPlugin extends JavaPlugin
     }
 
     /**
-     * Getter for the list of staff on duty in order to encapsulate and protect data.
+     * Getter for the list of staff on duty.
+     * @return the staff currently on duty in an ArrayList of Staff.
+     */
+    public List<Staff> getStaffOnDuty()
+    {
+        staffOnDuty = database.getStaff();
+        return staffOnDuty;
+    }
+
+    /**
+     * Getter for the list of staff on duty. (STRING)
      * @return the staff currently on duty in an ArrayList of Strings.
      */
-    public ArrayList<String> getStaffOnDuty()
+    public ArrayList<String> getStaffUUIDsOnDuty()
     {
-        return staffOnDuty;
+        ArrayList<String> staffUUIDsOnDuty = new ArrayList<String>();
+
+        for(Staff s : getStaffOnDuty())
+        {
+            staffUUIDsOnDuty.add(s.getUuid().toString());
+        }
+        return staffUUIDsOnDuty;
+    }
+
+    /**
+     * Handles notifying any on-duty staff about new tickets or ticket reassignments.
+     * @param team  the team whose members need to be notified (if they are on-duty).
+     */
+    public void notifyOnDutyStaff(Team team)
+    {
+        for(Staff staff : getStaffOnDuty())
+        {
+            Player player = Bukkit.getPlayer(UUID.fromString(staff.getUuid()));
+
+
+            if(player != null && player.hasPermission(PERMISSION_START + Team.getPermission(team)))
+            {
+                player.sendMessage(PREFIX + "A player ticket has been assigned to the " +
+                        Team.getColor(team) + team.name() + PREFIX + " team.");
+
+            }
+        }
+    }
+
+    /**
+     * Gets a specific staff member of the staff-team from the database. Overloaded.
+     * @return a {Staff} member who is currently on duty.
+     */
+    public Staff getStaffOnDuty(String uuid)
+    {
+        return database.getStaff(uuid);
+    }
+
+    /**
+     * Removes a staff member from the on-duty list.
+     * @param uuid  uuid in String form of the staff-member.
+     */
+    public void removeStaffOnDuty(String uuid)
+    {
+        database.updateStaffOnDuty(uuid, false);
     }
 }

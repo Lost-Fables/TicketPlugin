@@ -4,9 +4,11 @@ import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import net.md_5.bungee.api.chat.*;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DateFormat;
@@ -23,7 +25,8 @@ import java.util.UUID;
 public class Ticket implements Comparable
 {
     private static final int MINI_DESCRIPTION_LENGTH = 25;
-    private static final String USERNAME_COLOR = ChatColor.DARK_AQUA + "";
+    private static final String USERNAME_COLOR_ONLINE = ChatColor.GREEN + "";
+    private static final String USERNAME_COLOR_OFFLINE = ChatColor.RED + "";
     private static final String TEXT_COLOR = ChatColor.GRAY + "";
     private static final String TIME_COLOR = ChatColor.YELLOW + "";
     private static final String CLAIMED_COLOR = ChatColor.AQUA + "";
@@ -82,7 +85,17 @@ public class Ticket implements Comparable
         textComponents.add(ticketID);
 
         //Player
-        TextComponent username = new TextComponent(plugin.PREFIX + "Player: " + plugin.ALT_COLOR + playerName + "\n");
+        TextComponent username;
+        Player player = Bukkit.getPlayer(playerName);
+        if(player == null)
+        {
+            username = new TextComponent(plugin.PREFIX + "Player: " + USERNAME_COLOR_OFFLINE + playerName + "\n");
+        }
+        else
+        {
+            username = new TextComponent(plugin.PREFIX + "Player: " + USERNAME_COLOR_ONLINE + playerName + "\n");
+        }
+
         username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
         username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to message this player.").create()));
 
@@ -188,7 +201,19 @@ public class Ticket implements Comparable
         textComponents[0] = teamPrefix;
 
         //Set the player
-        TextComponent username = new TextComponent(USERNAME_COLOR + "" + playerName + ChatColor.DARK_GRAY + ": ");
+
+        Player player = Bukkit.getPlayer(playerName);
+        TextComponent username;
+
+        if(player == null)
+        {
+            username = new TextComponent(USERNAME_COLOR_OFFLINE + "" + playerName + ChatColor.DARK_GRAY + ": ");
+        }
+        else
+        {
+            username = new TextComponent(USERNAME_COLOR_ONLINE + "" + playerName + ChatColor.DARK_GRAY + ": ");
+        }
+
         username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
         username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
 

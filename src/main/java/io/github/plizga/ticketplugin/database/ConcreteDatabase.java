@@ -85,7 +85,7 @@ public class ConcreteDatabase extends Database
         this.PASSWORD = password;
         this.PORT = port;
         this.DATABASE_NAME = database;
-        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME;
+        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?UseSSL=false&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false";
 
     }
 
@@ -193,10 +193,11 @@ public class ConcreteDatabase extends Database
             preparedStatement.setString(9, locationString);
 
 
-            if(ticketData.length() > 255)
+            if(ticketData.length() >= 255)
             {
-                ticketData = ticketData.substring(0,254);
+                ticketData = ticketData.substring(0,253);
             }
+
             preparedStatement.setString(10, ticketData);
 
 
@@ -378,7 +379,7 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + " WHERE Assigned_Team = '" +
                     team + "' AND Status = '" + Status.OPEN.name() +
-                    "' ORDER BY `Date_Created` DESC;");
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -413,7 +414,7 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Status = '" + Status.OPEN.name() +
-                    "' ORDER BY `Date_Created` DESC;");
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 

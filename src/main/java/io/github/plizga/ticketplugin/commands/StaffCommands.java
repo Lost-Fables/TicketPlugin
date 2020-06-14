@@ -63,11 +63,11 @@ public class StaffCommands extends BaseCommand
 
                 if(openTickets.size() == 0)
                 {
-                    sender.sendMessage(plugin.PREFIX + "There are no open tickets for the " + plugin.ALT_COLOR + team.name() +
+                    sender.sendMessage(plugin.PREFIX + "There are no open tickets for the " + Team.getColor(team) + team.name() +
                             plugin.PREFIX + " team.");
                     return;
                 }
-                sender.sendMessage(plugin.PREFIX + "Viewing tickets for the " + plugin.ALT_COLOR + team.name() +
+                sender.sendMessage(plugin.PREFIX + "Viewing tickets for the " + Team.getColor(team) + team.name() +
                         plugin.PREFIX + " team:");
                 readTicketsBasic(sender, openTickets);
             }
@@ -146,7 +146,6 @@ public class StaffCommands extends BaseCommand
 
             }
 
-            Collections.sort(openTickets);
 
             if(openTickets.size() == 0)
             {

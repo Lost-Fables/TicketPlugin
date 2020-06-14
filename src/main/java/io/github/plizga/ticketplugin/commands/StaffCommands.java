@@ -179,6 +179,7 @@ public class StaffCommands extends BaseCommand
                 {
                     database.claimTicket(ticket.getId(), player.getName());
                     sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n");
+                    sendClaimedMessage(database.getTicketByUUID(uuid));
 
                 }
                 else if(assignedModerator.equalsIgnoreCase(player.getName()))
@@ -192,6 +193,7 @@ public class StaffCommands extends BaseCommand
                     database.unClaimTicket(uuid);
                     database.claimTicket(uuid, player.getName());
                     msg(plugin.PREFIX + "You have used your manager permissions to claim this ticket.");
+                    sendClaimedMessage(database.getTicketByUUID(uuid));
                 }
                 else
                 {
@@ -483,6 +485,7 @@ public class StaffCommands extends BaseCommand
                     if(info.length() <= 205)
                     {
                         database.createNewComment(player.getName(), info, uuid, isStaffComment);
+                        sendCommentMessage(database.getTicketByUUID(uuid));
                     }
                     else
                     {

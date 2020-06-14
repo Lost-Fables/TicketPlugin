@@ -150,8 +150,32 @@ public abstract class BaseCommand extends CommandTemplate
         if(player != null)
         {
             player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                    ticket.getInfo() + plugin.PREFIX + ",\" has been completed! Use " + plugin.ALT_COLOR + "\"/" +
+                    ticket.getInfo() + plugin.PREFIX + "\" has been completed! Use " + plugin.ALT_COLOR + "\"/" +
                     plugin.COMMAND_START + " viewCompleted\"" + plugin.PREFIX + "to add a review!");
+        }
+    }
+
+    void sendCommentMessage(Ticket ticket)
+    {
+        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+
+        if(player != null)
+        {
+            player.sendMessage(plugin.PREFIX + "A comment has been added to your ticket, with the description \"" + plugin.ALT_COLOR +
+                    ticket.getInfo() + plugin.PREFIX + "\" Use " + plugin.ALT_COLOR + "\"/" +
+                    plugin.COMMAND_START + " view\"" + plugin.PREFIX + ", and click \"View Comments\" to view!");
+        }
+    }
+
+    void sendClaimedMessage(Ticket ticket)
+    {
+        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+
+        if(player != null)
+        {
+            player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
+                    ticket.getInfo() + plugin.PREFIX + "\" has been claimed by " + plugin.ALT_COLOR + ticket.getAssignedModerator() +
+                    "!");
         }
     }
 

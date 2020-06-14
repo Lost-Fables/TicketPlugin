@@ -751,7 +751,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
                     " Set Assigned_Team = '" + team +
                     "', Status = '" + Status.OPEN.name() +
-                    "', Assigned_Moderator = '" + "NONE" +
+                    "', Assigned_Moderator = '" + "None" +
                     "' WHERE id = '" + uuid + "';");
 
             preparedStatement.executeUpdate();

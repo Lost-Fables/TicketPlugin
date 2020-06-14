@@ -85,7 +85,7 @@ public class ConcreteDatabase extends Database
         this.PASSWORD = password;
         this.PORT = port;
         this.DATABASE_NAME = database;
-        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?UseSSL=false&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false";
+        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false";
 
     }
 
@@ -107,7 +107,6 @@ public class ConcreteDatabase extends Database
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(CONNECTION_STRING, USERNAME, PASSWORD);
 
-            System.out.println("Connected to the mySQL database.");
             return connection;
         }
         catch (SQLException e)

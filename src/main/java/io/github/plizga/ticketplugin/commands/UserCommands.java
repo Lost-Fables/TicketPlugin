@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -195,7 +196,12 @@ public class UserCommands extends BaseCommand
             book.setItemMeta(bookMeta);
 
 
-            player.getInventory().addItem(book);
+            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
+
+            if(!itemStackHashMap.isEmpty())
+            {
+                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
+            }
 
         }
         else

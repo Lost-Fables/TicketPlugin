@@ -34,9 +34,9 @@ public final class TicketPlugin extends JavaPlugin
     /** Defines the start of commands '/COMMAND_START create etc' */
     public final String COMMAND_START = "request";
     /** Defines the first common color used in the plugin. */
-    public final String PREFIX = ChatColor.DARK_AQUA + "";
+    public final String PREFIX = ChatColor.GRAY + "";
     /** Defines the second common color used in the plugin. */
-    public final String ALT_COLOR = ChatColor.DARK_PURPLE + "";
+    public final String ALT_COLOR = ChatColor.BLUE + "";
     /** Defines the common error color used in the plugin. */
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
     /** Keeps track of any staff currently on duty. Will empty out upon plugin restart or shutdown. */

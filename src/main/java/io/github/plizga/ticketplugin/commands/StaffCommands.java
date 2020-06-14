@@ -309,7 +309,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            List openTickets = database.getOpenTicketsByTeam(team.name());
+            List openTickets = database.getTeamClaimedTickets(team.name());
 
             if(openTickets.size() == 0)
             {

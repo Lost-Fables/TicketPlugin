@@ -51,7 +51,7 @@ public class TicketPlayerListener implements Listener
             ItemMeta itemMeta = itemStack.getItemMeta();
             if(itemMeta instanceof BookMeta)
             {
-                if(((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
+                if(((BookMeta) itemMeta).getAuthor() != null &&((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
                 {
                     event.setCancelled(true);
                     itemStack.setAmount(0);
@@ -70,7 +70,7 @@ public class TicketPlayerListener implements Listener
             ItemMeta itemMeta = itemStack.getItemMeta();
             if(itemMeta instanceof BookMeta)
             {
-                if(((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
+                if(((BookMeta) itemMeta).getAuthor() != null &&((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
                 {
                     event.setCancelled(true);
                     itemStack.setAmount(0);

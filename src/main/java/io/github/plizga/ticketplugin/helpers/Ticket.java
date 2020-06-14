@@ -267,36 +267,35 @@ public class Ticket implements Comparable
         long differenceDays = difference / (60 * 60 * 24 * 1000);
         long differenceHours = difference / (60 * 60 * 1000) % 24;
         long differenceMinutes = difference / (60 * 1000) % 60;
-
+        boolean days = false, hours = false, minutes = false;
         TextComponent timeSinceCreated;
 
-        if(differenceHours == 0)
+        if(differenceDays == 0)
         {
-            if(differenceMinutes == 0)
+            if(differenceHours == 0)
             {
-                timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+                if(differenceMinutes == 0)
+                {
+                    timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+                }
+                else
+                {
+                    timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
+                }
             }
             else
-            {
-                timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
-            }
-
-        }
-        else
-        {
-            if (differenceDays == 0)
             {
                 timeSinceCreated = new TextComponent(TIME_COLOR + differenceHours +
                         "H, " + differenceMinutes + "M ");
             }
-            else
-            {
-                timeSinceCreated = new TextComponent(TIME_COLOR + differenceDays +
-                        "D, " + differenceHours +
-                        "H, " + differenceMinutes + "M ");
-            }
-
         }
+        else
+        {
+            timeSinceCreated = new TextComponent(TIME_COLOR + differenceDays +
+                    "D, " + differenceHours +
+                    "H, " + differenceMinutes + "M ");
+        }
+
         timeSinceCreated.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                 "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
         timeSinceCreated.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
@@ -309,7 +308,7 @@ public class Ticket implements Comparable
         //get the claimer
         TextComponent claimer;
 
-        if(this.assignedModerator.equals("None"))
+        if(this.assignedModerator.equalsIgnoreCase("None"))
         {
             claimer = new TextComponent(CLAIMED_COLOR +"UNCLAIMED");
         }

@@ -43,7 +43,7 @@
 - /request staff viewClaimed &lt;Team&gt;
     - Allows a staff member to view all currently-claimed tickets for a specified team.
     
--/request staff viewMyClaimed
+- /request staff viewMyClaimed
     - Allows a staff member to view their currently claimed tickets.
     
 ### Example of Workflow
@@ -51,6 +51,7 @@
 A staff-member types '/request staff viewAll' and sees the following tickets:
 
 ![Image of Tickets Being Viewed](https://i.gyazo.com/65a1e28fde22cccbcd2be9a9fc782a76.png)
+
 *The tickets appear in the quick-view list in the following format,*
 
 ```TEAM PREFIX ``` ```USERNAME``` ```FIRST CHARS``` ```X TIME AGO``` ```CLAIMER```

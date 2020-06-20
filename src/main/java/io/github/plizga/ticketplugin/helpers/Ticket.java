@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -107,7 +108,7 @@ public class Ticket implements Comparable
         textComponents.add(infoText);
 
         //Status
-        TextComponent statusText = new TextComponent(plugin.PREFIX + "Status: " + plugin.ALT_COLOR + status + "\n");
+        TextComponent statusText = new TextComponent(plugin.PREFIX + "Status: " + plugin.ALT_COLOR + status + " ");
         if(status.equals(Status.CLAIMED) || status.equals(Status.OPEN))
         {
             statusText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
@@ -120,7 +121,7 @@ public class Ticket implements Comparable
 
         //Team
 
-        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + Team.getColor(team) + team.name() + "\n");
+        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + Team.getColor(team) + team.name() + " ");
         teamText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                 "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
         teamText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -174,6 +175,14 @@ public class Ticket implements Comparable
 
         textComponents.add(locationText);
 
+        //comments
+
+
+        int commentAmount = getCommentAmount();
+        TextComponent commentText = new TextComponent(plugin.PREFIX + " Comments: " + plugin.ALT_COLOR + commentAmount + " ");
+        textComponents.add(commentText);
+
+        //build
         ComponentBuilder componentBuilder = new ComponentBuilder("");
 
         for(TextComponent textComponent : textComponents)
@@ -258,36 +267,35 @@ public class Ticket implements Comparable
         long differenceDays = difference / (60 * 60 * 24 * 1000);
         long differenceHours = difference / (60 * 60 * 1000) % 24;
         long differenceMinutes = difference / (60 * 1000) % 60;
-
+        boolean days = false, hours = false, minutes = false;
         TextComponent timeSinceCreated;
 
-        if(differenceHours == 0)
+        if(differenceDays == 0)
         {
-            if(differenceMinutes == 0)
+            if(differenceHours == 0)
             {
-                timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+                if(differenceMinutes == 0)
+                {
+                    timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+                }
+                else
+                {
+                    timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
+                }
             }
             else
-            {
-                timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
-            }
-
-        }
-        else
-        {
-            if (differenceDays == 0)
             {
                 timeSinceCreated = new TextComponent(TIME_COLOR + differenceHours +
                         "H, " + differenceMinutes + "M ");
             }
-            else
-            {
-                timeSinceCreated = new TextComponent(TIME_COLOR + differenceDays +
-                        "D, " + differenceHours +
-                        "H, " + differenceMinutes + "M ");
-            }
-
         }
+        else
+        {
+            timeSinceCreated = new TextComponent(TIME_COLOR + differenceDays +
+                    "D, " + differenceHours +
+                    "H, " + differenceMinutes + "M ");
+        }
+
         timeSinceCreated.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                 "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
         timeSinceCreated.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
@@ -300,7 +308,7 @@ public class Ticket implements Comparable
         //get the claimer
         TextComponent claimer;
 
-        if(this.assignedModerator.equals("None"))
+        if(this.assignedModerator.equalsIgnoreCase("None"))
         {
             claimer = new TextComponent(CLAIMED_COLOR +"UNCLAIMED");
         }
@@ -343,7 +351,12 @@ public class Ticket implements Comparable
             playerInfo.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
             playerInfo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to message the assigned staff member.").create()));
         }
-        return new ComponentBuilder(playerInfo);
+
+        int commentAmount = getCommentAmountPlayer();
+        TextComponent viewComments = new TextComponent(plugin.PREFIX + " Comments: " + plugin.ALT_COLOR + commentAmount);
+        viewComments.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  "/" + plugin.COMMAND_START + " comment " + this.id));
+        viewComments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open the comments for this ticket.").create()));
+        return new ComponentBuilder(playerInfo).append(viewComments);
     }
 
 
@@ -450,5 +463,39 @@ public class Ticket implements Comparable
             return this.getDateCreated().compareTo(str);
         }
         return -1;
+    }
+
+    private int getCommentAmount()
+    {
+        List<Comment> commentList = plugin.getDatabase().getAllComments(this.id);
+        int commentAmount;
+
+        if(commentList ==null)
+        {
+            commentAmount = 0;
+        }
+        else
+        {
+            commentAmount = commentList.size();
+        }
+
+        return commentAmount;
+    }
+
+    private int getCommentAmountPlayer()
+    {
+        List<Comment> commentList = plugin.getDatabase().getCommentsForPlayer(this.id);
+        int commentAmount;
+
+        if(commentList == null)
+        {
+            commentAmount = 0;
+        }
+        else
+        {
+            commentAmount = commentList.size();
+        }
+
+        return commentAmount;
     }
 }

@@ -29,6 +29,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class StaffCommands extends BaseCommand
@@ -63,11 +64,11 @@ public class StaffCommands extends BaseCommand
 
                 if(openTickets.size() == 0)
                 {
-                    sender.sendMessage(plugin.PREFIX + "There are no open tickets for the " + plugin.ALT_COLOR + team.name() +
+                    sender.sendMessage(plugin.PREFIX + "There are no open tickets for the " + Team.getColor(team) + team.name() +
                             plugin.PREFIX + " team.");
                     return;
                 }
-                sender.sendMessage(plugin.PREFIX + "Viewing tickets for the " + plugin.ALT_COLOR + team.name() +
+                sender.sendMessage(plugin.PREFIX + "Viewing tickets for the " + Team.getColor(team) + team.name() +
                         plugin.PREFIX + " team:");
                 readTicketsBasic(sender, openTickets);
             }
@@ -146,7 +147,6 @@ public class StaffCommands extends BaseCommand
 
             }
 
-            Collections.sort(openTickets);
 
             if(openTickets.size() == 0)
             {
@@ -180,6 +180,7 @@ public class StaffCommands extends BaseCommand
                 {
                     database.claimTicket(ticket.getId(), player.getName());
                     sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n");
+                    sendClaimedMessage(database.getTicketByUUID(uuid));
 
                 }
                 else if(assignedModerator.equalsIgnoreCase(player.getName()))
@@ -193,6 +194,7 @@ public class StaffCommands extends BaseCommand
                     database.unClaimTicket(uuid);
                     database.claimTicket(uuid, player.getName());
                     msg(plugin.PREFIX + "You have used your manager permissions to claim this ticket.");
+                    sendClaimedMessage(database.getTicketByUUID(uuid));
                 }
                 else
                 {
@@ -310,7 +312,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            List openTickets = database.getOpenTicketsByTeam(team.name());
+            List openTickets = database.getTeamClaimedTickets(team.name());
 
             if(openTickets.size() == 0)
             {
@@ -448,7 +450,13 @@ public class StaffCommands extends BaseCommand
             book.setItemMeta(bookMeta);
 
 
-            player.getInventory().addItem(book);
+            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
+
+            if(!itemStackHashMap.isEmpty())
+            {
+                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
+            }
+
 
 
         }
@@ -481,15 +489,15 @@ public class StaffCommands extends BaseCommand
 
                     BookMeta meta = getMeta();
                     String info = BookUtil.getPagesAsString(meta);
-                    if(info.length() <= 205)
+                    if(info.length() < 205)
                     {
                         database.createNewComment(player.getName(), info, uuid, isStaffComment);
+                        sendCommentMessage(database.getTicketByUUID(uuid));
                     }
                     else
                     {
                         msg(plugin.ERROR_COLOR + "Please limit your comment to under 205 characters.");
                     }
-
                 }
             };
 

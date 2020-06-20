@@ -85,7 +85,9 @@ public class ConcreteDatabase extends Database
         this.PASSWORD = password;
         this.PORT = port;
         this.DATABASE_NAME = database;
-        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false";
+
+
+        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false";
 
     }
 
@@ -107,7 +109,6 @@ public class ConcreteDatabase extends Database
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(CONNECTION_STRING, USERNAME, PASSWORD);
 
-            System.out.println("Connected to the mySQL database.");
             return connection;
         }
         catch (SQLException e)
@@ -193,10 +194,11 @@ public class ConcreteDatabase extends Database
             preparedStatement.setString(9, locationString);
 
 
-            if(ticketData.length() > 255)
+            if(ticketData.length() >= 255)
             {
-                ticketData = ticketData.substring(0,254);
+                ticketData = ticketData.substring(0,253);
             }
+
             preparedStatement.setString(10, ticketData);
 
 
@@ -342,7 +344,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Player = '" + playerName + "' AND (Status = '" + Status.OPEN.name() +
                     "' OR Status = '" + Status.CLAIMED.name() +
-                    "') ORDER BY `Date_Created` DESC;");
+                    "') ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -377,8 +379,8 @@ public class ConcreteDatabase extends Database
         {
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME + " WHERE Assigned_Team = '" +
-                    team + "' AND Status = '" + Status.OPEN.name() +
-                    "' ORDER BY `Date_Created` DESC;");
+                    team + "' AND (Status = '" + Status.OPEN.name() + "' OR Status = '" + Status.CLAIMED.name() +
+                    "') ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -412,8 +414,8 @@ public class ConcreteDatabase extends Database
         {
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
-                    " WHERE Status = '" + Status.OPEN.name() +
-                    "' ORDER BY `Date_Created` DESC;");
+                    " WHERE Status = '" + Status.OPEN.name() + "' OR Status = '" + Status.CLAIMED.name() +
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -637,7 +639,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Status = '" + Status.CLAIMED.name() +
             "' AND Assigned_Moderator = '" + player +
-                    "' ORDER BY `Date_Created` DESC;");
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -675,7 +677,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Status = '" + Status.CLAIMED.name() +
                     "' AND Assigned_Team = '" + team +
-                    "' ORDER BY `Date_Created` DESC;");
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -712,7 +714,7 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + TICKET_TABLE_NAME +
                     " WHERE Status = '" + Status.CLAIMED.name() +
-                    "' ORDER BY `Date_Created` DESC;");
+                    "' ORDER BY `Date_Created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -750,7 +752,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("UPDATE " + TICKET_TABLE_NAME +
                     " Set Assigned_Team = '" + team +
                     "', Status = '" + Status.OPEN.name() +
-                    "', Assigned_Moderator = '" + "NONE" +
+                    "', Assigned_Moderator = '" + "None" +
                     "' WHERE id = '" + uuid + "';");
 
             preparedStatement.executeUpdate();
@@ -777,7 +779,7 @@ public class ConcreteDatabase extends Database
             connection = getSqlConnection();
             preparedStatement = connection.prepareStatement("SELECT * FROM " + COMMENT_TABLE_NAME +
                     " WHERE ticket_id = '" + uuid +
-                    "' ORDER BY `date_created` DESC;");
+                    "' ORDER BY `date_created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -1011,7 +1013,7 @@ public class ConcreteDatabase extends Database
             preparedStatement = connection.prepareStatement("SELECT * FROM " + COMMENT_TABLE_NAME +
                     " WHERE ticket_id = '" + uuid +
                     "' AND staff_only = 'false'" +
-                    " ORDER BY `date_created` DESC;");
+                    " ORDER BY `date_created` ASC;");
 
             resultSet = preparedStatement.executeQuery();
 

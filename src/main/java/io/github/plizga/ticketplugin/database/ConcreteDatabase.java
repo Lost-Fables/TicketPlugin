@@ -85,7 +85,7 @@ public class ConcreteDatabase extends Database
         this.PASSWORD = password;
         this.PORT = port;
         this.DATABASE_NAME = database;
-        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false";
+        this.CONNECTION_STRING = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=utf8&jdbcCompliantTruncation=false";
 
     }
 
@@ -112,7 +112,6 @@ public class ConcreteDatabase extends Database
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "Error initializing mySQL database in method getSQLConnection.");
-            System.out.println("Debug: " + PASSWORD);
         }
         catch (ClassNotFoundException e)
         {

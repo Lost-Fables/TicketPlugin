@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="727409c6-4b93-407f-8f4c-2ab1ca7eec1d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/target/TicketPlugin-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/TicketPlugin-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/TicketPlugin.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/TicketPlugin.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/BaseCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/BaseCommand.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/ReassignCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/ReassignCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/ReviewCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/ReviewCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/StaffCommands$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/StaffCommands$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/StaffCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/StaffCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/UserCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/commands/UserCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/enums/Team$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/enums/Team$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/enums/Team.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/enums/Team.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/helpers/Ticket.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/helpers/Ticket.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/listeners/TicketPlayerListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/listeners/TicketPlayerListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/sqlite/ConcreteDatabase.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/sqlite/Database.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/sqlite/Error.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/io/github/plizga/ticketplugin/sqlite/Errors.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/original-TicketPlugin-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/original-TicketPlugin-1.0-SNAPSHOT.jar" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="C:\Users\Korvi\IdeaProjects\TicketPlugin\.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1cqmmtI3VEWJ7Tep2gzdd31ej2u" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="727409c6-4b93-407f-8f4c-2ab1ca7eec1d" name="Default Changelist" comment="" />
+      <created>1591264659222</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1591264659222</updated>
+    </task>
+    <servers />
+  </component>
+</project>

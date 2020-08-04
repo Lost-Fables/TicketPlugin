@@ -3,10 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TicketPlugin.iml" filepath="$PROJECT_DIR$/TicketPlugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-bukkit/tythan-bukkit.iml" filepath="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-bukkit/tythan-bukkit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-bungee/tythan-bungee.iml" filepath="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-bungee/tythan-bungee.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-common/tythan-common.iml" filepath="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-common/tythan-common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-dist/tythan-dist.iml" filepath="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan/tythan-dist/tythan-dist.iml" />
     </modules>
   </component>
 </project>

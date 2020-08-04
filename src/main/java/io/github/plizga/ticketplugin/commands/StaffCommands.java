@@ -6,7 +6,7 @@ import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.util.MessageUtil;
-import com.comphenix.protocol.PacketType;
+
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
@@ -34,7 +34,6 @@ import java.util.List;
 
 public class StaffCommands extends BaseCommand
 {
-    private Database database;
     private ReassignCommands reassignCommands;
     public StaffCommands()
     {
@@ -356,49 +355,7 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        if(sender instanceof Player)
-        {
-            Player player = (Player) sender;
-
-            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-
-            BookMeta bookMeta = (BookMeta) book.getItemMeta();
-            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
-            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
-
-            ArrayList<String> pages = new ArrayList<String>();
-
-            List<Comment> comments = database.getAllComments(uuid);
-
-            if(!comments.isEmpty())
-            {
-                for(Comment c : comments)
-                {
-                    pages.add(c.toString());
-                }
-            }
-            else
-            {
-                pages.add("There are no comments for this ticket!");
-            }
-            bookMeta.setPages(pages);
-            book.setItemMeta(bookMeta);
-
-
-            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
-
-            if(!itemStackHashMap.isEmpty())
-            {
-                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
-            }
-
-
-
-        }
-        else
-        {
-            msg("Only players may access and modify comments.");
-        }
+        makeCommentBook(sender, uuid);
     }
 
     @Cmd(value="add a comment to a ticket.")

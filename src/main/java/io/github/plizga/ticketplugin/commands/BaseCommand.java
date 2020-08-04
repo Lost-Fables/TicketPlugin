@@ -3,22 +3,29 @@ package io.github.plizga.ticketplugin.commands;
 import co.lotc.core.command.CommandTemplate;
 import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public abstract class BaseCommand extends CommandTemplate
 {
     protected TicketPlugin plugin = TicketPlugin.getTicketPluginInstance();
+    protected Database database = plugin.getDatabase();
 
     private final String TICKET_BORDER = "~~~~~~~~~~~~~~~";
 //todo here
@@ -33,40 +40,6 @@ public abstract class BaseCommand extends CommandTemplate
      */
     void readTicketsBasic(CommandSender sender, List ticketList)
     {
-        //int index = 1; //omg an index!!!!
-        /*
-        Player player = null;
-        if(sender instanceof  Player)
-        {
-            player = (Player) sender;
-        }
-
-        for(Object o : ticketList)
-        {
-            //msg(plugin.PREFIX + "\nTicket " + index + ":");
-            Ticket ticket = (Ticket) o;
-            if(ticket.getAssignedModerator().equals("None"))
-            {
-                msg(plugin.PREFIX + ticket.toBasicInfo());
-            }
-            else
-            {
-                msg(plugin.PREFIX + ticket.toBasicInfoClaimed());
-
-                if(player != null && ticket.getAssignedModerator().equals(player.getName()))
-                {
-                    BaseComponent cmdButton = MessageUtil.CommandButton("Close this Ticket", "/" + plugin.COMMAND_START + " staff closeTicket " + ticket.getId());
-                    msg(cmdButton);
-                }
-
-            }
-            BaseComponent cmdButton = MessageUtil.CommandButton("Expand This Ticket", "/" + plugin.COMMAND_START + " staff expandTicket " + ticket.getId());
-
-            msg(cmdButton);
-
-            msg(plugin.ALT_COLOR + TICKET_BORDER + "\n");
-            //index++;*/
-
         int index = 1;
 
         for(Object o: ticketList)
@@ -176,6 +149,58 @@ public abstract class BaseCommand extends CommandTemplate
             player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
                     ticket.getInfo() + plugin.PREFIX + "\" has been claimed by " + plugin.ALT_COLOR + ticket.getAssignedModerator() +
                     "!");
+        }
+    }
+
+
+    /**
+     * This function generates a WRITTEN book of comments for a given ticket.
+     * @param sender    the (Player) receiving the book of comments
+     * @param uuid  the ticket from which the comments are related to.
+     */
+    protected void makeCommentBook(CommandSender sender, String uuid)
+    {
+        if (sender instanceof Player)
+        {
+            Player player = (Player) sender;
+
+            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+
+            BookMeta bookMeta = (BookMeta) book.getItemMeta();
+
+            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
+            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
+
+
+            ArrayList<String> pages = new ArrayList<String>();
+
+            List<Comment> comments = database.getCommentsForPlayer(uuid);
+
+            if (!comments.isEmpty())
+            {
+                for (Comment c : comments)
+                {
+                    pages.add(c.toString());
+                }
+            } else
+            {
+                pages.add("There are no comments for this ticket!");
+            }
+            bookMeta.setPages(pages);
+            book.setItemMeta(bookMeta);
+
+
+            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
+
+            if(!itemStackHashMap.isEmpty())
+            {
+                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
+            }
+
+        }
+        else
+        {
+            msg("Only players may access and modify comments.");
         }
     }
 

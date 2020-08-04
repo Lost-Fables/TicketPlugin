@@ -6,7 +6,7 @@ import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.util.MessageUtil;
-import com.comphenix.protocol.PacketType;
+
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
@@ -34,7 +34,6 @@ import java.util.List;
 
 public class StaffCommands extends BaseCommand
 {
-    private Database database;
     private ReassignCommands reassignCommands;
     public StaffCommands()
     {
@@ -217,71 +216,6 @@ public class StaffCommands extends BaseCommand
 
     }
 
-    @Cmd(value="Allows staff to view currently claimed tickets for all of their teams.")
-    public void viewClaimed(CommandSender sender)
-    {
-        List openTickets = new ArrayList<Ticket>();
-
-        if (sender instanceof Player)
-        {
-            Player player = (Player) sender;
-
-            if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Admin)))
-            {
-
-                openTickets.addAll(database.getAllClaimedTickets());
-            }
-            else
-            {
-                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Tech)))
-                {
-                    openTickets.addAll(database.getTeamClaimedTickets(Team.Tech.name()));
-
-                }
-                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Moderator)))
-                {
-                    openTickets.addAll(database.getTeamClaimedTickets(Team.Moderator.name()));
-
-                }
-                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Event)))
-                {
-                    openTickets.addAll(database.getTeamClaimedTickets(Team.Event.name()));
-
-                }
-                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Lore)))
-                {
-                    openTickets.addAll(database.getTeamClaimedTickets(Team.Lore.name()));
-
-                }
-                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Build)))
-                {
-                    openTickets.addAll(database.getTeamClaimedTickets(Team.Build.name()));
-
-                }
-                if (player.hasPermission(TicketPlugin.PERMISSION_START + Team.getPermission(Team.Design)))
-                {
-                    openTickets.addAll(database.getTeamClaimedTickets(Team.Design.name()));
-
-                }
-
-
-                openTickets.addAll(database.getTeamClaimedTickets(Team.Global.name()));
-
-
-            }
-
-            Collections.sort(openTickets);
-
-            if (openTickets.size() == 0)
-            {
-                sender.sendMessage(plugin.PREFIX + "There are no claimed tickets for any teams you are a part of.");
-                return;
-            }
-            sender.sendMessage(plugin.PREFIX + "Viewing claimed tickets for your teams:");
-
-            readTicketsBasic(sender, openTickets);
-        }
-    }
 
     @Cmd(value="Allows staff members to view claimed tickets for a specified team.")
     public void viewClaimed(CommandSender sender, Team team)
@@ -421,49 +355,7 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        if(sender instanceof Player)
-        {
-            Player player = (Player) sender;
-
-            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-
-            BookMeta bookMeta = (BookMeta) book.getItemMeta();
-            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
-            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
-
-            ArrayList<String> pages = new ArrayList<String>();
-
-            List<Comment> comments = database.getAllComments(uuid);
-
-            if(!comments.isEmpty())
-            {
-                for(Comment c : comments)
-                {
-                    pages.add(c.toString());
-                }
-            }
-            else
-            {
-                pages.add("There are no comments for this ticket!");
-            }
-            bookMeta.setPages(pages);
-            book.setItemMeta(bookMeta);
-
-
-            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
-
-            if(!itemStackHashMap.isEmpty())
-            {
-                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
-            }
-
-
-
-        }
-        else
-        {
-            msg("Only players may access and modify comments.");
-        }
+        makeCommentBook(sender, uuid);
     }
 
     @Cmd(value="add a comment to a ticket.")

@@ -28,7 +28,7 @@ import java.util.List;
 public class UserCommands extends BaseCommand
 {
 
-    private Database database;
+
     private StaffCommands staffCommands;
     private ReviewCommands reviewCommands;
 
@@ -163,51 +163,18 @@ public class UserCommands extends BaseCommand
         }
     }
 
+
+    /**
+     * This method shares a similar function to the "comment" function of StaffCommands, and the majority of their code
+     * has been moved to BaseCommand's "makeCommentBook" function, where a book of ticket comments is entered into a
+     * book and handed to the player.
+     * @param sender Prerequisite: Must be Player to succeed
+     * @param uuid  the uuid of the ticket
+     */
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        if (sender instanceof Player)
-        {
-            Player player = (Player) sender;
-
-            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-
-            BookMeta bookMeta = (BookMeta) book.getItemMeta();
-
-            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
-            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
-
-
-            ArrayList<String> pages = new ArrayList<String>();
-
-            List<Comment> comments = database.getCommentsForPlayer(uuid);
-
-            if (!comments.isEmpty())
-            {
-                for (Comment c : comments)
-                {
-                    pages.add(c.toString());
-                }
-            } else
-            {
-                pages.add("There are no comments for this ticket!");
-            }
-            bookMeta.setPages(pages);
-            book.setItemMeta(bookMeta);
-
-
-            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
-
-            if(!itemStackHashMap.isEmpty())
-            {
-                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
-            }
-
-        }
-        else
-        {
-            msg("Only players may access and modify comments.");
-        }
+        makeCommentBook(sender, uuid);
     }
 
     @Cmd(value="Allows a plyer to view their completed tickets.")

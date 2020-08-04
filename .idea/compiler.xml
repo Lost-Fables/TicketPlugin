@@ -7,9 +7,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="TicketPlugin" />
-        <module name="tythan-bukkit" />
-        <module name="tythan-bungee" />
-        <module name="tythan-common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

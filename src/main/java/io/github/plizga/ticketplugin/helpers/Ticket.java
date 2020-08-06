@@ -150,16 +150,16 @@ public class Ticket implements Comparable
 
             String worldName = locationArray[0];
 
-            Double x = Double.parseDouble(locationArray[1]);
+            double x = Double.parseDouble(locationArray[1]);
 
-            Double y = Double.parseDouble(locationArray[2]);
+            double y = Double.parseDouble(locationArray[2]);
 
-            Double z = Double.parseDouble(locationArray[3]);
+            double z = Double.parseDouble(locationArray[3]);
 
             locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +
-                    ": X:" + x.shortValue() + " Y:" + y.shortValue() + " Z:" + z.shortValue());
+                                             ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z);
             locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                    "/" + plugin.COMMAND_START + " staff ticketTP "+ worldName + " " + x.intValue() + " " + y.intValue() + " " + z.intValue()));
+                                                      "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + (int) x + " " + (int) y + " " + (int) z));
             locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to teleport to this location.")));
 
         }
@@ -202,7 +202,7 @@ public class Ticket implements Comparable
                 "] ");
         teamPrefix.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                 "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
-        teamPrefix.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(this.info).create()));
+        teamPrefix.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)));
 
         textComponents[0] = teamPrefix;
 

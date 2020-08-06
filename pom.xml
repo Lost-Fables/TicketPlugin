@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.plizga</groupId>
-    <artifactId>TicketPlugin</artifactId>
+    <artifactId>TicketPluginBungee</artifactId>
     <version>1.16.0.2</version>
     <packaging>jar</packaging>
 
@@ -43,8 +43,8 @@
 
     <repositories>
         <repository>
-            <id>spigotmc-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
         <repository>
             <id>sonatype</id>
@@ -54,20 +54,24 @@
     </repositories>
 
     <dependencies>
-
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.16-R0.2-SNAPSHOT</version>
+            <type>jar</type>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.16-R0.2-SNAPSHOT</version>
+            <type>javadoc</type>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId> co.lotc</groupId>
-            <artifactId>tythan-bukkit</artifactId>
+            <artifactId>tythan-bungee</artifactId>
             <version>0.7.9</version>
         </dependency>
     </dependencies>
-
-
 </project>

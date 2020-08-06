@@ -2,7 +2,7 @@ package io.github.plizga.ticketplugin.enums;
 
 
 import co.lotc.core.agnostic.Sender;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;

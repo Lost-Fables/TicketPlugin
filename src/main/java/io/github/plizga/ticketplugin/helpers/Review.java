@@ -1,7 +1,7 @@
 package io.github.plizga.ticketplugin.helpers;
 
 import io.github.plizga.ticketplugin.TicketPlugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.plugin.Plugin;
 
 /**
  * semi-stub class for Reviews. Reviews aren't currently accessed, so this is kinda just here.
@@ -13,7 +13,7 @@ public class Review
 
     private TicketPlugin plugin;
 
-    public Review(JavaPlugin plugin, String id, int rating)
+    public Review(Plugin plugin, String id, int rating)
     {
         this.plugin = (TicketPlugin) plugin;
         this.id = id;

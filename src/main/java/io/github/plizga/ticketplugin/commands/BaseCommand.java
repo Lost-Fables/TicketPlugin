@@ -7,15 +7,11 @@ import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +23,7 @@ public abstract class BaseCommand extends CommandTemplate
     protected TicketPlugin plugin = TicketPlugin.getTicketPluginInstance();
     protected Database database = plugin.getDatabase();
 
-    private final String TICKET_BORDER = "~~~~~~~~~~~~~~~";
+    private static final String TICKET_BORDER = "~~~~~~~~~~~~~~~";
 //todo here
     private OfflineStorage offlineStorage = new OfflineStorage(plugin);
 
@@ -47,11 +43,10 @@ public abstract class BaseCommand extends CommandTemplate
             Ticket ticket = (Ticket) o;
             ComponentBuilder componentBuilder = ticket.toBasicInfo();
 
-            sender.spigot().sendMessage(componentBuilder.create());
+            sender.sendMessage(componentBuilder.create());
 
 
             index++;
-
         }
     }
 
@@ -68,7 +63,7 @@ public abstract class BaseCommand extends CommandTemplate
         {
             msg("\nTicket " + index + ":");
             Ticket ticket = (Ticket) o;
-            sender.spigot().sendMessage(ticket.toPlayerInfo().create());
+            sender.sendMessage(ticket.toPlayerInfo().create());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + ticket.getId());
             msg(cmdButton);
             msg(plugin.PREFIX + TICKET_BORDER + "\n");
@@ -85,7 +80,7 @@ public abstract class BaseCommand extends CommandTemplate
         for(Ticket t : completedTickets)
         {
             msg("\nTicket " + index + ":");
-            sender.spigot().sendMessage(t.toPlayerInfo().create());
+            sender.sendMessage(t.toPlayerInfo().create());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + t.getId());
             msg(cmdButton);
 
@@ -104,13 +99,13 @@ public abstract class BaseCommand extends CommandTemplate
 
     void sendReassignMessage(Ticket ticket, String team)
     {
-        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+        ProxiedPlayer player = plugin.getProxy().getPlayer(ticket.getPlayerName());
 
         if(player != null)
         {
-            player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                    ticket.getInfo() + plugin.PREFIX + ",\" has been reassigned to the " + plugin.ALT_COLOR +
-                    team + plugin.PREFIX + " team!");
+            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
+                                                 ticket.getInfo() + plugin.PREFIX + ",\" has been reassigned to the " + plugin.ALT_COLOR +
+                                                 team + plugin.PREFIX + " team!"));
         }
 
 
@@ -118,46 +113,49 @@ public abstract class BaseCommand extends CommandTemplate
 
     void sendCompletedMessage(Ticket ticket)
     {
-        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+        ProxiedPlayer player = plugin.getProxy().getPlayer(ticket.getPlayerName());
 
         if(player != null)
         {
-            player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                    ticket.getInfo() + plugin.PREFIX + "\" has been completed! Use " + plugin.ALT_COLOR + "\"/" +
-                    plugin.COMMAND_START + " viewCompleted\"" + plugin.PREFIX + "to add a review!");
+            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
+                                                 ticket.getInfo() + plugin.PREFIX + "\" has been completed! Use " + plugin.ALT_COLOR + "\"/" +
+                                                 plugin.COMMAND_START + " viewCompleted\"" + plugin.PREFIX + "to add a review!"));
         }
     }
 
     void sendCommentMessage(Ticket ticket)
     {
-        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+        ProxiedPlayer player = plugin.getProxy().getPlayer(ticket.getPlayerName());
 
         if(player != null)
         {
-            player.sendMessage(plugin.PREFIX + "A comment has been added to your ticket, with the description \"" + plugin.ALT_COLOR +
-                    ticket.getInfo() + plugin.PREFIX + "\" Use " + plugin.ALT_COLOR + "\"/" +
-                    plugin.COMMAND_START + " view\"" + plugin.PREFIX + ", and click \"View Comments\" to view!");
+            player.sendMessage(new TextComponent(plugin.PREFIX + "A comment has been added to your ticket, with the description \"" + plugin.ALT_COLOR +
+                                                 ticket.getInfo() + plugin.PREFIX + "\" Use " + plugin.ALT_COLOR + "\"/" +
+                                                 plugin.COMMAND_START + " view\"" + plugin.PREFIX + ", and click \"View Comments\" to view!"));
         }
     }
 
     void sendClaimedMessage(Ticket ticket)
     {
-        Player player = Bukkit.getPlayer(ticket.getPlayerName());
+        ProxiedPlayer player = plugin.getProxy().getPlayer(ticket.getPlayerName());
 
         if(player != null)
         {
-            player.sendMessage(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                    ticket.getInfo() + plugin.PREFIX + "\" has been claimed by " + plugin.ALT_COLOR + ticket.getAssignedModerator() +
-                    "!");
+            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
+                                                 ticket.getInfo() + plugin.PREFIX + "\" has been claimed by " + plugin.ALT_COLOR + ticket.getAssignedModerator() +
+                                                 "!"));
         }
     }
 
 
+    // TODO Make bukkit hook to make the comment books?
+    /*
     /**
      * This function generates a WRITTEN book of comments for a given ticket.
      * @param sender    the (Player) receiving the book of comments
      * @param uuid  the ticket from which the comments are related to.
      */
+    /*
     protected void makeCommentBook(CommandSender sender, String uuid)
     {
         if (sender instanceof Player)
@@ -217,7 +215,7 @@ public abstract class BaseCommand extends CommandTemplate
         }
 
         return totalPageCount;
-    }
+    }*//*
 
     /**
      * Helper method to assist in pagination of data given a list of values.
@@ -229,6 +227,7 @@ public abstract class BaseCommand extends CommandTemplate
      * @param page  the page number
      * @param contentPerPage    amount of content to be shown per page.
      */
+    /*
     protected void paginate(CommandSender sender, List list, int page, int totalPageCount, int contentPerPage)
     {
 
@@ -262,7 +261,7 @@ public abstract class BaseCommand extends CommandTemplate
 
 
 
-    }
+    }*/
 
 
 }

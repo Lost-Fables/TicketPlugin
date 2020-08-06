@@ -4,24 +4,17 @@ package io.github.plizga.ticketplugin.commands;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 
-import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
-import io.github.plizga.ticketplugin.helpers.Comment;
-import io.github.plizga.ticketplugin.database.Database;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.*;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
+import net.md_5.bungee.api.chat.hover.content.Text;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -55,9 +48,9 @@ public class UserCommands extends BaseCommand
                        @Arg(value="info", description="The description for the ticket being created.") String[] info)
     {
 
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             String infoMessage = String.join(" ", info);
 
@@ -72,7 +65,7 @@ public class UserCommands extends BaseCommand
         }
         else
         {
-            sender.sendMessage(ChatColor.DARK_RED + "Only players may create a ticket.");
+            sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may create a ticket."));
         }
     }
 
@@ -80,26 +73,26 @@ public class UserCommands extends BaseCommand
     @Cmd(value="look at the open tickets you have created", permission=TicketPlugin.PERMISSION_START + ".view")
     public void view(CommandSender sender)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
-            List openTickets = database.getPlayerOpenTickets(player.getName());
+            ProxiedPlayer player = (ProxiedPlayer) sender;
+            List<? extends Object> openTickets = database.getPlayerOpenTickets(player.getName());
 
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(plugin.PREFIX + "No open tickets to view!");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "No open tickets to view!"));
                 return;
             }
 
             readPlayerTickets(sender, openTickets);
-            sender.sendMessage(plugin.PREFIX + "To delete a ticket, use the command " + plugin.ALT_COLOR +
-                    " /request cancel <number> " + plugin.PREFIX + ", where <number> is the ticket number as it appears" +
-                    " on this list. \n Alternatively, use " + plugin.ALT_COLOR + "/request cancel all" +
-                    plugin.PREFIX + " to cancel all of your current tickets.");
+            sender.sendMessage(new TextComponent(plugin.PREFIX + "To delete a ticket, use the command " + plugin.ALT_COLOR +
+                                                 " /request cancel <number> " + plugin.PREFIX + ", where <number> is the ticket number as it appears" +
+                                                 " on this list. \n Alternatively, use " + plugin.ALT_COLOR + "/request cancel all" +
+                                                 plugin.PREFIX + " to cancel all of your current tickets."));
         }
         else
         {
-            sender.sendMessage(ChatColor.DARK_RED + "Only players may get a list of their own tickets.");
+            sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may get a list of their own tickets."));
         }
 
     }
@@ -107,9 +100,9 @@ public class UserCommands extends BaseCommand
     @Cmd(value="allows a player to cancel their own tickets", permission=TicketPlugin.PERMISSION_START + ".cancel")
     public void cancel(CommandSender sender, @Arg(value = "number (or 'all')", description = "number of ticket to delete") String num)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
             List openTickets = database.getPlayerOpenTickets(player.getName());
             if(openTickets.size() == 0)
             {
@@ -122,7 +115,7 @@ public class UserCommands extends BaseCommand
                 if(num.equals("all"))
                 {
                     database.cancelTicketByPlayer(player.getName());
-                    sender.sendMessage(plugin.PREFIX +  "All of your open tickets have been cancelled.");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX +  "All of your open tickets have been cancelled."));
                 }
                 else
                 {
@@ -134,20 +127,20 @@ public class UserCommands extends BaseCommand
                     }
                     catch(NumberFormatException e)
                     {
-                        sender.sendMessage(plugin.ERROR_COLOR + "Failed to execute command. Use 'all' or a number" +
-                                "instead of " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR + ".");
+                        sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Failed to execute command. Use 'all' or a number" +
+                                                             "instead of " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR + "."));
                         return;
                     }
                     Ticket ticket = (Ticket) openTickets.get(numAsInt);
                     database.cancelTicketByUUID(ticket.getId());
-                    sender.sendMessage(plugin.PREFIX + "Ticket " + plugin.ALT_COLOR + num + plugin.PREFIX + " has been deleted.");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "Ticket " + plugin.ALT_COLOR + num + plugin.PREFIX + " has been deleted."));
                 }
 
             }
             catch(IndexOutOfBoundsException e)
             {
-                sender.sendMessage(plugin.ERROR_COLOR + "Ticket " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR +
-                        " does not exist. Please enter a valid ticket number to cancel.");
+                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR +
+                                                     " does not exist. Please enter a valid ticket number to cancel."));
             }
 
 
@@ -174,20 +167,21 @@ public class UserCommands extends BaseCommand
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        makeCommentBook(sender, uuid);
+        //TODO Update this when we update the make comment book on the Bukkit/Spigot/Paper side.
+        //makeCommentBook(sender, uuid);
     }
 
     @Cmd(value="Allows a plyer to view their completed tickets.")
     public void viewCompleted(CommandSender sender)
     {
-        if(sender instanceof  Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
-            List completedTickets = database.getCompletedPlayerTickets(player.getUniqueId().toString());
+            ProxiedPlayer player = (ProxiedPlayer) sender;
+            List<Ticket> completedTickets = database.getCompletedPlayerTickets(player.getUniqueId().toString());
 
             if(completedTickets.size() == 0)
             {
-                sender.sendMessage(plugin.PREFIX + "No completed tickets to view!");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "No completed tickets to view!"));
                 return;
             }
 
@@ -202,33 +196,33 @@ public class UserCommands extends BaseCommand
     @Cmd(value="[Button] Allows a player to write a review for a ticket.")
     public void addReview(CommandSender sender, String ticketUUID)
     {
-        if(sender instanceof  Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             msg(plugin.PREFIX + "Please leave a review below, where 1 is the worst, and 5 is the best.\n");
             TextComponent oneStarButton = new TextComponent("[ * ");
             oneStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review one " + ticketUUID));
-            oneStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("1").create()));
+            oneStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("1")));
 
             TextComponent twoStarButton = new TextComponent("* ");
             twoStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review two " + ticketUUID));
-            twoStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("2").create()));
+            twoStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("2")));
 
             TextComponent threeStarButton = new TextComponent("* ");
             threeStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review three " + ticketUUID));
-            threeStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("3").create()));
+            threeStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("3")));
 
             TextComponent fourStarButton = new TextComponent("* ");
             fourStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review four " + ticketUUID));
-            fourStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("4").create()));
+            fourStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("4")));
 
             TextComponent fiveStarButton = new TextComponent("* ]");
             fiveStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review five " + ticketUUID));
-            fiveStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("5").create()));
+            fiveStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("5")));
             msg(plugin.PREFIX + "Review Rating: ");
             ComponentBuilder componentBuilder = new ComponentBuilder("").append(oneStarButton).append(twoStarButton).append(threeStarButton).append(fourStarButton).append(fiveStarButton);
-            sender.spigot().sendMessage(componentBuilder.create());
+            sender.sendMessage(componentBuilder.create());
         }
         else
         {

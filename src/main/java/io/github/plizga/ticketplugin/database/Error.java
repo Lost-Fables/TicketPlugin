@@ -1,6 +1,6 @@
 package io.github.plizga.ticketplugin.database;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.logging.Level;
 
@@ -10,10 +10,10 @@ import java.util.logging.Level;
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
 public class Error {
-    public static void execute(JavaPlugin plugin, Exception ex){
+    public static void execute(Plugin plugin, Exception ex){
         plugin.getLogger().log(Level.SEVERE, "Couldn't execute MySQL statement: ", ex);
     }
-    public static void close(JavaPlugin plugin, Exception ex){
+    public static void close(Plugin plugin, Exception ex){
         plugin.getLogger().log(Level.SEVERE, "Failed to close MySQL connection: ", ex);
     }
 }

@@ -1,7 +1,7 @@
 package io.github.plizga.ticketplugin.helpers;
 
 import io.github.plizga.ticketplugin.TicketPlugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.plugin.Plugin;
 
 public class Comment implements Comparable
 {
@@ -14,7 +14,7 @@ public class Comment implements Comparable
     private String dateCreated;
     private boolean isStaffOnly;
 
-   public Comment(JavaPlugin plugin, String id, String ticketId, String author, String comment, String dateCreated, boolean isStaffOnly)
+   public Comment(Plugin plugin, String id, String ticketId, String author, String comment, String dateCreated, boolean isStaffOnly)
    {
        this.plugin = (TicketPlugin) plugin;
        this.id = id;

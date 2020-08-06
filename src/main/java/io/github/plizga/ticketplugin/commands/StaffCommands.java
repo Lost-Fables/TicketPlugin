@@ -1,8 +1,5 @@
 package io.github.plizga.ticketplugin.commands;
 
-import co.lotc.core.bukkit.book.BookStream;
-import co.lotc.core.bukkit.util.BookUtil;
-import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.util.MessageUtil;
@@ -10,26 +7,19 @@ import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.TicketPlugin;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
-import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.database.Database;
 import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class StaffCommands extends BaseCommand
@@ -52,42 +42,42 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="look at the list of tickets for a specific team")
     public void view(CommandSender sender, Team team)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(team)) ||
             player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Admin)))
             {
-                List openTickets = database.getOpenTicketsByTeam(team.name());
+                List<? extends Object> openTickets = database.getOpenTicketsByTeam(team.name());
 
                 if(openTickets.size() == 0)
                 {
-                    sender.sendMessage(plugin.PREFIX + "There are no open tickets for the " + Team.getColor(team) + team.name() +
-                            plugin.PREFIX + " team.");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for the " + Team.getColor(team) + team.name() +
+                                                         plugin.PREFIX + " team."));
                     return;
                 }
-                sender.sendMessage(plugin.PREFIX + "Viewing tickets for the " + Team.getColor(team) + team.name() +
-                        plugin.PREFIX + " team:");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for the " + Team.getColor(team) + team.name() +
+                                                     plugin.PREFIX + " team:"));
                 readTicketsBasic(sender, openTickets);
             }
             else
             {
-                sender.sendMessage(plugin.ERROR_COLOR + "You do not have permission to view that team's tickets!");
+                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "You do not have permission to view that team's tickets!"));
             }
         }
         else
         {
-            List openTickets = database.getOpenTicketsByTeam(team.name());
+            List<? extends Object> openTickets = database.getOpenTicketsByTeam(team.name());
 
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(plugin.PREFIX + "There are no open tickets for the " + plugin.ALT_COLOR + team.name() +
-                        plugin.PREFIX + " team.");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for the " + plugin.ALT_COLOR + team.name() +
+                                                     plugin.PREFIX + " team."));
                 return;
             }
-            sender.sendMessage(plugin.PREFIX + "Viewing tickets for the " + plugin.ALT_COLOR + team.name() +
-                    plugin.PREFIX + " team:");
+            sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for the " + plugin.ALT_COLOR + team.name() +
+                                                 plugin.PREFIX + " team:"));
             readTicketsBasic(sender, openTickets);
         }
 
@@ -96,11 +86,11 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="look at the list of all available tickets for the staff member initiating the command.")
     public void viewAll(CommandSender sender)
     {
-       List openTickets = new ArrayList<Ticket>();
+       List<Ticket> openTickets = new ArrayList<>();
 
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Admin)))
             {
@@ -164,9 +154,9 @@ public class StaffCommands extends BaseCommand
     public void claim(CommandSender sender, String uuid)
     {
         //todo: allow managers to claim tickets even if they are already claimed.
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             try
             {
@@ -220,14 +210,14 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="Allows staff members to view claimed tickets for a specified team.")
     public void viewClaimed(CommandSender sender, Team team)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             if(player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(team)) ||
                     player.hasPermission(TicketPlugin.PERMISSION_START +  Team.getPermission(Team.Admin)))
             {
-                List openTickets = database.getTeamClaimedTickets(team.name());
+                List<? extends Ticket> openTickets = database.getTeamClaimedTickets(team.name());
 
                 if(openTickets.size() == 0)
                 {
@@ -246,7 +236,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            List openTickets = database.getTeamClaimedTickets(team.name());
+            List<? extends Ticket> openTickets = database.getTeamClaimedTickets(team.name());
 
             if(openTickets.size() == 0)
             {
@@ -263,9 +253,9 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="Allows staff members to view all of their currently claimed tickets.")
     public void viewMyClaimed(CommandSender sender)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             try
             {
@@ -314,17 +304,17 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="Allows for the expansion of tickets. Called from an 'expand ticket' button.")
     public void expandTicket(CommandSender sender, String uuid)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
             try
             {
                 Database database = plugin.getDatabase();
                 Ticket ticket =  database.getTicketByUUID(uuid);
                 msg(plugin.PREFIX + "Ticket Information: ");
-                sender.spigot().sendMessage(ticket.toExpandedInfo().create());
+                sender.sendMessage(ticket.toExpandedInfo().create());
                 BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true");
-                BaseComponent addCommentsButton2 = MessageUtil.CommandButton("Add Player and Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false");
+                BaseComponent addCommentsButton2 = MessageUtil.CommandButton("Add ProxiedPlayer and Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false");
                 BaseComponent viewCommentsButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
 
                 msg(addCommentsButton);
@@ -340,13 +330,13 @@ public class StaffCommands extends BaseCommand
             }
             catch(NullPointerException e)
             {
-                sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                        plugin.ALT_COLOR + "Method: claim");
+                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
+                                                     plugin.ALT_COLOR + "Method: claim"));
             }
         }
         else
         {
-            sender.sendMessage("Only players may expand tickets dude.");
+            sender.sendMessage(new TextComponent("Only players may expand tickets dude."));
         }
 
 
@@ -355,9 +345,12 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        makeCommentBook(sender, uuid);
+        // TODO re-enable after bukkit/spigot/paper hook
+        //makeCommentBook(sender, uuid);
     }
 
+    // TODO Spigot hook
+    /*
     @Cmd(value="add a comment to a ticket.")
     public void addComment(CommandSender sender, String uuid, boolean isStaffComment)
     {
@@ -403,12 +396,12 @@ public class StaffCommands extends BaseCommand
         {
             msg("Only players may access and modify comments.");
         }
-    }
+    }*/
 
     @Cmd(value="Allows a staff member to close a given ticket.")
     public void closeTicket(CommandSender sender, String ticketUUID)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
             try
             {
@@ -433,9 +426,9 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="Sets a staff-member off-duty.")
     public void offDuty(CommandSender sender)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
             String playerUUID = player.getUniqueId().toString();
             if(plugin.getStaffUUIDsOnDuty().contains(playerUUID))
             {
@@ -459,10 +452,10 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="Sets a staff-member on-duty.")
     public void onDuty(CommandSender sender, @Default("") String persistent)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
-            Staff staff = database.getStaff(((Player) sender).getUniqueId().toString());
+            ProxiedPlayer player = (ProxiedPlayer) sender;
+            Staff staff = database.getStaff(((ProxiedPlayer) sender).getUniqueId().toString());
 
             switch(persistent)
             {
@@ -522,7 +515,7 @@ public class StaffCommands extends BaseCommand
                             .append(slashMark)
                             .append(noButton);
 
-                    sender.spigot().sendMessage(componentBuilder.create());
+                    sender.sendMessage(componentBuilder.create());
                     break;
             }
 
@@ -534,12 +527,14 @@ public class StaffCommands extends BaseCommand
         }
     }
 
+    // TODO Spigot hook
+    /*
     @Cmd(value="Allows a staff member to teleport to a location given by a ticket.")
     public void ticketTP(CommandSender sender, String worldName, int x, int y, int z)
     {
-        if(sender instanceof Player)
+        if(sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
 
             World world = plugin.getServer().getWorld(worldName);
 
@@ -547,6 +542,6 @@ public class StaffCommands extends BaseCommand
 
             player.teleport(location);
         }
-    }
+    }*/
 
 }

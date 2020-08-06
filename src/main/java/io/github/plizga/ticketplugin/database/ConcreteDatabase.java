@@ -6,9 +6,8 @@ import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -77,7 +76,7 @@ public class ConcreteDatabase extends Database
      * database.
      * @param plugin    the JavaPlugin being attached to this ConcreteDatabase database.
      */
-    public ConcreteDatabase(JavaPlugin plugin, String host, String username, String password, String database, int port)
+    public ConcreteDatabase(Plugin plugin, String host, String username, String password, String database, int port)
     {
         super(plugin);
         this.HOST = host;
@@ -155,7 +154,7 @@ public class ConcreteDatabase extends Database
      * @param ticketData    the string representation of the ticket.
      */
     @Override
-    public void createNewTicket(Player player, Status status, Team team, String ticketData)
+    public void createNewTicket(ProxiedPlayer player, Status status, Team team, String ticketData)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -187,11 +186,12 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(8, null);
 
-            Location location = player.getLocation();
+            // TODO Make bukkit hook to grab server + location?
+            /*Location location = player.getLocation();
             String locationString = location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," +
-                    location.getZ();
+                    location.getZ();*/
 
-            preparedStatement.setString(9, locationString);
+            preparedStatement.setString(9, null/*locationString*/);
 
 
             if(ticketData.length() >= 255)

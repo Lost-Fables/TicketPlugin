@@ -1,7 +1,6 @@
 package io.github.plizga.ticketplugin.helpers;
 
 import com.google.common.collect.Lists;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ public class TicketList
     private final List<List<Ticket>> allTickets;
     private int currentIndex;
 
-    public TicketList(List ticketList, int elementsPerPage)
+    public TicketList(List<Ticket> ticketList, int elementsPerPage)
     {
         int partition = ((ticketList.size() - 1) / elementsPerPage) + 1;
 

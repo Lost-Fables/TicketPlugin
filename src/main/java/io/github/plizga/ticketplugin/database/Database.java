@@ -8,8 +8,8 @@ import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +26,7 @@ import java.util.List;
 public abstract class Database extends BaseCommand
 {
     /** The Java Plugin which will be associated with this database. */
-    protected JavaPlugin plugin;
+    protected Plugin plugin;
     /** The SQL Connection reference.*/
     Connection connection;
     /** The name of the table to be established in the database. */
@@ -41,7 +41,7 @@ public abstract class Database extends BaseCommand
      * The Constructor for the abstract class Database. Simply takes in the plugin.
      * @param plugin    the JavaPlugin associated with this database.
      */
-    Database(JavaPlugin plugin)
+    Database(Plugin plugin)
     {
         this.plugin = plugin;
     }
@@ -143,21 +143,21 @@ public abstract class Database extends BaseCommand
 
     public abstract void load();
 
-    public abstract void createNewTicket(Player player, Status status, Team team, String ticketData);
+    public abstract void createNewTicket(ProxiedPlayer player, Status status, Team team, String ticketData);
 
     public abstract void createNewComment(String player, String text, String ticketUUID, boolean isStaffOnly);
 
-    public abstract List getAllOpenTickets();
+    public abstract List<Ticket> getAllOpenTickets();
 
     public abstract List<Ticket> getAllClaimedTickets();
 
-    public abstract List getPlayerOpenTickets(String playerName);
+    public abstract List<Ticket> getPlayerOpenTickets(String playerName);
 
     public abstract void cancelTicketByUUID(String uuid);
 
     public abstract void cancelTicketByPlayer(String player);
 
-    public abstract List getOpenTicketsByTeam(String team);
+    public abstract List<Ticket> getOpenTicketsByTeam(String team);
 
     public abstract Ticket getTicketByUUID(String uuid);
 

@@ -1,6 +1,7 @@
 package io.github.plizga.ticketplugin;
 
-import co.lotc.core.bukkit.command.Commands;
+import co.lotc.core.bungee.command.BungeeCommandData;
+import co.lotc.core.bungee.command.Commands;
 import io.github.plizga.ticketplugin.commands.UserCommands;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.enums.TicketViewOptions;
@@ -8,13 +9,17 @@ import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.listeners.TicketPlayerListener;
 import io.github.plizga.ticketplugin.database.ConcreteDatabase;
 import io.github.plizga.ticketplugin.database.Database;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +30,7 @@ import java.util.UUID;
  * and defining global variables.
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
-public final class TicketPlugin extends JavaPlugin
+public final class TicketPlugin extends Plugin
 {
     /** The database used throughout the plugin. */
     private Database database;
@@ -44,7 +49,7 @@ public final class TicketPlugin extends JavaPlugin
     /** Represents an instance of the ticket plugin. */
     private static TicketPlugin ticketPluginInstance;
     /** Represents the config file. */
-    public static FileConfiguration config;
+    public static Configuration config;
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
@@ -63,21 +68,21 @@ public final class TicketPlugin extends JavaPlugin
     public void onEnable()
     {
         ticketPluginInstance = this;
-        getServer().getConsoleSender().sendMessage("TicketPlugin V1 Enabled!");
+        getProxy().getConsole().sendMessage(new TextComponent("TicketPlugin V1 Enabled!"));
         loadConfig();
 
         establishDatabase();
 
         this.database.load();
-        getServer().getConsoleSender().sendMessage("TicketPlugin database established properly.");
+        getProxy().getConsole().sendMessage(new TextComponent("TicketPlugin database established properly."));
 
 
         registerParameters();
-        Commands.build(getCommand(COMMAND_START), UserCommands::new);
+        Commands.build(new BungeeCommandData(this, COMMAND_START), UserCommands::new);
 
-        PluginManager pluginManager = getServer().getPluginManager();
+        PluginManager pluginManager = getProxy().getPluginManager();
         TicketPlayerListener listener = new TicketPlayerListener(this);
-        pluginManager.registerEvents(listener, this);
+        pluginManager.registerListener(this, listener);
 
 
     }
@@ -97,8 +102,12 @@ public final class TicketPlugin extends JavaPlugin
      */
     public void loadConfig()
     {
-        saveDefaultConfig();
-        config = getConfig();
+        try {
+            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(getDataFolder(), "config.yml"));
+        } catch (IOException e) {
+            getProxy().getConsole().sendMessage(new TextComponent("Failed to find config."));
+            e.printStackTrace();
+        }
     }
 
 
@@ -179,13 +188,12 @@ public final class TicketPlugin extends JavaPlugin
     {
         for(Staff staff : getStaffOnDuty())
         {
-            Player player = Bukkit.getPlayer(UUID.fromString(staff.getUuid()));
-
+            ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
 
             if(player != null && player.hasPermission(PERMISSION_START + Team.getPermission(team)))
             {
-                player.sendMessage(PREFIX + "A player ticket has been assigned to the " +
-                        Team.getColor(team) + team.name() + PREFIX + " team.");
+                player.sendMessage(new TextComponent(PREFIX + "A player ticket has been assigned to the " +
+                        Team.getColor(team) + team.name() + PREFIX + " team."));
 
             }
         }

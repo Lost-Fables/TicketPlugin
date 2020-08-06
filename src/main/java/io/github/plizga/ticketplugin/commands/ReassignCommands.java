@@ -4,7 +4,7 @@ import co.lotc.core.command.annotate.Cmd;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
-import org.bukkit.command.CommandSender;
+import net.md_5.bungee.api.CommandSender;
 
 public class ReassignCommands extends BaseCommand
 {

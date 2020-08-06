@@ -9,7 +9,7 @@
     <version>1.16.0.2</version>
     <packaging>jar</packaging>
 
-    <name>TicketPlugin</name>
+    <name>TicketPluginBungee</name>
 
     <description>A Ticket Plugin for Spigot that allows users to submit tickets, and allows moderators to answer said
         tickets.

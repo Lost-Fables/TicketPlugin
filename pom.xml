@@ -64,7 +64,7 @@
         <dependency>
             <groupId> co.lotc</groupId>
             <artifactId>tythan-bukkit</artifactId>
-            <version>0.7.3</version>
+            <version>0.7.9</version>
         </dependency>
     </dependencies>
 

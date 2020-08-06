@@ -191,7 +191,7 @@ public class ConcreteDatabase extends Database
             String locationString = location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," +
                     location.getZ();*/
 
-            preparedStatement.setString(9, null/*locationString*/);
+            preparedStatement.setString(9, ""/*locationString*/);
 
 
             if(ticketData.length() >= 255)

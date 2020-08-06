@@ -6,7 +6,7 @@
 
     <groupId>io.github.plizga</groupId>
     <artifactId>TicketPlugin</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.16.0.2</version>
     <packaging>jar</packaging>
 
     <name>TicketPlugin</name>
@@ -21,6 +21,7 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
+        <finalName>${project.name}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

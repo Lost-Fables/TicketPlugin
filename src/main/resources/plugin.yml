@@ -1,6 +1,6 @@
 name: TicketPlugin
-version: 0.01
-api-version: "1.13"
+version: ${project.version}
+api-version: "1.16"
 main: io.github.plizga.ticketplugin.TicketPlugin
 authors: [Plizga]
 description: A Ticket Plugin for Spigot that allows users to submit tickets, and allows moderators to answer said tickets.
@@ -10,7 +10,7 @@ commands:
   request:
     description: Allows a player to create a new ticket.
     usage: /<command>
-    aliases: [modreq]
+    aliases: [req, modreq]
 
 permissions:
 

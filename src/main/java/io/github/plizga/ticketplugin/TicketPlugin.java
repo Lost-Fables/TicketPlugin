@@ -20,6 +20,8 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -102,6 +104,20 @@ public final class TicketPlugin extends Plugin
      */
     public void loadConfig()
     {
+        // Save default config if config doesn't exist.
+        if (!getDataFolder().exists())
+            getDataFolder().mkdir();
+
+        File file = new File(getDataFolder(), "config.yml");
+        if (!file.exists()) {
+            try (InputStream in = getResourceAsStream("config.yml")) {
+                Files.copy(in, file.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Try to load our config
         try {
             config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(getDataFolder(), "config.yml"));
         } catch (IOException e) {

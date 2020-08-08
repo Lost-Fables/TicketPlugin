@@ -165,7 +165,7 @@ public class Ticket implements Comparable
             double z = 0;
             if (locationArray.length > i) x = Double.parseDouble(locationArray[i++]);
 
-            String serverName = "null";
+            String serverName = "main";
             if (locationArray.length > i) serverName = locationArray[i];
 
             locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +

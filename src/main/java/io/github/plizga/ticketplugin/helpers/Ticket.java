@@ -143,25 +143,36 @@ public class Ticket implements Comparable
 
 
         //Location - There will be 4 items in the String array due to being hard-coded into the SQL database
-        TextComponent locationText;
-        if(location.contains(","))
-        {
+        TextComponent locationText = null;
+        if(location.contains(",")) {
             String[] locationArray = this.location.split(",");
 
-            String worldName = locationArray[0];
+            String text = null;
+            String click = null;
+            String hover = null;
 
-            double x = Double.parseDouble(locationArray[1]);
+            int i = 0;
 
-            double y = Double.parseDouble(locationArray[2]);
+            String serverName = "null";
+            if (locationArray.length > i) serverName = locationArray[i++];
 
-            double z = Double.parseDouble(locationArray[3]);
+            String worldName = "null";
+            if (locationArray.length > i) worldName = locationArray[i++];
+
+            double x = 0;
+            if (locationArray.length > i) x = Double.parseDouble(locationArray[i++]);
+
+            double y = 0;
+            if (locationArray.length > i) x = Double.parseDouble(locationArray[i++]);
+
+            double z = 0;
+            if (locationArray.length > i) x = Double.parseDouble(locationArray[i]);
 
             locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +
                                              ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z);
             locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                                      "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + (int) x + " " + (int) y + " " + (int) z));
+                                                      "/" + plugin.COMMAND_START + " staff ticketTP " + serverName + " " + worldName + " " + (int) x + " " + (int) y + " " + (int) z));
             locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to teleport to this location.")));
-
         }
         else
         {

@@ -55,10 +55,10 @@ public class UserCommands extends BaseCommand
             String infoMessage = String.join(" ", info);
 
 
-            database.createNewTicket(player, Status.OPEN, team, infoMessage);
+            database.createNewTicket(player, "", Status.OPEN, team, infoMessage);
 
-            sender.sendMessage(plugin.PREFIX + "Your ticket, with the description: " +  plugin.ALT_COLOR +
-                    infoMessage + plugin.PREFIX + " has been created!");
+            sender.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description: " +  plugin.ALT_COLOR +
+                                                 infoMessage + plugin.PREFIX + " has been created!"));
 
             plugin.notifyOnDutyStaff(team);
 

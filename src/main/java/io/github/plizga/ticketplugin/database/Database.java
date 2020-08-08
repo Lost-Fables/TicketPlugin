@@ -143,7 +143,7 @@ public abstract class Database extends BaseCommand
 
     public abstract void load();
 
-    public abstract void createNewTicket(ProxiedPlayer player, Status status, Team team, String ticketData);
+    public abstract void createNewTicket(ProxiedPlayer player, String location, Status status, Team team, String ticketData);
 
     public abstract void createNewComment(String player, String text, String ticketUUID, boolean isStaffOnly);
 

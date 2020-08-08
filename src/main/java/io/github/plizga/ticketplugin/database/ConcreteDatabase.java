@@ -7,6 +7,7 @@ import io.github.plizga.ticketplugin.helpers.Review;
 import io.github.plizga.ticketplugin.helpers.Staff;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.*;
@@ -154,7 +155,7 @@ public class ConcreteDatabase extends Database
      * @param ticketData    the string representation of the ticket.
      */
     @Override
-    public void createNewTicket(ProxiedPlayer player, Status status, Team team, String ticketData)
+    public void createNewTicket(ProxiedPlayer player, String location, Status status, Team team, String ticketData)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -186,12 +187,10 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(8, null);
 
-            // TODO Make bukkit hook to grab server + location?
-            /*Location location = player.getLocation();
-            String locationString = location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," +
-                    location.getZ();*/
+            String locationString = player.getServer().getInfo().getName() + "," + location;
+            // location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ()
 
-            preparedStatement.setString(9, ""/*locationString*/);
+            preparedStatement.setString(9, locationString);
 
 
             if(ticketData.length() >= 255)

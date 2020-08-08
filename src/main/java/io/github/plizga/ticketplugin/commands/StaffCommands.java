@@ -16,6 +16,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
@@ -527,21 +528,29 @@ public class StaffCommands extends BaseCommand
         }
     }
 
-    // TODO Spigot hook
-    /*
+    // TODO Spigot hook for location TP after server swapping
+
     @Cmd(value="Allows a staff member to teleport to a location given by a ticket.")
-    public void ticketTP(CommandSender sender, String worldName, int x, int y, int z)
+    public void ticketTP(CommandSender sender, String serverName, String worldName, int x, int y, int z)
     {
         if(sender instanceof ProxiedPlayer)
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
-
+            ServerInfo server = plugin.getProxy().getServerInfo(serverName);
+            if (server != null) {
+                if (!player.getServer().getInfo().equals(server)) {
+                    player.connect(server);
+                }
+            } else {
+                msg(plugin.ERROR_COLOR + "Unable to find the server this ticket was made on. You can TP manually using the coordinates " + x + ", " + y + ", " + z);
+            }
+            /*
             World world = plugin.getServer().getWorld(worldName);
 
             Location location = new Location(world, x, y, z);
 
-            player.teleport(location);
+            player.teleport(location);*/
         }
-    }*/
+    }
 
 }

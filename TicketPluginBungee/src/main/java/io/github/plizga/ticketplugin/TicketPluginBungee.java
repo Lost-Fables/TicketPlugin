@@ -32,7 +32,7 @@ import java.util.UUID;
  * and defining global variables.
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
-public final class TicketPlugin extends Plugin
+public final class TicketPluginBungee extends Plugin
 {
     /** The database used throughout the plugin. */
     private Database database;
@@ -49,20 +49,21 @@ public final class TicketPlugin extends Plugin
     /** Keeps track of any staff currently on duty. Will empty out upon plugin restart or shutdown. */
     private List<Staff> staffOnDuty = new ArrayList<Staff>();
     /** Represents an instance of the ticket plugin. */
-    private static TicketPlugin ticketPluginInstance;
+    private static TicketPluginBungee ticketPluginBungeeInstance;
     /** Represents the config file. */
     public static Configuration config;
     /** The Bungee-Bukkit channels we use to communicate. */
     public final String CHANNEL = "lf:tickets";
     public final String TP_SUB_CHANNEL = "TicketsTeleport";
+    public final String CREATE_SUB_CHANNEL = "TicketsCreate";
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
      * @return  The {TicketPluginInstance}
      */
-    public static TicketPlugin getTicketPluginInstance()
+    public static TicketPluginBungee getTicketPluginBungeeInstance()
     {
-        return ticketPluginInstance;
+        return ticketPluginBungeeInstance;
     }
 
     /**
@@ -72,7 +73,7 @@ public final class TicketPlugin extends Plugin
     @Override
     public void onEnable()
     {
-        ticketPluginInstance = this;
+        ticketPluginBungeeInstance = this;
         getProxy().registerChannel(CHANNEL);
         getProxy().getConsole().sendMessage(new TextComponent("TicketPlugin V1 Enabled!"));
         loadConfig();
@@ -89,8 +90,6 @@ public final class TicketPlugin extends Plugin
         PluginManager pluginManager = getProxy().getPluginManager();
         TicketPlayerListener listener = new TicketPlayerListener(this);
         pluginManager.registerListener(this, listener);
-
-
     }
 
 

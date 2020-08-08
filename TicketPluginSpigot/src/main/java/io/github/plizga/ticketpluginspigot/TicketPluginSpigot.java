@@ -1,6 +1,7 @@
 package io.github.plizga.ticketpluginspigot;
 
 import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +18,7 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 	/** The Bungee-Bukkit channels we use to communicate. */
 	public final String CHANNEL = "lf:tickets";
 	public final String TP_SUB_CHANNEL = "TicketsTeleport";
+	public final String CREATE_SUB_CHANNEL = "TicketsCreate";
 
 	@Override
 	public void onEnable() {
@@ -45,21 +47,50 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 		if (subChannel.equalsIgnoreCase(TP_SUB_CHANNEL)) {
 			Location location = parseLocation(in.readUTF());
 			UUID uuid = UUID.fromString(in.readUTF());
+			pluginTPReceived(location, uuid);
+		} else if (subChannel.equalsIgnoreCase(CREATE_SUB_CHANNEL)) {
+			UUID uuid = UUID.fromString(in.readUTF());
+			String team = in.readUTF();
+			String message = in.readUTF();
+			returnWithLocation(uuid, team, message);
+		}
+	}
 
-			if (location != null) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						Player player = Bukkit.getPlayer(uuid);
-						if (player != null) {
-							player.teleport(location);
-							this.cancel();
-						}
-					}
-				}.runTaskTimer(this, 1, 1);
-			} else {
-				throw new NullPointerException("Passed null location from teleport request.");
+	private void returnWithLocation(UUID uuid, String team, String message) {
+		Player player = Bukkit.getPlayer(uuid);
+		if (player != null && player.isOnline()) {
+			Location loc = player.getLocation();
+			if (loc.getWorld() != null) {
+				String locationString = (loc.getWorld().getName() + "," +
+										 loc.getBlockX() + "," +
+										 loc.getBlockY() + "," +
+										 loc.getBlockZ());
+
+				ByteArrayDataOutput out = ByteStreams.newDataOutput();
+				out.writeUTF(CREATE_SUB_CHANNEL);
+				out.writeUTF(uuid.toString());
+				out.writeUTF(team);
+				out.writeUTF(message);
+				out.writeUTF(locationString);
+				this.getServer().sendPluginMessage(this, CHANNEL, out.toByteArray());
 			}
+		}
+	}
+
+	private void pluginTPReceived(Location location, UUID uuid) {
+		if (location != null) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					Player player = Bukkit.getPlayer(uuid);
+					if (player != null) {
+						player.teleport(location);
+						this.cancel();
+					}
+				}
+			}.runTaskTimer(this, 1, 1);
+		} else {
+			throw new NullPointerException("Passed null location from teleport request.");
 		}
 	}
 

@@ -1,6 +1,6 @@
 package io.github.plizga.ticketplugin.helpers;
 
-import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.TicketPluginBungee;
 import net.md_5.bungee.api.plugin.Plugin;
 
 /**
@@ -11,11 +11,11 @@ public class Review
     private String id;
     private int rating;
 
-    private TicketPlugin plugin;
+    private TicketPluginBungee plugin;
 
     public Review(Plugin plugin, String id, int rating)
     {
-        this.plugin = (TicketPlugin) plugin;
+        this.plugin = (TicketPluginBungee) plugin;
         this.id = id;
         this.rating = rating;
     }

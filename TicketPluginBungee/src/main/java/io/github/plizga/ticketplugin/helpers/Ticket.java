@@ -1,6 +1,6 @@
 package io.github.plizga.ticketplugin.helpers;
 
-import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.TicketPluginBungee;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import net.md_5.bungee.api.ChatColor;
@@ -9,7 +9,6 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,12 +40,12 @@ public class Ticket implements Comparable
     private String playerID;
 
 
-    private TicketPlugin plugin;
+    private TicketPluginBungee plugin;
 
     public Ticket(Plugin plugin, String id, String playerName, String playerID, Status status, Team team, String assignedModerator,
                   String dateCreated, String dateCleared, String location, String info)
     {
-        this.plugin = (TicketPlugin) plugin;
+        this.plugin = (TicketPluginBungee) plugin;
         this.id = id;
         this.playerName = playerName;
         this.status = status;

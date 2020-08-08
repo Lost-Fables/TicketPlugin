@@ -2,8 +2,7 @@ package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.CommandTemplate;
 import co.lotc.core.util.MessageUtil;
-import io.github.plizga.ticketplugin.TicketPlugin;
-import io.github.plizga.ticketplugin.helpers.Comment;
+import io.github.plizga.ticketplugin.TicketPluginBungee;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
@@ -13,14 +12,12 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
 public abstract class BaseCommand extends CommandTemplate
 {
-    protected TicketPlugin plugin = TicketPlugin.getTicketPluginInstance();
+    protected TicketPluginBungee plugin = TicketPluginBungee.getTicketPluginBungeeInstance();
     protected Database database = plugin.getDatabase();
 
     private static final String TICKET_BORDER = "~~~~~~~~~~~~~~~";

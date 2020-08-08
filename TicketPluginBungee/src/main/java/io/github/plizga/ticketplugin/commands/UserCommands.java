@@ -4,24 +4,27 @@ package io.github.plizga.ticketplugin.commands;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 
-import io.github.plizga.ticketplugin.TicketPlugin;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import io.github.plizga.ticketplugin.TicketPluginBungee;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Collection;
 import java.util.List;
 
 
 public class UserCommands extends BaseCommand
 {
-
-
     private StaffCommands staffCommands;
     private ReviewCommands reviewCommands;
 
@@ -33,7 +36,7 @@ public class UserCommands extends BaseCommand
         this.reviewCommands = new ReviewCommands();
     }
 
-    @Cmd(value="Moderator access to tickets.", permission=TicketPlugin.PERMISSION_START + ".staff")
+    @Cmd(value="Moderator access to tickets.", permission= TicketPluginBungee.PERMISSION_START + ".staff")
     public BaseCommand staff()
     {
         return staffCommands;
@@ -42,41 +45,47 @@ public class UserCommands extends BaseCommand
     @Cmd(value="Allows access to reviews.")
     public BaseCommand review() {return reviewCommands;}
 
-
-    @Cmd(value="Create a new ticket.", permission=TicketPlugin.PERMISSION_START + ".create")
+    @Cmd(value="Create a new ticket.", permission= TicketPluginBungee.PERMISSION_START + ".create")
     public void create(CommandSender sender, Team team,
                        @Arg(value="info", description="The description for the ticket being created.") String[] info)
     {
-
         if(sender instanceof ProxiedPlayer)
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
+            ServerInfo server = player.getServer().getInfo();
+            if (server != null) {
+                if (!player.getServer().getInfo().equals(server)) {
+                    player.connect(server);
+                }
 
-            String infoMessage = String.join(" ", info);
+                Collection<ProxiedPlayer> networkPlayers = ProxyServer.getInstance().getPlayers();
+                // perform a check to see if globally are no players
+                if ( networkPlayers == null || networkPlayers.isEmpty() )
+                {
+                    return;
+                }
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF(plugin.CREATE_SUB_CHANNEL);
+                out.writeUTF(player.getUniqueId().toString());
+                out.writeUTF(team.name());
+                out.writeUTF(String.join(" ", info));
 
-
-            database.createNewTicket(player, "", Status.OPEN, team, infoMessage);
-
-            sender.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description: " +  plugin.ALT_COLOR +
-                                                 infoMessage + plugin.PREFIX + " has been created!"));
-
-            plugin.notifyOnDutyStaff(team);
-
-        }
-        else
-        {
+                server.sendData(plugin.CHANNEL, out.toByteArray());
+            } else {
+                msg(plugin.ERROR_COLOR + "Unable to find the server you're on. Are you still logged in?");
+            }
+        } else {
             sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may create a ticket."));
         }
     }
 
-
-    @Cmd(value="look at the open tickets you have created", permission=TicketPlugin.PERMISSION_START + ".view")
+    @Cmd(value="look at the open tickets you have created", permission= TicketPluginBungee.PERMISSION_START + ".view")
     public void view(CommandSender sender)
     {
         if(sender instanceof ProxiedPlayer)
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
-            List<? extends Object> openTickets = database.getPlayerOpenTickets(player.getName());
+            List<Ticket> openTickets = database.getPlayerOpenTickets(player.getName());
 
             if(openTickets.size() == 0)
             {
@@ -97,16 +106,16 @@ public class UserCommands extends BaseCommand
 
     }
 
-    @Cmd(value="allows a player to cancel their own tickets", permission=TicketPlugin.PERMISSION_START + ".cancel")
+    @Cmd(value="allows a player to cancel their own tickets", permission= TicketPluginBungee.PERMISSION_START + ".cancel")
     public void cancel(CommandSender sender, @Arg(value = "number (or 'all')", description = "number of ticket to delete") String num)
     {
         if(sender instanceof ProxiedPlayer)
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
-            List openTickets = database.getPlayerOpenTickets(player.getName());
+            List<Ticket> openTickets = database.getPlayerOpenTickets(player.getName());
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(plugin.PREFIX + "No open tickets to cancel!");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "No open tickets to cancel!"));
                 return;
             }
 

@@ -1,11 +1,11 @@
 package io.github.plizga.ticketplugin.helpers;
 
-import io.github.plizga.ticketplugin.TicketPlugin;
+import io.github.plizga.ticketplugin.TicketPluginBungee;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class Comment implements Comparable
 {
-    private TicketPlugin plugin;
+    private TicketPluginBungee plugin;
 
     private String id;
     private String ticketId;
@@ -16,7 +16,7 @@ public class Comment implements Comparable
 
    public Comment(Plugin plugin, String id, String ticketId, String author, String comment, String dateCreated, boolean isStaffOnly)
    {
-       this.plugin = (TicketPlugin) plugin;
+       this.plugin = (TicketPluginBungee) plugin;
        this.id = id;
        this.ticketId = ticketId;
        this.author = author;

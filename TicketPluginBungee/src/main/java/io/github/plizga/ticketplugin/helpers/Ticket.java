@@ -155,14 +155,14 @@ public class Ticket implements Comparable
             String worldName = "null";
             if (locationArray.length > i) worldName = locationArray[i++];
 
-            double x = 0;
-            if (locationArray.length > i) x = Double.parseDouble(locationArray[i++]);
+            int x = 0;
+            if (locationArray.length > i) x = Integer.parseInt(locationArray[i++]);
 
-            double y = 0;
-            if (locationArray.length > i) x = Double.parseDouble(locationArray[i++]);
+            int y = 0;
+            if (locationArray.length > i) y = Integer.parseInt(locationArray[i++]);
 
-            double z = 0;
-            if (locationArray.length > i) x = Double.parseDouble(locationArray[i++]);
+            int z = 0;
+            if (locationArray.length > i) z = Integer.parseInt(locationArray[i++]);
 
             String serverName = "main";
             if (locationArray.length > i) serverName = locationArray[i];
@@ -170,7 +170,7 @@ public class Ticket implements Comparable
             locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +
                                              ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z);
             locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                                      "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + (int) x + " " + (int) y + " " + (int) z + " " + serverName));
+                                                      "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + x + " " + y + " " + z + " " + serverName));
             locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to teleport to this location.")));
         }
         else

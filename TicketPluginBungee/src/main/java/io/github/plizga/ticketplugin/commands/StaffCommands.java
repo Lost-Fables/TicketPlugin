@@ -535,7 +535,7 @@ public class StaffCommands extends BaseCommand
     // TODO Spigot hook for location TP after server swapping
 
     @Cmd(value="Allows a staff member to teleport to a location given by a ticket.")
-    public void ticketTP(CommandSender sender, String serverName, String worldName, int x, int y, int z)
+    public void ticketTP(CommandSender sender, String worldName, int x, int y, int z, String serverName)
     {
         if(sender instanceof ProxiedPlayer)
         {

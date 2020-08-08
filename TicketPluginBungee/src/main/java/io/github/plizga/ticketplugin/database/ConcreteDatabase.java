@@ -187,7 +187,7 @@ public class ConcreteDatabase extends Database
 
             preparedStatement.setString(8, null);
 
-            String locationString = player.getServer().getInfo().getName() + "," + location;
+            String locationString = location + "," + player.getServer().getInfo().getName();
             // location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ()
 
             preparedStatement.setString(9, locationString);

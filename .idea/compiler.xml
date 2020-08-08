@@ -6,11 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="TicketPlugin" />
+        <module name="TicketPluginBungee" />
+        <module name="TicketPluginSpigot" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="TicketPlugin" target="1.8" />
+      <module name="TicketPlugin" target="1.5" />
+      <module name="TicketPluginBungee" target="1.8" />
+      <module name="TicketPluginSpigot" target="1.8" />
       <module name="tythan" target="1.5" />
       <module name="tythan (1)" target="1.5" />
       <module name="tythan (2)" target="1.5" />

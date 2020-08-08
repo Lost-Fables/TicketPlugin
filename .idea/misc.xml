@@ -13,6 +13,8 @@
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan-master/pom.xml" />
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/pom.xml" />
         <option value="$PROJECT_DIR$/../MC SERVERS/SQlite/Tythan-master/Tythan/.flattened-pom.xml" />
+        <option value="$PROJECT_DIR$/TicketPluginSpigot/pom.xml" />
+        <option value="$PROJECT_DIR$/TicketPluginBungee/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

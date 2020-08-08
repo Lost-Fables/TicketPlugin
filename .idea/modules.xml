@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TicketPlugin.iml" filepath="$PROJECT_DIR$/TicketPlugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TicketPluginBungee/TicketPluginBungee.iml" filepath="$PROJECT_DIR$/TicketPluginBungee/TicketPluginBungee.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TicketPluginSpigot/TicketPluginSpigot.iml" filepath="$PROJECT_DIR$/TicketPluginSpigot/TicketPluginSpigot.iml" />
     </modules>
   </component>
 </project>

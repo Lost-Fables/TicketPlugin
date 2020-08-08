@@ -1,0 +1,4 @@
+name: TicketPluginSpigot
+version: ${project.version}
+main: io.github.plizga.ticketpluginspigot.TicketPluginSpigot
+api-version: 1.16

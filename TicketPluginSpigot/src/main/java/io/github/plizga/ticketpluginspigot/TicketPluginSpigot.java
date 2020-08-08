@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
@@ -46,7 +47,16 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 			UUID uuid = UUID.fromString(in.readUTF());
 
 			if (location != null) {
-				getServer().getLogger().info("Teleporting " + uuid + " to " + location);
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						Player player = Bukkit.getPlayer(uuid);
+						if (player != null) {
+							player.teleport(location);
+							this.cancel();
+						}
+					}
+				}.runTaskTimer(this, 1, 1);
 			} else {
 				throw new NullPointerException("Passed null location from teleport request.");
 			}

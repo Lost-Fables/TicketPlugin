@@ -21,7 +21,6 @@ public abstract class BaseCommand extends CommandTemplate
     protected Database database = plugin.getDatabase();
 
     private static final String TICKET_BORDER = "~~~~~~~~~~~~~~~";
-//todo here
     private OfflineStorage offlineStorage = new OfflineStorage(plugin);
 
     /**

@@ -1,4 +1,8 @@
 name: TicketPluginSpigot
 version: ${project.version}
+api-version: "1.16"
 main: io.github.plizga.ticketpluginspigot.TicketPluginSpigot
-api-version: 1.16
+authors: [Plizga]
+description: A Ticket Plugin for Spigot that allows users to submit tickets, and allows moderators to answer said tickets.
+website: plizga.github.io
+depends: [Tythan]

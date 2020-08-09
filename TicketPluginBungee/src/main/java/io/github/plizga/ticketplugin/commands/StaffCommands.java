@@ -368,7 +368,7 @@ public class StaffCommands extends BaseCommand
                 database.createNewComment(player.getName(), comment, uuid, staffComment);
                 sendCommentMessage(database.getTicketByUUID(uuid));
             } else {
-                msg(plugin.ERROR_COLOR + "Please limit your comment to 180 characters.");
+                msg(plugin.ERROR_COLOR + "Please limit your comment to 150 characters.");
             }
         } else {
             msg("Only players may access and modify comments.");

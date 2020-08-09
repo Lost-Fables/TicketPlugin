@@ -63,45 +63,4 @@ public class TicketPlayerListener implements Listener
             plugin.notifyOnDutyStaff(team);
         }
     }
-/*
-    @EventHandler
-    public void onDroppedItem(PlayerDropItemEvent event)
-    {
-
-        {
-            ItemStack itemStack = event.getItemDrop().getItemStack();
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if(itemMeta instanceof BookMeta)
-            {
-                if(((BookMeta) itemMeta).getAuthor() != null &&((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
-                {
-                    event.setCancelled(true);
-                    itemStack.setAmount(0);
-                }
-            }
-        }
-
-    }
-
-    @EventHandler
-    public void onInteractedItem(InventoryClickEvent event)
-    {
-        if(event.getCurrentItem() != null)
-        {
-            ItemStack itemStack = event.getCurrentItem();
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if(itemMeta instanceof BookMeta)
-            {
-                if(((BookMeta) itemMeta).getAuthor() != null &&((BookMeta) itemMeta).getAuthor().equals(TicketPlugin.PERMISSION_START))
-                {
-                    event.setCancelled(true);
-                    itemStack.setAmount(0);
-                }
-            }
-        }
-
-
-
-
-    }*/
 }

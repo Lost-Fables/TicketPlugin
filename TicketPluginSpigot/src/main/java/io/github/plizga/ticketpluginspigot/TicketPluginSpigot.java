@@ -86,12 +86,13 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 	}
 
 	private void provideCommentBook(Player player, String uuid, ArrayList<String> pages) {
-		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+		ItemStack book = new ItemStack(Material.WRITTEN_BOOK, 1);
 		BookMeta bookMeta = (BookMeta) book.getItemMeta();
 		if (bookMeta != null) {
-			bookMeta.setAuthor(PERMISSION_START);
-			bookMeta.setTitle(PREFIX + "Comments for ticket " + uuid);
 			bookMeta.setPages(pages);
+			bookMeta.setAuthor("Server");
+			bookMeta.setTitle("Blank");
+
 			book.setItemMeta(bookMeta);
 			player.openBook(book);
 		}

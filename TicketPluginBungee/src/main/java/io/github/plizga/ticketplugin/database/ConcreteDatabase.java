@@ -52,7 +52,7 @@ public class ConcreteDatabase extends Database
             "`id` varchar(36) NOT NULL," + //unique id of comment
             "`ticket_id` varchar(36) NOT NULL," +
             "`author` varchar(32) NOT NULL," +
-            "`comment` varchar(100) NOT NULL," +
+            "`comment` varchar(150) NOT NULL," +
             "`date_created` varchar(32) NOT NULL," +
             "`staff_only` varchar(8) NOT NULL," +
             "PRIMARY KEY (`id`)" +

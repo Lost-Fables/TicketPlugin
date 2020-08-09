@@ -364,11 +364,11 @@ public class StaffCommands extends BaseCommand
         if (sender instanceof ProxiedPlayer) {
             ProxiedPlayer player = (ProxiedPlayer) sender;
             String comment = String.join(" ", info);
-            if (comment.length() < 205) {
+            if (comment.length() <= 100) {
                 database.createNewComment(player.getName(), comment, uuid, staffComment);
                 sendCommentMessage(database.getTicketByUUID(uuid));
             } else {
-                msg(plugin.ERROR_COLOR + "Please limit your comment to under 205 characters.");
+                msg(plugin.ERROR_COLOR + "Please limit your comment to 100 characters.");
             }
         } else {
             msg("Only players may access and modify comments.");

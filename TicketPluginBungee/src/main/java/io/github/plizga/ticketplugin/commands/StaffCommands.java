@@ -319,14 +319,14 @@ public class StaffCommands extends BaseCommand
                 msg(plugin.PREFIX + "Ticket Information: ");
                 sender.sendMessage(ticket.toExpandedInfo().create());
 
-                TextComponent addCommentsButton = new TextComponent("Add Staff Comment");
+                TextComponent addCommentsButton = new TextComponent(plugin.ALT_COLOR + "[" + plugin.PREFIX + "Add Staff Comment" + plugin.ALT_COLOR + "]");
                 addCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true "));
 
-                TextComponent addCommentsButton2 = new TextComponent("Add Player and Staff Comment");
+                TextComponent addCommentsButton2 = new TextComponent(plugin.ALT_COLOR + "[" + plugin.PREFIX + "Add Player and Staff Comment" + plugin.ALT_COLOR + "]");
                 addCommentsButton2.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false "));
 
-                BaseComponent viewCommentsButton = new TextComponent("View Comments");
-                viewCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff comment " + ticket.getId()));
+                BaseComponent viewCommentsButton = new TextComponent(plugin.ALT_COLOR + "[" + plugin.PREFIX + "View Comments" + plugin.ALT_COLOR + "]");
+                viewCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START +" staff comment " + ticket.getId()));
 
                 msg(addCommentsButton);
                 msg(addCommentsButton2);

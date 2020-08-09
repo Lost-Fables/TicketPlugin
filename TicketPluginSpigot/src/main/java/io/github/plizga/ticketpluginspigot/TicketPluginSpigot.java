@@ -3,22 +3,36 @@ package io.github.plizga.ticketpluginspigot;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public final class TicketPluginSpigot extends JavaPlugin implements PluginMessageListener {
 
+	/** Defines the start of permissions used in this plugin. */
+	public static final String PERMISSION_START = "ticketplugin";
+	/** Defines the first common color used in the plugin. */
+	public final String PREFIX = ChatColor.GRAY + "";
+	/** Defines the second common color used in the plugin. */
+	public final String ALT_COLOR = ChatColor.BLUE + "";
+	/** Defines the common error color used in the plugin. */
+	public final String ERROR_COLOR = ChatColor.DARK_RED + "";
 	/** The Bungee-Bukkit channels we use to communicate. */
 	public final String CHANNEL = "lf:tickets";
 	public final String TP_SUB_CHANNEL = "TicketsTeleport";
 	public final String CREATE_SUB_CHANNEL = "TicketsCreate";
+	public final String COMMENT_SUB_CHANNEL = "TicketsComment";
 
 	@Override
 	public void onEnable() {
@@ -53,6 +67,33 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 			String team = in.readUTF();
 			String message = in.readUTF();
 			returnWithLocation(uuid, team, message);
+		} else if (subChannel.equalsIgnoreCase(COMMENT_SUB_CHANNEL)) {
+			Player providedPlayer = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
+			String commentUUID = in.readUTF();
+			if (providedPlayer != null) {
+				ArrayList<String> pages = new ArrayList<>();
+				boolean endOfStream = false;
+				while (!endOfStream) {
+					try {
+						pages.add(in.readUTF());
+					} catch (IllegalStateException ise) {
+						endOfStream = true;
+					}
+				}
+				provideCommentBook(providedPlayer, commentUUID, pages);
+			}
+		}
+	}
+
+	private void provideCommentBook(Player player, String uuid, ArrayList<String> pages) {
+		ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+		BookMeta bookMeta = (BookMeta) book.getItemMeta();
+		if (bookMeta != null) {
+			bookMeta.setAuthor(PERMISSION_START);
+			bookMeta.setTitle(PREFIX + "Comments for ticket " + uuid);
+			bookMeta.setPages(pages);
+			book.setItemMeta(bookMeta);
+			player.openBook(book);
 		}
 	}
 

@@ -46,8 +46,6 @@ public final class TicketPluginBungee extends Plugin
     public final String ALT_COLOR = ChatColor.BLUE + "";
     /** Defines the common error color used in the plugin. */
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
-    /** Keeps track of any staff currently on duty. Will empty out upon plugin restart or shutdown. */
-    private List<Staff> staffOnDuty = new ArrayList<Staff>();
     /** Represents an instance of the ticket plugin. */
     private static TicketPluginBungee ticketPluginBungeeInstance;
     /** Represents the config file. */
@@ -56,6 +54,7 @@ public final class TicketPluginBungee extends Plugin
     public final String CHANNEL = "lf:tickets";
     public final String TP_SUB_CHANNEL = "TicketsTeleport";
     public final String CREATE_SUB_CHANNEL = "TicketsCreate";
+    public final String COMMENT_SUB_CHANNEL = "TicketsComment";
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
@@ -180,8 +179,8 @@ public final class TicketPluginBungee extends Plugin
      */
     public List<Staff> getStaffOnDuty()
     {
-        staffOnDuty = database.getStaff();
-        return staffOnDuty;
+        // Keeps track of any staff currently on duty. Will empty out upon plugin restart or shutdown.
+        return database.getStaff();
     }
 
     /**

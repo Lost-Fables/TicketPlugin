@@ -2,16 +2,22 @@ package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.CommandTemplate;
 import co.lotc.core.util.MessageUtil;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import io.github.plizga.ticketplugin.TicketPluginBungee;
+import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -144,53 +150,46 @@ public abstract class BaseCommand extends CommandTemplate
     }
 
 
-    // TODO Make bukkit hook to make the comment books?
-    /*
     /**
      * This function generates a WRITTEN book of comments for a given ticket.
      * @param sender    the (Player) receiving the book of comments
      * @param uuid  the ticket from which the comments are related to.
      */
-    /*
     protected void makeCommentBook(CommandSender sender, String uuid)
     {
-        if (sender instanceof Player)
+        if (sender instanceof ProxiedPlayer)
         {
-            Player player = (Player) sender;
-
-            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-
-            BookMeta bookMeta = (BookMeta) book.getItemMeta();
-
-            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
-            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket " + uuid);
-
-
-            ArrayList<String> pages = new ArrayList<String>();
-
+            ProxiedPlayer player = (ProxiedPlayer) sender;
             List<Comment> comments = database.getCommentsForPlayer(uuid);
 
-            if (!comments.isEmpty())
-            {
-                for (Comment c : comments)
+            ServerInfo server = player.getServer().getInfo();
+            if (server != null) {
+                Collection<ProxiedPlayer> networkPlayers = ProxyServer.getInstance().getPlayers();
+                // perform a check to see if there are globally no players
+                if (networkPlayers == null || networkPlayers.isEmpty())
                 {
-                    pages.add(c.toString());
+                    return;
                 }
-            } else
-            {
-                pages.add("There are no comments for this ticket!");
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF(plugin.COMMENT_SUB_CHANNEL);
+                out.writeUTF(player.getUniqueId().toString());
+                out.writeUTF(uuid);
+
+                if (!comments.isEmpty())
+                {
+                    for (Comment c : comments)
+                    {
+                        out.writeUTF(c.toString());
+                    }
+                } else
+                {
+                    out.writeUTF("There are no comments for this ticket!");
+                }
+
+                server.sendData(plugin.CHANNEL, out.toByteArray());
+            } else {
+                msg(plugin.ERROR_COLOR + "Unable to find the server you're on. Are you still online?");
             }
-            bookMeta.setPages(pages);
-            book.setItemMeta(bookMeta);
-
-
-            HashMap<Integer, ItemStack> itemStackHashMap= player.getInventory().addItem(book);
-
-            if(!itemStackHashMap.isEmpty())
-            {
-                msg(plugin.ERROR_COLOR + "Please ensure you have an empty item slot in your inventory.");
-            }
-
         }
         else
         {
@@ -211,7 +210,7 @@ public abstract class BaseCommand extends CommandTemplate
         }
 
         return totalPageCount;
-    }*//*
+    }
 
     /**
      * Helper method to assist in pagination of data given a list of values.
@@ -223,14 +222,13 @@ public abstract class BaseCommand extends CommandTemplate
      * @param page  the page number
      * @param contentPerPage    amount of content to be shown per page.
      */
-    /*
     protected void paginate(CommandSender sender, List list, int page, int totalPageCount, int contentPerPage)
     {
 
         if(page <= totalPageCount)
         {
             String paginatedFirstLine = String.valueOf(page) + "/" + String.valueOf(totalPageCount);
-            sender.sendMessage(paginatedFirstLine);
+            sender.sendMessage(new TextComponent(paginatedFirstLine));
 
             //begin a line
             int index = 0, subIndex = 0;
@@ -243,7 +241,7 @@ public abstract class BaseCommand extends CommandTemplate
                         (index != ((page * contentPerPage) + contentPerPage + 1)))
                 {
                     subIndex++;
-                    sender.sendMessage((String) object);
+                    sender.sendMessage(new TextComponent((String) object));
                 }
             }
 
@@ -251,13 +249,13 @@ public abstract class BaseCommand extends CommandTemplate
         }
         else
         {
-            sender.sendMessage(plugin.PREFIX + "There are only " + plugin.ALT_COLOR + totalPageCount + plugin.PREFIX + "pages.");
+            sender.sendMessage(new TextComponent(plugin.PREFIX + "There are only " + plugin.ALT_COLOR + totalPageCount + plugin.PREFIX + "pages."));
         }
 
 
 
 
-    }*/
+    }
 
 
 }

@@ -4,6 +4,7 @@ package io.github.plizga.ticketplugin.commands;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 
+import co.lotc.core.command.annotate.Range;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import io.github.plizga.ticketplugin.TicketPluginBungee;
@@ -26,14 +27,11 @@ import java.util.List;
 public class UserCommands extends BaseCommand
 {
     private StaffCommands staffCommands;
-    private ReviewCommands reviewCommands;
-
 
     public UserCommands()
     {
         this.database = plugin.getDatabase();
         this.staffCommands = new StaffCommands();
-        this.reviewCommands = new ReviewCommands();
     }
 
     @Cmd(value="Moderator access to tickets.", permission= TicketPluginBungee.PERMISSION_START + ".staff")
@@ -43,7 +41,10 @@ public class UserCommands extends BaseCommand
     }
 
     @Cmd(value="Allows access to reviews.")
-    public BaseCommand review() {return reviewCommands;}
+    public void review(CommandSender sender, String ticketUUID, @Range(min=1, max=5)int rating) {
+        database.createNewReview(ticketUUID, rating);
+        msg(plugin.PREFIX + "Thank you for submitting a review!");
+    }
 
     @Cmd(value="Create a new ticket.", permission= TicketPluginBungee.PERMISSION_START + ".create")
     public void create(CommandSender sender, Team team,
@@ -121,7 +122,7 @@ public class UserCommands extends BaseCommand
 
             try
             {
-                if(num.equals("all"))
+                if(num.equalsIgnoreCase("all"))
                 {
                     database.cancelTicketByPlayer(player.getName());
                     sender.sendMessage(new TextComponent(plugin.PREFIX +  "All of your open tickets have been cancelled."));
@@ -151,33 +152,24 @@ public class UserCommands extends BaseCommand
                 sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR +
                                                      " does not exist. Please enter a valid ticket number to cancel."));
             }
-
-
-
-
-
-
-
         }
         else
         {
-            sender.sendMessage(ChatColor.DARK_RED + "Only players may remove their own tickets.");
+            sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may remove their own tickets."));
         }
     }
 
 
     /**
      * This method shares a similar function to the "comment" function of StaffCommands, and the majority of their code
-     * has been moved to BaseCommand's "makeCommentBook" function, where a book of ticket comments is entered into a
-     * book and handed to the player.
+     * has been moved to BaseCommand's "makeCommentBook" function, where a book of ticket comments is force opened.
      * @param sender Prerequisite: Must be Player to succeed
      * @param uuid  the uuid of the ticket
      */
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        //TODO Update this when we update the make comment book on the Bukkit/Spigot/Paper side.
-        //makeCommentBook(sender, uuid);
+        makeCommentBook(sender, uuid);
     }
 
     @Cmd(value="Allows a plyer to view their completed tickets.")
@@ -210,24 +202,24 @@ public class UserCommands extends BaseCommand
             ProxiedPlayer player = (ProxiedPlayer) sender;
 
             msg(plugin.PREFIX + "Please leave a review below, where 1 is the worst, and 5 is the best.\n");
-            TextComponent oneStarButton = new TextComponent("[ * ");
-            oneStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review one " + ticketUUID));
+            TextComponent oneStarButton = new TextComponent("[ ☆ ");
+            oneStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review " + ticketUUID + " 1"));
             oneStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("1")));
 
-            TextComponent twoStarButton = new TextComponent("* ");
-            twoStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review two " + ticketUUID));
+            TextComponent twoStarButton = new TextComponent("☆ ");
+            twoStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review " + ticketUUID + " 2"));
             twoStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("2")));
 
-            TextComponent threeStarButton = new TextComponent("* ");
-            threeStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review three " + ticketUUID));
+            TextComponent threeStarButton = new TextComponent("☆ ");
+            threeStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review " + ticketUUID + " 3"));
             threeStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("3")));
 
-            TextComponent fourStarButton = new TextComponent("* ");
-            fourStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review four " + ticketUUID));
+            TextComponent fourStarButton = new TextComponent("☆ ");
+            fourStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review " + ticketUUID + " 4"));
             fourStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("4")));
 
-            TextComponent fiveStarButton = new TextComponent("* ]");
-            fiveStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review five " + ticketUUID));
+            TextComponent fiveStarButton = new TextComponent("☆ ]");
+            fiveStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review " + ticketUUID + " 5"));
             fiveStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("5")));
             msg(plugin.PREFIX + "Review Rating: ");
             ComponentBuilder componentBuilder = new ComponentBuilder("").append(oneStarButton).append(twoStarButton).append(threeStarButton).append(fourStarButton).append(fiveStarButton);

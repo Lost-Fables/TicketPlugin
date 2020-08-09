@@ -20,7 +20,7 @@ import java.util.UUID;
  * Represents a ticket as a Java object.
  * @author <a href="brad.plizga@mail.rit.edu">Plizga</a>
  */
-public class Ticket implements Comparable
+public class Ticket implements Comparable<Ticket>
 {
     private static final int MINI_DESCRIPTION_LENGTH = 25;
     private static final String USERNAME_COLOR_ONLINE = ChatColor.GREEN + "";
@@ -116,7 +116,6 @@ public class Ticket implements Comparable
         textComponents.add(statusText);
 
         //Team
-
         TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + Team.getColor(team) + team.name() + " ");
         teamText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                 "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
@@ -182,9 +181,7 @@ public class Ticket implements Comparable
 
         textComponents.add(locationText);
 
-        //comments
-
-
+        //Comments
         int commentAmount = getCommentAmount();
         TextComponent commentText = new TextComponent(plugin.PREFIX + " Comments: " + plugin.ALT_COLOR + commentAmount + " ");
         textComponents.add(commentText);
@@ -455,14 +452,10 @@ public class Ticket implements Comparable
 
 
     @Override
-    public int compareTo(Object o)
+    public int compareTo(Ticket ticket)
     {
-        if(o instanceof Ticket)
-        {
-            String str = ((Ticket) o).getDateCreated();
-            return this.getDateCreated().compareTo(str);
-        }
-        return -1;
+        String str = ((Ticket) ticket).getDateCreated();
+        return this.getDateCreated().compareTo(str);
     }
 
     private int getCommentAmount()

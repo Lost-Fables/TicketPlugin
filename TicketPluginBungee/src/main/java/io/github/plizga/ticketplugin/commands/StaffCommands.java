@@ -54,7 +54,7 @@ public class StaffCommands extends BaseCommand
             if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(team)) ||
                player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Admin)))
             {
-                List<? extends Object> openTickets = database.getOpenTicketsByTeam(team.name());
+                List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
 
                 if(openTickets.size() == 0)
                 {
@@ -73,7 +73,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            List<? extends Object> openTickets = database.getOpenTicketsByTeam(team.name());
+            List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
 
             if(openTickets.size() == 0)
             {
@@ -144,10 +144,10 @@ public class StaffCommands extends BaseCommand
 
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(plugin.PREFIX + "There are no open tickets for any teams you are a part of. Pretty cool!");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for any teams you are a part of. Pretty cool!"));
                 return;
             }
-            sender.sendMessage(plugin.PREFIX + "Viewing tickets for your teams:");
+            sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for your teams:"));
 
             readTicketsBasic(sender, openTickets);
 
@@ -173,17 +173,17 @@ public class StaffCommands extends BaseCommand
                 if(ticket.getStatus() == Status.OPEN)
                 {
                     database.claimTicket(ticket.getId(), player.getName());
-                    sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n"));
                     sendClaimedMessage(database.getTicketByUUID(uuid));
 
                 }
                 else if(assignedModerator.equalsIgnoreCase(player.getName()))
                 {
                     database.unClaimTicket(uuid);
-                    sender.sendMessage(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "unclaimed.\n");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "unclaimed.\n"));
 
                 }
-                else if(player.hasPermission(plugin.PERMISSION_START + "." + ticket.getTeam().name() + ".manager"))
+                else if(player.hasPermission(TicketPluginBungee.PERMISSION_START + "." + ticket.getTeam().name() + ".manager"))
                 {
                     database.unClaimTicket(uuid);
                     database.claimTicket(uuid, player.getName());
@@ -192,21 +192,21 @@ public class StaffCommands extends BaseCommand
                 }
                 else
                 {
-                    sender.sendMessage(plugin.PREFIX + "This ticket has been claimed by " + plugin.ALT_COLOR +
-                            ticket.getAssignedModerator() + plugin.PREFIX + ".");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "This ticket has been claimed by " + plugin.ALT_COLOR +
+                                                         ticket.getAssignedModerator() + plugin.PREFIX + "."));
                 }
             }
             catch(NullPointerException e)
             {
-                sender.sendMessage(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                        plugin.ALT_COLOR + " Method: claim");
+                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
+                                                     plugin.ALT_COLOR + " Method: claim"));
             }
         }
         else
         {
-            sender.sendMessage("Only players may claim tickets dude. " +
-                    "If a console claimed a ticket, what do you think would happen? Seriously, what would happen? " +
-                    "Tell me. I'd like to know.");
+            sender.sendMessage(new TextComponent("Only players may claim tickets dude. " +
+                                                 "If a console claimed a ticket, what do you think would happen? Seriously, what would happen? " +
+                                                 "Tell me. I'd like to know."));
         }
 
     }
@@ -226,17 +226,17 @@ public class StaffCommands extends BaseCommand
 
                 if(openTickets.size() == 0)
                 {
-                    sender.sendMessage(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                            plugin.PREFIX + " team.");
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                                                         plugin.PREFIX + " team."));
                     return;
                 }
-                sender.sendMessage(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                        plugin.PREFIX + " team:");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                                                     plugin.PREFIX + " team:"));
                 readTicketsBasic(sender, openTickets);
             }
             else
             {
-                sender.sendMessage(plugin.ERROR_COLOR + "You do not have permission to view that team's claimed tickets!");
+                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "You do not have permission to view that team's claimed tickets!"));
             }
         }
         else
@@ -245,12 +245,12 @@ public class StaffCommands extends BaseCommand
 
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                        plugin.PREFIX + " team.");
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                                                     plugin.PREFIX + " team."));
                 return;
             }
-            sender.sendMessage(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                    plugin.PREFIX + " team:");
+            sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
+                                                 plugin.PREFIX + " team:"));
             readTicketsBasic(sender, openTickets);
         }
     }
@@ -318,9 +318,15 @@ public class StaffCommands extends BaseCommand
                 Ticket ticket =  database.getTicketByUUID(uuid);
                 msg(plugin.PREFIX + "Ticket Information: ");
                 sender.sendMessage(ticket.toExpandedInfo().create());
-                BaseComponent addCommentsButton = MessageUtil.CommandButton("Add Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true");
-                BaseComponent addCommentsButton2 = MessageUtil.CommandButton("Add ProxiedPlayer and Staff Comment", "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false");
-                BaseComponent viewCommentsButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START +" staff comment " + ticket.getId());
+
+                TextComponent addCommentsButton = new TextComponent("Add Staff Comment");
+                addCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true "));
+
+                TextComponent addCommentsButton2 = new TextComponent("Add Player and Staff Comment");
+                addCommentsButton2.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false "));
+
+                BaseComponent viewCommentsButton = new TextComponent("View Comments");
+                viewCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff comment " + ticket.getId()));
 
                 msg(addCommentsButton);
                 msg(addCommentsButton2);
@@ -350,58 +356,24 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="access the comments section of a ticket.")
     public void comment(CommandSender sender, String uuid)
     {
-        // TODO re-enable after bukkit/spigot/paper hook
-        //makeCommentBook(sender, uuid);
+        makeCommentBook(sender, uuid);
     }
 
-    // TODO Spigot hook
-    /*
     @Cmd(value="add a comment to a ticket.")
-    public void addComment(CommandSender sender, String uuid, boolean isStaffComment)
-    {
-        if(sender instanceof Player)
-        {
-            Player player = (Player) sender;
-
-            ItemStack book = new ItemStack(Material.WRITABLE_BOOK);
-
-            BookMeta bookMeta = (BookMeta) book.getItemMeta();
-            bookMeta.setAuthor(TicketPlugin.PERMISSION_START);
-            bookMeta.setTitle(plugin.PREFIX + "Comments for ticket:  " + uuid);
-
-
-
-            BookStream stream = new BookStream(player, book, plugin.PREFIX + "Add your comment!")
-            {
-                @Override
-                public void onBookClose()
-                {
-
-                    BookMeta meta = getMeta();
-                    String info = BookUtil.getPagesAsString(meta);
-                    if(info.length() < 205)
-                    {
-                        database.createNewComment(player.getName(), info, uuid, isStaffComment);
-                        sendCommentMessage(database.getTicketByUUID(uuid));
-                    }
-                    else
-                    {
-                        msg(plugin.ERROR_COLOR + "Please limit your comment to under 205 characters.");
-                    }
-                }
-            };
-
-            stream.open(player);
-
-            //player.getInventory().addItem(book);
-
-
-        }
-        else
-        {
+    public void addComment(CommandSender sender, String uuid, boolean staffComment, String[] info) {
+        if (sender instanceof ProxiedPlayer) {
+            ProxiedPlayer player = (ProxiedPlayer) sender;
+            String comment = String.join(" ", info);
+            if (comment.length() < 205) {
+                database.createNewComment(player.getName(), comment, uuid, staffComment);
+                sendCommentMessage(database.getTicketByUUID(uuid));
+            } else {
+                msg(plugin.ERROR_COLOR + "Please limit your comment to under 205 characters.");
+            }
+        } else {
             msg("Only players may access and modify comments.");
         }
-    }*/
+    }
 
     @Cmd(value="Allows a staff member to close a given ticket.")
     public void closeTicket(CommandSender sender, String ticketUUID)

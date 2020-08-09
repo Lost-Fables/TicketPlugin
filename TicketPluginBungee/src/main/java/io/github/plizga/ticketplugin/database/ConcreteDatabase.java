@@ -329,7 +329,7 @@ public class ConcreteDatabase extends Database
 
 
 
-    public List getPlayerOpenTickets(String playerName)
+    public List<Ticket> getPlayerOpenTickets(String playerName)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -366,7 +366,7 @@ public class ConcreteDatabase extends Database
     }
 
     @Override
-    public List getOpenTicketsByTeam(String team)
+    public List<Ticket> getOpenTicketsByTeam(String team)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -402,7 +402,7 @@ public class ConcreteDatabase extends Database
 
     }
 
-    public List getAllOpenTickets()
+    public List<Ticket> getAllOpenTickets()
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;

@@ -115,10 +115,12 @@ public class ConcreteDatabase extends Database
         catch (SQLException e)
         {
             plugin.getLogger().log(Level.SEVERE, "Error initializing mySQL database in method getSQLConnection.");
+            e.printStackTrace();
         }
         catch (ClassNotFoundException e)
         {
             plugin.getLogger().log(Level.SEVERE, "Unable to find jdbc library for mySQL connection in method getSqlConnection.");
+            e.printStackTrace();
         }
         return null;
     }

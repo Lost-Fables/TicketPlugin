@@ -150,12 +150,13 @@ public class ConcreteDatabase extends Database
 
     /**
      * Creates a new ticket, given a player, a status, and the String sent with the ticket.
-     * @param player    the player filing the ticket
-     * @param status    the status of the ticket upon creation
-     * @param ticketData    the string representation of the ticket.
+     * @param ticketUUID the current UUID to be used for this ticket.
+     * @param player     the player filing the ticket
+     * @param status     the status of the ticket upon creation
+     * @param ticketData the string representation of the ticket.
      */
     @Override
-    public void createNewTicket(ProxiedPlayer player, String location, Status status, Team team, String ticketData)
+    public void createNewTicket(UUID ticketUUID, ProxiedPlayer player, String location, Status status, Team team, String ticketData)
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -168,7 +169,7 @@ public class ConcreteDatabase extends Database
                     "Date_Cleared,Location,Initial_Request) VALUES(?,?,?,?,?,?,?,?,?,?)");
             //SetString requires an index associated with the column being changed. For this default dance ticket, we will modify some core details that cannot be null.
             //NOTE!! Index is 1-based here, not 0. don't fucking zero index it. that's so silly dude imagine using the number 0 in literally anything.
-            preparedStatement.setString(1, UUID.randomUUID().toString());
+            preparedStatement.setString(1, ticketUUID.toString());
 
             preparedStatement.setString(2, player.getName());
 

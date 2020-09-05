@@ -12,6 +12,7 @@ import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 
+import io.github.plizga.ticketplugin.listeners.TicketPlayerListener;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -22,6 +23,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 public class UserCommands extends BaseCommand
@@ -65,12 +67,18 @@ public class UserCommands extends BaseCommand
                 {
                     return;
                 }
+
+                UUID uuid = UUID.randomUUID();
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF(plugin.CREATE_SUB_CHANNEL);
+                out.writeUTF(uuid.toString());
                 out.writeUTF(player.getUniqueId().toString());
                 out.writeUTF(team.name());
                 out.writeUTF(String.join(" ", info));
 
+                if (!TicketPlayerListener.waiting.contains(uuid)) {
+                    TicketPlayerListener.waiting.add(uuid);
+                }
                 server.sendData(plugin.CHANNEL, out.toByteArray());
             } else {
                 msg(plugin.ERROR_COLOR + "Unable to find the server you're on. Are you still logged in?");

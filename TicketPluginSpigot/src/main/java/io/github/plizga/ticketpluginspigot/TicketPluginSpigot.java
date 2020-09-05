@@ -16,6 +16,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public final class TicketPluginSpigot extends JavaPlugin implements PluginMessageListener {
@@ -33,6 +34,8 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 	public final String TP_SUB_CHANNEL = "TicketsTeleport";
 	public final String CREATE_SUB_CHANNEL = "TicketsCreate";
 	public final String COMMENT_SUB_CHANNEL = "TicketsComment";
+
+	private List<UUID> processing = new ArrayList<>();
 
 	@Override
 	public void onEnable() {
@@ -63,15 +66,19 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 			UUID uuid = UUID.fromString(in.readUTF());
 			pluginTPReceived(location, uuid);
 		} else if (subChannel.equalsIgnoreCase(CREATE_SUB_CHANNEL)) {
-			UUID uuid = UUID.fromString(in.readUTF());
-			String team = in.readUTF();
-			String message = in.readUTF();
-			returnWithLocation(uuid, team, message);
+			UUID ticketUUID = UUID.fromString(in.readUTF());
+			if (!processing.contains(ticketUUID)) {
+				processing.add(ticketUUID);
+				UUID playerUUID = UUID.fromString(in.readUTF());
+				String team = in.readUTF();
+				String message = in.readUTF();
+				returnWithLocation(ticketUUID, playerUUID, team, message);
+			}
 		} else if (subChannel.equalsIgnoreCase(COMMENT_SUB_CHANNEL)) {
 			Player providedPlayer = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
 			String commentUUID = in.readUTF();
 			if (providedPlayer != null) {
-				ArrayList<String> pages = new ArrayList<>();
+				List<String> pages = new ArrayList<>();
 				boolean endOfStream = false;
 				while (!endOfStream) {
 					try {
@@ -85,7 +92,7 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 		}
 	}
 
-	private void provideCommentBook(Player player, String uuid, ArrayList<String> pages) {
+	private void provideCommentBook(Player player, String uuid, List<String> pages) {
 		ItemStack book = new ItemStack(Material.WRITTEN_BOOK, 1);
 		BookMeta bookMeta = (BookMeta) book.getItemMeta();
 		if (bookMeta != null) {
@@ -98,8 +105,8 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 		}
 	}
 
-	private void returnWithLocation(UUID uuid, String team, String message) {
-		Player player = Bukkit.getPlayer(uuid);
+	private void returnWithLocation(UUID ticketUUID, UUID playerUUID, String team, String message) {
+		Player player = Bukkit.getPlayer(playerUUID);
 		if (player != null && player.isOnline()) {
 			Location loc = player.getLocation();
 			if (loc.getWorld() != null) {
@@ -110,7 +117,8 @@ public final class TicketPluginSpigot extends JavaPlugin implements PluginMessag
 
 				ByteArrayDataOutput out = ByteStreams.newDataOutput();
 				out.writeUTF(CREATE_SUB_CHANNEL);
-				out.writeUTF(uuid.toString());
+				out.writeUTF(ticketUUID.toString());
+				out.writeUTF(playerUUID.toString());
 				out.writeUTF(team);
 				out.writeUTF(message);
 				out.writeUTF(locationString);

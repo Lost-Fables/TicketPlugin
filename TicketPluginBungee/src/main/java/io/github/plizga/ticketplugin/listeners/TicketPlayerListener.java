@@ -14,12 +14,15 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TicketPlayerListener implements Listener
 {
 
     private TicketPluginBungee plugin;
+    public static List<UUID> waiting = new ArrayList<>();
 
     public TicketPlayerListener(Plugin plugin)
     {
@@ -50,17 +53,22 @@ public class TicketPlayerListener implements Listener
         String subChannel = in.readUTF();
 
         if (subChannel.equalsIgnoreCase(plugin.CREATE_SUB_CHANNEL)) {
-            UUID uuid = UUID.fromString(in.readUTF());
-            Team team = Team.getByName(in.readUTF());
-            String message = in.readUTF();
-            String location = in.readUTF();
+            UUID ticketUUID = UUID.fromString(in.readUTF());
+            if (waiting.contains(ticketUUID)) {
+                waiting.remove(ticketUUID);
 
-            ProxiedPlayer player = plugin.getProxy().getPlayer(uuid);
-            plugin.getDatabase().createNewTicket(player, location, Status.OPEN, team, message);
+                UUID playerUUID = UUID.fromString(in.readUTF());
+                Team team = Team.getByName(in.readUTF());
+                String message = in.readUTF();
+                String location = in.readUTF();
+                ProxiedPlayer player = plugin.getProxy().getPlayer(playerUUID);
 
-            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description: " + plugin.ALT_COLOR +
-                                                 message + plugin.PREFIX + " has been created!"));
-            plugin.notifyOnDutyStaff(team);
+
+                plugin.getDatabase().createNewTicket(ticketUUID, player, location, Status.OPEN, team, message);
+                player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description: " + plugin.ALT_COLOR +
+                                                     message + plugin.PREFIX + " has been created!"));
+                plugin.notifyOnDutyStaff(team);
+            }
         }
     }
 }

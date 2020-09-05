@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Abstract class for the database. Defines the table name to be used in the ConcreteDatabase, and handles some basic
@@ -137,13 +138,22 @@ public abstract class Database extends BaseCommand
         }
     }
 
+    /**
+     * Creates a new ticket while generating a random UUID for it.
+     * @param player     the player filing the ticket
+     * @param status     the status of the ticket upon creation
+     * @param ticketData the string representation of the ticket.
+     */
+    public void createNewTicket(ProxiedPlayer player, String location, Status status, Team team, String ticketData) {
+        createNewTicket(UUID.randomUUID(), player, location, status, team, ticketData);
+    }
 
 
     protected abstract Connection getSqlConnection();
 
     public abstract void load();
 
-    public abstract void createNewTicket(ProxiedPlayer player, String location, Status status, Team team, String ticketData);
+    public abstract void createNewTicket(UUID ticketUUID, ProxiedPlayer player, String location, Status status, Team team, String ticketData);
 
     public abstract void createNewComment(String player, String text, String ticketUUID, boolean isStaffOnly);
 

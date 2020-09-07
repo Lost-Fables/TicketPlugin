@@ -155,13 +155,31 @@ public class Ticket implements Comparable<Ticket>
             if (locationArray.length > i) worldName = locationArray[i++];
 
             int x = 0;
-            if (locationArray.length > i) x = Integer.parseInt(locationArray[i++]);
+            if (locationArray.length > i) {
+                try {
+                    x = Integer.parseInt(locationArray[i++]);
+                } catch (NumberFormatException nfe) {
+                    x = (int) Double.parseDouble(locationArray[i++]);
+                }
+            }
 
             int y = 0;
-            if (locationArray.length > i) y = Integer.parseInt(locationArray[i++]);
+            if (locationArray.length > i) {
+                try {
+                    y = Integer.parseInt(locationArray[i++]);
+                } catch (NumberFormatException nfe) {
+                    y = (int) Double.parseDouble(locationArray[i++]);
+                }
+            }
 
             int z = 0;
-            if (locationArray.length > i) z = Integer.parseInt(locationArray[i++]);
+            if (locationArray.length > i) {
+                try {
+                    z = Integer.parseInt(locationArray[i++]);
+                } catch (NumberFormatException nfe) {
+                    z = (int) Double.parseDouble(locationArray[i++]);
+                }
+            }
 
             String serverName = "main";
             if (locationArray.length > i) serverName = locationArray[i];

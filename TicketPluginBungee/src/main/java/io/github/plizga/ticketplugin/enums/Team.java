@@ -2,6 +2,7 @@ package io.github.plizga.ticketplugin.enums;
 
 
 import co.lotc.core.agnostic.Sender;
+import co.lotc.core.util.ColorUtil;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.ArrayList;
@@ -45,21 +46,21 @@ public enum Team
         switch(team)
         {
             case Admin:
-                return ChatColor.DARK_RED + "";
+                return ColorUtil.hexToColor("1abc9c") + "";
             case Moderator:
-                return ChatColor.BLUE +"";
+                return ColorUtil.hexToColor("#1a67ed") + "";
             case Event:
-                return ChatColor.GREEN + "";
+                return ColorUtil.hexToColor("#cf0606") + "";
             case Tech:
-                return ChatColor.DARK_AQUA + "";
+                return ColorUtil.hexToColor("#95de16") + "";
             case Lore:
-                return ChatColor.DARK_GREEN +"";
+                return ColorUtil.hexToColor("#fae36e") + "";
             case Build:
-                return ChatColor.GOLD + "";
+                return ColorUtil.hexToColor("#ec9706") + "";
             case Design:
-                return ChatColor.DARK_PURPLE + "";
+                return ColorUtil.hexToColor("#8634b3") + "";
             case Global:
-                return ChatColor.WHITE + "";
+                return ChatColor.RESET + "";
             default:
                 return null;
         }

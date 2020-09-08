@@ -46,19 +46,19 @@ public enum Team
         switch(team)
         {
             case Admin:
-                return ColorUtil.hexToColor("1abc9c") + "";
+                return ChatColor.of(ColorUtil.hexToColor("1abc9c")) + "";
             case Moderator:
-                return ColorUtil.hexToColor("#1a67ed") + "";
+                return ChatColor.of(ColorUtil.hexToColor("#1a67ed")) + "";
             case Event:
-                return ColorUtil.hexToColor("#cf0606") + "";
+                return ChatColor.of(ColorUtil.hexToColor("#cf0606")) + "";
             case Tech:
-                return ColorUtil.hexToColor("#95de16") + "";
+                return ChatColor.of(ColorUtil.hexToColor("#95de16")) + "";
             case Lore:
-                return ColorUtil.hexToColor("#fae36e") + "";
+                return ChatColor.of(ColorUtil.hexToColor("#fae36e")) + "";
             case Build:
-                return ColorUtil.hexToColor("#ec9706") + "";
+                return ChatColor.of(ColorUtil.hexToColor("#ec9706")) + "";
             case Design:
-                return ColorUtil.hexToColor("#8634b3") + "";
+                return ChatColor.of(ColorUtil.hexToColor("#8634b3")) + "";
             case Global:
                 return ChatColor.RESET + "";
             default:

@@ -46,7 +46,7 @@ public enum Team
         switch(team)
         {
             case Admin:
-                return ChatColor.of(ColorUtil.hexToColor("1abc9c")) + "";
+                return ChatColor.of(ColorUtil.hexToColor("#1abc9c")) + "";
             case Moderator:
                 return ChatColor.of(ColorUtil.hexToColor("#1a67ed")) + "";
             case Event:

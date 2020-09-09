@@ -55,7 +55,11 @@ public class TicketPlayerListener implements Listener
         if (subChannel.equalsIgnoreCase(plugin.CREATE_SUB_CHANNEL)) {
             UUID ticketUUID = UUID.fromString(in.readUTF());
             if (waiting.contains(ticketUUID)) {
-                waiting.remove(ticketUUID);
+                try {
+                    waiting.remove(ticketUUID);
+                } catch (Exception ignore) {
+                    // If this throws, the ticket was already removed and ArrayList tried to use fastRemove();
+                }
 
                 UUID playerUUID = UUID.fromString(in.readUTF());
                 Team team = Team.getByName(in.readUTF());

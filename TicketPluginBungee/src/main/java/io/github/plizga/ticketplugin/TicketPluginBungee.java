@@ -208,10 +208,10 @@ public final class TicketPluginBungee extends Plugin
         {
             ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
 
-            if(player != null && player.hasPermission(PERMISSION_START + Team.getPermission(team)))
+            if(player != null && player.hasPermission(PERMISSION_START + team.permission))
             {
                 player.sendMessage(new TextComponent(PREFIX + "A player ticket has been assigned to the " +
-                        Team.getColor(team) + team.name() + PREFIX + " team."));
+                        team.color + team.name() + PREFIX + " team."));
 
             }
         }

@@ -3,6 +3,7 @@ package io.github.plizga.ticketplugin.enums;
 
 import co.lotc.core.agnostic.Sender;
 import co.lotc.core.util.ColorUtil;
+import jdk.nashorn.internal.objects.annotations.Getter;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.ArrayList;
@@ -11,59 +12,21 @@ import java.util.List;
 public enum Team
 {
 
-    Admin, Moderator, Event, Tech, Lore, Build, Global, Design;
+    Admin (ChatColor.of(ColorUtil.hexToColor("#1abc9c")), ".admin"),
+    Moderator (ChatColor.of(ColorUtil.hexToColor("#1a67ed")), ".mod"),
+    Tech (ChatColor.of(ColorUtil.hexToColor("#95de16")), ".dev"),
+    Lore (ChatColor.of(ColorUtil.hexToColor("#fae36e")), ".lore"),
+    Event (ChatColor.of(ColorUtil.hexToColor("#cf0606")), ".event"),
+    Build (ChatColor.of(ColorUtil.hexToColor("#ec9706")), ".build"),
+    Design (ChatColor.of(ColorUtil.hexToColor("#8634b3")), ".design"),
+    Global (ChatColor.WHITE, ".staff");
 
+    public final ChatColor color;
+    public final String permission;
 
-
-    public static String getPermission(Team team)
-    {
-
-        switch(team)
-        {
-            case Admin:
-                return ".admin";
-            case Moderator:
-                return ".mod";
-            case Event:
-                return ".event";
-            case Tech:
-                return ".dev";
-            case Lore:
-                return ".lore";
-            case Build:
-                return ".build";
-            case Design:
-                return ".design";
-            case Global:
-                return ".staff";
-            default:
-                return null;
-        }
-    }
-
-    public static String getColor(Team team)
-    {
-        switch(team)
-        {
-            case Admin:
-                return ChatColor.of(ColorUtil.hexToColor("#1abc9c")) + "";
-            case Moderator:
-                return ChatColor.of(ColorUtil.hexToColor("#1a67ed")) + "";
-            case Event:
-                return ChatColor.of(ColorUtil.hexToColor("#cf0606")) + "";
-            case Tech:
-                return ChatColor.of(ColorUtil.hexToColor("#95de16")) + "";
-            case Lore:
-                return ChatColor.of(ColorUtil.hexToColor("#fae36e")) + "";
-            case Build:
-                return ChatColor.of(ColorUtil.hexToColor("#ec9706")) + "";
-            case Design:
-                return ChatColor.of(ColorUtil.hexToColor("#8634b3")) + "";
-            case Global:
-                return ChatColor.RESET + "";
-            default:
-                return null;
-        }
+    Team(ChatColor color, String permission) {
+        this.color = color;
+        this.permission = permission;
     }
 
     public static List<String> getAvailable(Sender player)

@@ -116,7 +116,7 @@ public class Ticket implements Comparable<Ticket>
         textComponents.add(statusText);
 
         //Team
-        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + Team.getColor(team) + team.name() + " ");
+        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + team.color + team.name() + " ");
         teamText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                 "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
         teamText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -226,7 +226,7 @@ public class Ticket implements Comparable<Ticket>
 
         TextComponent[] textComponents = new TextComponent[5];
         //Set the team
-        TextComponent teamPrefix = new TextComponent(Team.getColor(team) + "[" + team.toString().charAt(0) +
+        TextComponent teamPrefix = new TextComponent(team.color + "[" + team.toString().charAt(0) +
                 "] ");
         teamPrefix.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                 "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
@@ -354,7 +354,7 @@ public class Ticket implements Comparable<Ticket>
     public ComponentBuilder toPlayerInfo()
     {
         String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + Team.getColor(team) + team +
+                plugin.PREFIX + ", Team: " + team.color + team +
                 plugin.PREFIX + ", Staff Member: " + plugin.ALT_COLOR + assignedModerator +
                 plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
 

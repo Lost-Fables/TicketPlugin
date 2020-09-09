@@ -51,18 +51,18 @@ public class StaffCommands extends BaseCommand
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
 
-            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(team)) ||
-               player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Admin)))
+            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
+               player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission))
             {
                 List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
 
                 if(openTickets.size() == 0)
                 {
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for the " + Team.getColor(team) + team.name() +
+                    sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for the " + team.color + team.name() +
                                                          plugin.PREFIX + " team."));
                     return;
                 }
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for the " + Team.getColor(team) + team.name() +
+                sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for the " + team.color + team.name() +
                                                      plugin.PREFIX + " team:"));
                 readTicketsBasic(sender, openTickets);
             }
@@ -97,48 +97,39 @@ public class StaffCommands extends BaseCommand
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
 
-            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Admin)))
+            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission))
             {
-
                 openTickets.addAll(database.getAllOpenTickets());
             }
             else
             {
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Tech)))
+                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Tech.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Tech.name()));
-
                 }
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Moderator)))
+                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Moderator.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Moderator.name()));
-
                 }
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Event)))
+                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Event.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Event.name()));
-
                 }
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Lore)))
+                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Lore.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Lore.name()));
-
                 }
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Build)))
+                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Build.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Build.name()));
-
                 }
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Design)))
+                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Design.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Design.name()));
-
                 }
 
 
                 openTickets.addAll(database.getOpenTicketsByTeam(Team.Global.name()));
-
-
             }
 
 
@@ -219,8 +210,8 @@ public class StaffCommands extends BaseCommand
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
 
-            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(team)) ||
-               player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.getPermission(Team.Admin)))
+            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
+               player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission))
             {
                 List<? extends Ticket> openTickets = database.getTeamClaimedTickets(team.name());
 

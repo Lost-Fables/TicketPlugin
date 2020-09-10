@@ -41,9 +41,9 @@ public final class TicketPluginBungee extends Plugin
     /** Defines the start of commands '/COMMAND_START create etc' */
     public final String COMMAND_START = "request";
     /** Defines the first common color used in the plugin. */
-    public final String PREFIX = ChatColor.GRAY + "";
+    public final ChatColor PREFIX = ChatColor.GRAY;
     /** Defines the second common color used in the plugin. */
-    public final String ALT_COLOR = ChatColor.BLUE + "";
+    public final ChatColor ALT_COLOR = ChatColor.BLUE;
     /** Defines the common error color used in the plugin. */
     public final String ERROR_COLOR = ChatColor.DARK_RED + "";
     /** Represents an instance of the ticket plugin. */

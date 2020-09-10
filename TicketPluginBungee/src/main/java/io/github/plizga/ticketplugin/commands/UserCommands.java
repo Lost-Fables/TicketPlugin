@@ -242,7 +242,27 @@ public class UserCommands extends BaseCommand
     @Cmd(value="List the available teams.")
     public void teams(CommandSender sender) {
         for (Team team : Team.values()) {
-            sender.sendMessage(new TextComponent("Team '" + team.color + team.name() + ChatColor.RESET + "' with the permission ending '" + team.permission + "'"));
+            TextComponent finalMessage = new TextComponent();
+
+            {
+                TextComponent message = new TextComponent("Team '");
+                message.setColor(plugin.PREFIX);
+                finalMessage.addExtra(message);
+            }
+
+            {
+                TextComponent message = new TextComponent(team.name());
+                message.setColor(team.color);
+                finalMessage.addExtra(message);
+            }
+
+            {
+                TextComponent message = new TextComponent("' with the permission ending '" + team.permission + "'");
+                message.setColor(plugin.PREFIX);
+                finalMessage.addExtra(message);
+            }
+
+            sender.sendMessage(finalMessage);
         }
     }
 }

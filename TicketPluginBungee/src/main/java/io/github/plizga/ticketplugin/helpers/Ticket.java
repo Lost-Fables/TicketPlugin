@@ -226,7 +226,7 @@ public class Ticket implements Comparable<Ticket>
 
         TextComponent[] textComponents = new TextComponent[5];
         //Set the team
-        TextComponent teamPrefix = new TextComponent(team.color + "[" + team.toString().charAt(0) +
+        TextComponent teamPrefix = new TextComponent(team.color + "[" + team.name().charAt(0) +
                 "] ");
         teamPrefix.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                 "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));

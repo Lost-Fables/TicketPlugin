@@ -213,7 +213,7 @@ public class StaffCommands extends BaseCommand
             if(player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
                player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission))
             {
-                List<? extends Ticket> openTickets = database.getTeamClaimedTickets(team.name());
+                List<Ticket> openTickets = database.getTeamClaimedTickets(team.name());
 
                 if(openTickets.size() == 0)
                 {
@@ -232,7 +232,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            List<? extends Ticket> openTickets = database.getTeamClaimedTickets(team.name());
+            List<Ticket> openTickets = database.getTeamClaimedTickets(team.name());
 
             if(openTickets.size() == 0)
             {

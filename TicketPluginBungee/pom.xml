@@ -66,9 +66,8 @@
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
+            <artifactId>bungeecord-chat</artifactId>
             <version>1.16-R0.3</version>
-            <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
         <dependency>

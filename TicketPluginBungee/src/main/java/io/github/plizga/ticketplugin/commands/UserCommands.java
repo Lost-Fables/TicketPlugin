@@ -238,4 +238,11 @@ public class UserCommands extends BaseCommand
             msg(plugin.ERROR_COLOR + "Only players may leave reviews on their tickets.");
         }
     }
+
+    @Cmd(value="List the available teams.")
+    public void teams(CommandSender sender) {
+        for (Team team : Team.values()) {
+            sender.sendMessage(new TextComponent("Team '" + team.color + team.name() + ChatColor.RESET + "' with the permission ending '" + team.permission + "'"));
+        }
+    }
 }

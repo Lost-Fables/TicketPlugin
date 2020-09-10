@@ -36,7 +36,7 @@ public abstract class BaseCommand extends CommandTemplate
      * @param sender    the command sender such as a player
      * @param ticketList    the ticket list being passed to print out
      */
-    void readTicketsBasic(CommandSender sender, List ticketList)
+    void readTicketsBasic(CommandSender sender, List<Ticket> ticketList)
     {
         int index = 1;
 
@@ -58,7 +58,7 @@ public abstract class BaseCommand extends CommandTemplate
      * @param sender    the {CommandSender} who wants those motherfuckin tickets!!!!
      * @param ticketList    the motherfuckin ticket list!!!!!!!!!!
      */
-    void readPlayerTickets(CommandSender sender, List ticketList)
+    void readPlayerTickets(CommandSender sender, List<Ticket> ticketList)
     {
         int index = 1; //omg an index!!!!
         for(Object o : ticketList)

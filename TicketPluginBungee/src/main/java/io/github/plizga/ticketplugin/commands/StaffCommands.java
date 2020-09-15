@@ -1,5 +1,6 @@
 package io.github.plizga.ticketplugin.commands;
 
+import co.lotc.core.bungee.util.ChatBuilder;
 import co.lotc.core.command.annotate.Cmd;
 import co.lotc.core.command.annotate.Default;
 import co.lotc.core.util.MessageUtil;
@@ -34,7 +35,6 @@ public class StaffCommands extends BaseCommand
     {
         this.database = plugin.getDatabase();
         this.reassignCommands = new ReassignCommands();
-
     }
 
     @Cmd(value ="Internally used to reassign tickets to various teams.")
@@ -47,45 +47,35 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="look at the list of tickets for a specific team")
     public void view(CommandSender sender, Team team)
     {
+        ProxiedPlayer player = null;
         if(sender instanceof ProxiedPlayer)
         {
-            ProxiedPlayer player = (ProxiedPlayer) sender;
+            player = (ProxiedPlayer) sender;
+        }
 
-            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
-               player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission))
-            {
-                List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
+        if(player == null ||
+           player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
+           player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission)) {
+            List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
 
-                if(openTickets.size() == 0)
-                {
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for the " + team.color + team.name() +
-                                                         plugin.PREFIX + " team."));
-                    return;
-                }
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for the " + team.color + team.name() +
-                                                     plugin.PREFIX + " team:"));
-                readTicketsBasic(sender, openTickets);
+            if (openTickets.size() == 0) {
+                TextComponent message = ChatBuilder.appendTextComponent(null, "There are no open tickets for the ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(message, team.name(), team.color);
+                ChatBuilder.appendTextComponent(message, " team.", plugin.PREFIX);
+                sender.sendMessage(message);
+                return;
             }
-            else
-            {
-                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "You do not have permission to view that team's tickets!"));
-            }
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Viewing tickets for the ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, team.name(), team.color);
+            ChatBuilder.appendTextComponent(message, " team:", plugin.PREFIX);
+            sender.sendMessage(message);
+
+            readTicketsBasic(sender, openTickets);
         }
         else
         {
-            List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
-
-            if(openTickets.size() == 0)
-            {
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for the " + plugin.ALT_COLOR + team.name() +
-                                                     plugin.PREFIX + " team."));
-                return;
-            }
-            sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for the " + plugin.ALT_COLOR + team.name() +
-                                                 plugin.PREFIX + " team:"));
-            readTicketsBasic(sender, openTickets);
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "You do not have permission to view that team's tickets!", plugin.ERROR_COLOR));
         }
-
     }
 
     @Cmd(value="look at the list of all available tickets for the staff member initiating the command.")
@@ -135,10 +125,10 @@ public class StaffCommands extends BaseCommand
 
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no open tickets for any teams you are a part of. Pretty cool!"));
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "There are no open tickets for any teams you are a part of. Pretty cool!", plugin.PREFIX));
                 return;
             }
-            sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing tickets for your teams:"));
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Viewing tickets for your teams:", plugin.PREFIX));
 
             readTicketsBasic(sender, openTickets);
 
@@ -149,7 +139,6 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="allows a staff member to claim or unclaim a ticket, based upon whether they have currently claimed it or not.")
     public void claim(CommandSender sender, String uuid)
     {
-        //todo: allow managers to claim tickets even if they are already claimed.
         if(sender instanceof ProxiedPlayer)
         {
             ProxiedPlayer player = (ProxiedPlayer) sender;
@@ -164,33 +153,40 @@ public class StaffCommands extends BaseCommand
                 if(ticket.getStatus() == Status.OPEN)
                 {
                     database.claimTicket(ticket.getId(), player.getName());
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "claimed.\n"));
+                    TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket has been ", plugin.PREFIX);
+                    ChatBuilder.appendTextComponent(message, "claimed", plugin.ALT_COLOR);
+                    ChatBuilder.appendTextComponent(message, ".", plugin.PREFIX);
+                    sender.sendMessage(message);
                     sendClaimedMessage(database.getTicketByUUID(uuid));
-
                 }
                 else if(assignedModerator.equalsIgnoreCase(player.getName()))
                 {
                     database.unClaimTicket(uuid);
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "Ticket has been " + plugin.ALT_COLOR + "unclaimed.\n"));
-
+                    TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket has been ", plugin.PREFIX);
+                    ChatBuilder.appendTextComponent(message, "unclaimed", plugin.ALT_COLOR);
+                    ChatBuilder.appendTextComponent(message, ".", plugin.PREFIX);
+                    sender.sendMessage(message);
                 }
                 else if(player.hasPermission(TicketPluginBungee.PERMISSION_START + "." + ticket.getTeam().name() + ".manager"))
                 {
                     database.unClaimTicket(uuid);
                     database.claimTicket(uuid, player.getName());
-                    msg(plugin.PREFIX + "You have used your manager permissions to claim this ticket.");
+                    sender.sendMessage(ChatBuilder.appendTextComponent(null, "You have used your manager permissions to claim this ticket.", plugin.PREFIX));
                     sendClaimedMessage(database.getTicketByUUID(uuid));
                 }
                 else
                 {
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "This ticket has been claimed by " + plugin.ALT_COLOR +
-                                                         ticket.getAssignedStaff() + plugin.PREFIX + "."));
+                    TextComponent message = ChatBuilder.appendTextComponent(null, "This ticket has been claimed by ", plugin.PREFIX);
+                    ChatBuilder.appendTextComponent(message, ticket.getAssignedStaff(), plugin.ALT_COLOR);
+                    ChatBuilder.appendTextComponent(message, ".", plugin.PREFIX);
+                    sender.sendMessage(message);
                 }
             }
             catch(NullPointerException e)
             {
-                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                                                     plugin.ALT_COLOR + " Method: claim"));
+                TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket not found! Contact a developer if this continues to occur.", plugin.ERROR_COLOR);
+                ChatBuilder.appendTextComponent(message, " Method: claim", plugin.ALT_COLOR);
+                sender.sendMessage(message);
             }
         }
         else
@@ -206,43 +202,34 @@ public class StaffCommands extends BaseCommand
     @Cmd(value="Allows staff members to view claimed tickets for a specified team.")
     public void viewClaimed(CommandSender sender, Team team)
     {
+        ProxiedPlayer player = null;
         if(sender instanceof ProxiedPlayer)
         {
-            ProxiedPlayer player = (ProxiedPlayer) sender;
+            player = (ProxiedPlayer) sender;
+        }
 
-            if(player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
-               player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission))
-            {
-                List<Ticket> openTickets = database.getTeamClaimedTickets(team.name());
+        if(player == null ||
+           player.hasPermission(TicketPluginBungee.PERMISSION_START + team.permission) ||
+           player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Admin.permission)) {
+            List<Ticket> openTickets = database.getTeamClaimedTickets(team.name());
 
-                if(openTickets.size() == 0)
-                {
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                                                         plugin.PREFIX + " team."));
-                    return;
-                }
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                                                     plugin.PREFIX + " team:"));
-                readTicketsBasic(sender, openTickets);
+            if (openTickets.size() == 0) {
+                TextComponent message = ChatBuilder.appendTextComponent(null, "There are no claimed tickets for the ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(message, team.name(), team.color);
+                ChatBuilder.appendTextComponent(message, " team.", plugin.PREFIX);
+                sender.sendMessage(message);
+                return;
             }
-            else
-            {
-                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "You do not have permission to view that team's claimed tickets!"));
-            }
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Viewing claimed tickets for the ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, team.name(), team.color);
+            ChatBuilder.appendTextComponent(message, " team:", plugin.PREFIX);
+            sender.sendMessage(message);
+
+            readTicketsBasic(sender, openTickets);
         }
         else
         {
-            List<Ticket> openTickets = database.getTeamClaimedTickets(team.name());
-
-            if(openTickets.size() == 0)
-            {
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "There are no claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                                                     plugin.PREFIX + " team."));
-                return;
-            }
-            sender.sendMessage(new TextComponent(plugin.PREFIX + "Viewing claimed tickets for the " + plugin.ALT_COLOR + team.name() +
-                                                 plugin.PREFIX + " team:"));
-            readTicketsBasic(sender, openTickets);
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "You do not have permission to view that team's claimed tickets!", plugin.ERROR_COLOR));
         }
     }
 
@@ -262,37 +249,34 @@ public class StaffCommands extends BaseCommand
 
                 if(claimedTickets.size() == 0)
                 {
-
-                    msg(plugin.PREFIX + "You have no currently claimed tickets!");
+                    sender.sendMessage(ChatBuilder.appendTextComponent(null, "You have no currently claimed tickets!", plugin.PREFIX));
                     return;
                 }
 
-                msg( plugin.PREFIX +"Viewing your claimed tickets:");
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "Viewing your claimed tickets:", plugin.PREFIX));
                 readTicketsBasic(sender, claimedTickets);
-
-
-
             }
             catch(NullPointerException e)
             {
-                msg(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                        plugin.ALT_COLOR + " Method: viewMyClaimed");
+                TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket not found! Contact a developer if this continues to occur.", plugin.ERROR_COLOR);
+                ChatBuilder.appendTextComponent(message, " Method: viewMyClaimed", plugin.ALT_COLOR);
+                sender.sendMessage(message);
             }
         }
         else
         {
-            msg("Only players may view their claimed tickets because you can't claim tickets dude you're a console.");
+            sender.sendMessage(new TextComponent("Only players may view their claimed tickets because you can't claim tickets dude you're a console."));
         }
     }
 
     @Cmd(value="Allows for tickets to be reassigned to other teams.")
     public void reassignTicket(CommandSender sender, String uuid)
     {
-        msg("\n" + plugin.PREFIX + "Choose a team to reassign to:");
+        sender.sendMessage(ChatBuilder.appendTextComponent(null, "Choose a team to reassign to:", plugin.PREFIX));
         for(Team t: Team.values())
         {
             BaseComponent cmdButton = MessageUtil.CommandButton("Reassign to " + t.name(),
-                    "/" + plugin.COMMAND_START +" staff reassign " + t.name().toLowerCase() + " " + uuid);
+                    "/" + plugin.COMMAND_START +" staff reassign " + t.name().toLowerCase() + " " + uuid, t.color, plugin.ALT_COLOR);
             msg(cmdButton);
         }
     }
@@ -310,30 +294,37 @@ public class StaffCommands extends BaseCommand
                 msg(plugin.PREFIX + "Ticket Information: ");
                 sender.sendMessage(ticket.toExpandedInfo().create());
 
-                TextComponent addCommentsButton = new TextComponent(plugin.ALT_COLOR + "[" + plugin.PREFIX + "Add Staff Comment" + plugin.ALT_COLOR + "]");
+                TextComponent addCommentsButton = ChatBuilder.appendTextComponent(null, "[", plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(addCommentsButton, "Add Staff Comment", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(addCommentsButton, "]", plugin.ALT_COLOR);
                 addCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true "));
 
-                TextComponent addCommentsButton2 = new TextComponent(plugin.ALT_COLOR + "[" + plugin.PREFIX + "Add Player and Staff Comment" + plugin.ALT_COLOR + "]");
+                TextComponent addCommentsButton2 = ChatBuilder.appendTextComponent(null, "[", plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(addCommentsButton, "Add Player and Staff Comment", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(addCommentsButton, "]", plugin.ALT_COLOR);
                 addCommentsButton2.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false "));
 
-                BaseComponent viewCommentsButton = new TextComponent(plugin.ALT_COLOR + "[" + plugin.PREFIX + "View Comments" + plugin.ALT_COLOR + "]");
+                TextComponent viewCommentsButton = ChatBuilder.appendTextComponent(null, "[", plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(addCommentsButton, "View Comments", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(addCommentsButton, "]", plugin.ALT_COLOR);
                 viewCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START +" staff comment " + ticket.getId()));
 
-                msg(addCommentsButton);
-                msg(addCommentsButton2);
-                msg(viewCommentsButton);
+                sender.sendMessage(addCommentsButton);
+                sender.sendMessage(addCommentsButton2);
+                sender.sendMessage(viewCommentsButton);
 
                 if(ticket.getAssignedStaff().equals(player.getName()))
                 {
                     BaseComponent closeButton = MessageUtil.CommandButton("Close this Ticket", "/" + plugin.COMMAND_START + " staff closeTicket " + ticket.getId());
-                    msg(closeButton);
+                    sender.sendMessage(closeButton);
                 }
 
             }
             catch(NullPointerException e)
             {
-                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket not found! Contact a developer if this continues to occur." +
-                                                     plugin.ALT_COLOR + "Method: claim"));
+                TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket not found! Contact a developer if this continues to occur.", plugin.ERROR_COLOR);
+                ChatBuilder.appendTextComponent(message, "Method: claim", plugin.ALT_COLOR);
+                sender.sendMessage(message);
             }
         }
         else
@@ -359,10 +350,10 @@ public class StaffCommands extends BaseCommand
                 database.createNewComment(player.getName(), comment, uuid, staffComment);
                 sendCommentMessage(database.getTicketByUUID(uuid));
             } else {
-                msg(plugin.ERROR_COLOR + "Please limit your comment to 150 characters.");
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "Please limit your comment to 150 characters.", plugin.ERROR_COLOR));
             }
         } else {
-            msg("Only players may access and modify comments.");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may access and modify comments.", plugin.ERROR_COLOR));
         }
     }
 
@@ -377,17 +368,18 @@ public class StaffCommands extends BaseCommand
 
                 sendCompletedMessage(database.getTicketByUUID(ticketUUID));
 
-                msg(plugin.PREFIX + "Ticket has been closed.");
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "Ticket has been closed.", plugin.PREFIX));
             }
             catch(NullPointerException e)
             {
-                msg("Ticket does not exist. Contact a developer if this continues to occur.");
+                TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket not found! Contact a developer if this continues to occur.", plugin.ERROR_COLOR);
+                ChatBuilder.appendTextComponent(message, "Method: closeTicket", plugin.ALT_COLOR);
+                sender.sendMessage(message);
             }
-
         }
         else
         {
-            msg("Only players may close tickets.");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players can close tickets.", plugin.ERROR_COLOR));
         }
     }
 
@@ -401,19 +393,20 @@ public class StaffCommands extends BaseCommand
             if(plugin.getStaffUUIDsOnDuty().contains(playerUUID))
             {
                 plugin.getDatabase().removeStaffFromOnDuty(playerUUID);
-                msg(plugin.PREFIX + "You are now " + ChatColor.RED + "off-duty " +
-                        plugin.PREFIX +"and will no longer receive notifications regarding new tickets.");
+
+                TextComponent message = ChatBuilder.appendTextComponent(null, "You are now ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(message, "off-duty ", ChatColor.RED);
+                ChatBuilder.appendTextComponent(message, "and will no longer receive notifications regarding new tickets.", plugin.PREFIX);
+                sender.sendMessage(message);
             }
             else
             {
-                msg(plugin.ERROR_COLOR + "You are already off-duty!");
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "You are already off-duty!", plugin.ERROR_COLOR));
             }
-
-
         }
         else
         {
-            msg("Only players can go off-duty!");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players can go off-duty!", plugin.ERROR_COLOR));
         }
     }
 
@@ -436,7 +429,12 @@ public class StaffCommands extends BaseCommand
                     {
                         database.updateStaffOnDuty(player.getUniqueId().toString(), true);
                     }
-                    msg(plugin.PREFIX + "You are now marked as " + ChatColor.GREEN + "on-duty.");
+                    {
+                        TextComponent message = ChatBuilder.appendTextComponent(null, "You are now marked as ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(message, "on-duty", ChatColor.GREEN);
+                        ChatBuilder.appendTextComponent(message, ".", plugin.PREFIX);
+                        sender.sendMessage(message);
+                    }
                     break;
 
                 case "false":
@@ -448,35 +446,43 @@ public class StaffCommands extends BaseCommand
                     {
                         database.updateStaffOnDuty(player.getUniqueId().toString(), false);
                     }
-                    msg(plugin.PREFIX + "You are now marked as " + ChatColor.GREEN + "on-duty.");
+                    {
+                        TextComponent message = ChatBuilder.appendTextComponent(null, "You are now marked as ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(message, "on-duty", ChatColor.GREEN);
+                        ChatBuilder.appendTextComponent(message, ".", plugin.PREFIX);
+                        sender.sendMessage(message);
+                    }
                     break;
 
                 default:
                     TextComponent question;
                     if(staff == null)
                     {
-                        question = new TextComponent(plugin.PREFIX + "You are currently " +
-                                ChatColor.DARK_RED + "off-duty" + plugin.PREFIX + ". " +
-                                "Would you like to stay on-duty " + plugin.PREFIX + "while logged off? ");
+                        question = ChatBuilder.appendTextComponent(null, "You are currently ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(question, "off-duty", ChatColor.RED);
+                        ChatBuilder.appendTextComponent(question, ". Would you like to stay ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(question, "on-duty ", ChatColor.GREEN);
+                        ChatBuilder.appendTextComponent(question, "between logins?", plugin.PREFIX);
                     }
                     else if(staff.isPersistent())
                     {
-                        question = new TextComponent(plugin.PREFIX + "You are currently " +
-                                ChatColor.GREEN + "on-duty" + plugin.PREFIX + ", and will stay on-duty after " + plugin.PREFIX + "logging off. Would you like to stay on-duty while logged off? ");
+                        question = ChatBuilder.appendTextComponent(null, "You are currently ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(question, "on-duty", ChatColor.GREEN);
+                        ChatBuilder.appendTextComponent(question, ". Would you like to stay ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(question, "on-duty ", ChatColor.GREEN);
+                        ChatBuilder.appendTextComponent(question, "between logins?", plugin.PREFIX);
                     }
                     else
                     {
-                        question = new TextComponent(plugin.PREFIX + "You are currently " +
-                                ChatColor.GREEN + "on-duty" + plugin.PREFIX + ", and will be taken off-duty upon " + plugin.PREFIX + "logging off. Would you like to stay on-duty while logged off? ");
+                        question = ChatBuilder.appendTextComponent(null, "You are currently ", plugin.PREFIX);
+                        ChatBuilder.appendTextComponent(question, "on-duty", ChatColor.GREEN);
+                        ChatBuilder.appendTextComponent(question, ", and will be taken off-duty upon logging off. Would you like to stay on-duty while logged off?", plugin.PREFIX);
                     }
 
-                    TextComponent yesButton = new TextComponent(ChatColor.GREEN + "[YES]");
-                    yesButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            "/" + plugin.COMMAND_START +" staff onDuty " + "true"));
-                    TextComponent slashMark = new TextComponent(ChatColor.DARK_GRAY+ "/");
-                    TextComponent noButton = new TextComponent(ChatColor.RED + "[NO]");
-                    noButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            "/" + plugin.COMMAND_START + " staff onDuty " + "false"));
+                    BaseComponent yesButton = MessageUtil.CommandButton("YES", "/" + plugin.COMMAND_START +" staff onDuty " + "true", ChatColor.GREEN, ChatColor.GREEN);
+                    TextComponent slashMark = new TextComponent("/");
+                    slashMark.setColor(ChatColor.DARK_GRAY);
+                    BaseComponent noButton = MessageUtil.CommandButton("NO", "/" + plugin.COMMAND_START + " staff onDuty " + "false", ChatColor.RED, ChatColor.RED);
 
                     ComponentBuilder componentBuilder = new ComponentBuilder("").append(question)
                             .append(yesButton)
@@ -491,7 +497,7 @@ public class StaffCommands extends BaseCommand
         }
         else
         {
-            msg("Only players can go on-duty!");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players can go on-duty!", plugin.ERROR_COLOR));
         }
     }
 
@@ -520,7 +526,7 @@ public class StaffCommands extends BaseCommand
 
                 server.sendData(plugin.CHANNEL, out.toByteArray());
             } else {
-                msg(plugin.ERROR_COLOR + "Unable to find the server this ticket was made on. You can TP manually using the coordinates " + x + ", " + y + ", " + z);
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "Unable to find the server this ticket was made on. You can TP manually using the coordinates " + x + ", " + y + ", " + z, plugin.ERROR_COLOR));
             }
         }
     }

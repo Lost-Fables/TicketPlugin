@@ -205,14 +205,14 @@ public final class TicketPluginBungee extends Plugin
      */
     public void notifyOnDutyStaff(Team team)
     {
-        List<ProxiedPlayer> broadcastedPlayers = new ArrayList<>();
+        List<UUID> broadcastedPlayers = new ArrayList<>();
         for(Staff staff : getStaffOnDuty())
         {
             ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
 
-            if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player))
+            if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId()))
             {
-                broadcastedPlayers.add(player);
+                broadcastedPlayers.add(player.getUniqueId());
 
                 TextComponent message = ChatBuilder.appendTextComponent(null, "A player ticket has been assigned to the ", PREFIX);
                 ChatBuilder.appendTextComponent(message, team.name(), team.color);

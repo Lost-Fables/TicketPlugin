@@ -1,5 +1,6 @@
 package io.github.plizga.ticketplugin.listeners;
 
+import co.lotc.core.bungee.util.ChatBuilder;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import io.github.plizga.ticketplugin.TicketPluginBungee;
@@ -69,8 +70,10 @@ public class TicketPlayerListener implements Listener
 
 
                 plugin.getDatabase().createNewTicket(ticketUUID, player, location, Status.OPEN, team, message);
-                player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description: " + plugin.ALT_COLOR +
-                                                     message + plugin.PREFIX + " has been created!"));
+                TextComponent componentMessage = ChatBuilder.appendTextComponent(null, "Your ticket, with the description: ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(componentMessage, message, plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(componentMessage, " has been created!", plugin.PREFIX);
+                player.sendMessage(componentMessage);
                 plugin.notifyOnDutyStaff(team);
             }
         }

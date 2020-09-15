@@ -1,6 +1,7 @@
 package io.github.plizga.ticketplugin.commands;
 
 
+import co.lotc.core.bungee.util.ChatBuilder;
 import co.lotc.core.command.annotate.Arg;
 import co.lotc.core.command.annotate.Cmd;
 
@@ -45,7 +46,7 @@ public class UserCommands extends BaseCommand
     @Cmd(value="Allows access to reviews.")
     public void review(CommandSender sender, String ticketUUID, @Range(min=1, max=5)int rating) {
         database.createNewReview(ticketUUID, rating);
-        msg(plugin.PREFIX + "Thank you for submitting a review!");
+        sender.sendMessage(ChatBuilder.appendTextComponent(null, "Thank you for submitting a review!", plugin.PREFIX));
     }
 
     @Cmd(value="Create a new ticket.", permission= TicketPluginBungee.PERMISSION_START + ".create")
@@ -81,10 +82,10 @@ public class UserCommands extends BaseCommand
                 }
                 server.sendData(plugin.CHANNEL, out.toByteArray());
             } else {
-                msg(plugin.ERROR_COLOR + "Unable to find the server you're on. Are you still logged in?");
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "Unable to find the server you're on. Are you still logged in?", plugin.ERROR_COLOR));
             }
         } else {
-            sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may create a ticket."));
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may create a ticket.", plugin.ERROR_COLOR));
         }
     }
 
@@ -98,19 +99,22 @@ public class UserCommands extends BaseCommand
 
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "No open tickets to view!"));
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "No open tickets to view!", plugin.PREFIX));
                 return;
             }
 
             readPlayerTickets(sender, openTickets);
-            sender.sendMessage(new TextComponent(plugin.PREFIX + "To delete a ticket, use the command " + plugin.ALT_COLOR +
-                                                 " /request cancel <number> " + plugin.PREFIX + ", where <number> is the ticket number as it appears" +
-                                                 " on this list. \n Alternatively, use " + plugin.ALT_COLOR + "/request cancel all" +
-                                                 plugin.PREFIX + " to cancel all of your current tickets."));
+
+            TextComponent message = ChatBuilder.appendTextComponent(null, "To delete a ticket, use the command ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, " /request cancel <number> ", plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, ", where <number> is the ticket number as it appears on this list. \n Alternatively, use ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, "/request cancel all", plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, " to cancel all of your current tickets.", plugin.PREFIX);
+            sender.sendMessage(message);
         }
         else
         {
-            sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may get a list of their own tickets."));
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may get a list of their own tickets.", plugin.ERROR_COLOR));
         }
 
     }
@@ -124,7 +128,7 @@ public class UserCommands extends BaseCommand
             List<Ticket> openTickets = database.getPlayerOpenTickets(player.getName());
             if(openTickets.size() == 0)
             {
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "No open tickets to cancel!"));
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "No open tickets to cancel!", plugin.PREFIX));
                 return;
             }
 
@@ -133,7 +137,7 @@ public class UserCommands extends BaseCommand
                 if(num.equalsIgnoreCase("all"))
                 {
                     database.cancelTicketByPlayer(player.getName());
-                    sender.sendMessage(new TextComponent(plugin.PREFIX +  "All of your open tickets have been cancelled."));
+                    sender.sendMessage(ChatBuilder.appendTextComponent(null, "All of your open tickets have been cancelled.", plugin.PREFIX));
                 }
                 else
                 {
@@ -145,25 +149,33 @@ public class UserCommands extends BaseCommand
                     }
                     catch(NumberFormatException e)
                     {
-                        sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Failed to execute command. Use 'all' or a number" +
-                                                             "instead of " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR + "."));
+                        TextComponent message = ChatBuilder.appendTextComponent(null, "Failed to execute command. Use 'all' or a number instead of ", plugin.ERROR_COLOR);
+                        ChatBuilder.appendTextComponent(message, num, plugin.ALT_COLOR);
+                        ChatBuilder.appendTextComponent(message, ".", plugin.ERROR_COLOR);
+                        sender.sendMessage(message);
                         return;
                     }
                     Ticket ticket = (Ticket) openTickets.get(numAsInt);
                     database.cancelTicketByUUID(ticket.getId());
-                    sender.sendMessage(new TextComponent(plugin.PREFIX + "Ticket " + plugin.ALT_COLOR + num + plugin.PREFIX + " has been deleted."));
+
+                    TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket ", plugin.PREFIX);
+                    ChatBuilder.appendTextComponent(message, num, plugin.ALT_COLOR);
+                    ChatBuilder.appendTextComponent(message, " has been deleted.", plugin.PREFIX);
+                    sender.sendMessage(message);
                 }
 
             }
             catch(IndexOutOfBoundsException e)
             {
-                sender.sendMessage(new TextComponent(plugin.ERROR_COLOR + "Ticket " + plugin.ALT_COLOR + num + plugin.ERROR_COLOR +
-                                                     " does not exist. Please enter a valid ticket number to cancel."));
+                TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket ", plugin.ERROR_COLOR);
+                ChatBuilder.appendTextComponent(message, num, plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(message, " does not exist. Please enter a valid ticket number to cancel.", plugin.ERROR_COLOR);
+                sender.sendMessage(message);
             }
         }
         else
         {
-            sender.sendMessage(new TextComponent(ChatColor.DARK_RED + "Only players may remove their own tickets."));
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may remove their own tickets.", plugin.ERROR_COLOR));
         }
     }
 
@@ -190,7 +202,9 @@ public class UserCommands extends BaseCommand
 
             if(completedTickets.size() == 0)
             {
-                sender.sendMessage(new TextComponent(plugin.PREFIX + "No completed tickets to view!"));
+                TextComponent message = new TextComponent("No completed tickets to view!");
+                message.setColor(plugin.PREFIX);
+                sender.sendMessage(message);
                 return;
             }
 
@@ -198,7 +212,7 @@ public class UserCommands extends BaseCommand
         }
         else
         {
-            msg(plugin.ERROR_COLOR + "Only players may view their completed tickets.");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may view their completed tickets.", plugin.ERROR_COLOR));
         }
     }
 
@@ -229,40 +243,23 @@ public class UserCommands extends BaseCommand
             TextComponent fiveStarButton = new TextComponent("☆ ]");
             fiveStarButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " review " + ticketUUID + " 5"));
             fiveStarButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("5")));
-            msg(plugin.PREFIX + "Review Rating: ");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Review Rating:", plugin.PREFIX));
             ComponentBuilder componentBuilder = new ComponentBuilder("").append(oneStarButton).append(twoStarButton).append(threeStarButton).append(fourStarButton).append(fiveStarButton);
             sender.sendMessage(componentBuilder.create());
         }
         else
         {
-            msg(plugin.ERROR_COLOR + "Only players may leave reviews on their tickets.");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may leave reviews on their tickets.", plugin.ERROR_COLOR));
         }
     }
 
     @Cmd(value="List the available teams.")
     public void teams(CommandSender sender) {
         for (Team team : Team.values()) {
-            TextComponent finalMessage = new TextComponent();
-
-            {
-                TextComponent message = new TextComponent("Team '");
-                message.setColor(plugin.PREFIX);
-                finalMessage.addExtra(message);
-            }
-
-            {
-                TextComponent message = new TextComponent(team.name());
-                message.setColor(team.color);
-                finalMessage.addExtra(message);
-            }
-
-            {
-                TextComponent message = new TextComponent("' with the permission ending '" + team.permission + "'");
-                message.setColor(plugin.PREFIX);
-                finalMessage.addExtra(message);
-            }
-
-            sender.sendMessage(finalMessage);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Team '", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, team.name(), team.color);
+            ChatBuilder.appendTextComponent(message, "' with the permission ending '" + team.permission + "'", plugin.PREFIX);
+            sender.sendMessage(message);
         }
     }
 }

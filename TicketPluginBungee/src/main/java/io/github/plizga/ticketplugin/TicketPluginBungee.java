@@ -2,6 +2,7 @@ package io.github.plizga.ticketplugin;
 
 import co.lotc.core.bungee.command.BungeeCommandData;
 import co.lotc.core.bungee.command.Commands;
+import co.lotc.core.bungee.util.ChatBuilder;
 import io.github.plizga.ticketplugin.commands.UserCommands;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.enums.TicketViewOptions;
@@ -45,7 +46,7 @@ public final class TicketPluginBungee extends Plugin
     /** Defines the second common color used in the plugin. */
     public final ChatColor ALT_COLOR = ChatColor.BLUE;
     /** Defines the common error color used in the plugin. */
-    public final String ERROR_COLOR = ChatColor.DARK_RED + "";
+    public final ChatColor ERROR_COLOR = ChatColor.DARK_RED;
     /** Represents an instance of the ticket plugin. */
     private static TicketPluginBungee ticketPluginBungeeInstance;
     /** Represents the config file. */
@@ -204,14 +205,19 @@ public final class TicketPluginBungee extends Plugin
      */
     public void notifyOnDutyStaff(Team team)
     {
+        List<ProxiedPlayer> broadcastedPlayers = new ArrayList<>();
         for(Staff staff : getStaffOnDuty())
         {
             ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
 
-            if(player != null && player.hasPermission(PERMISSION_START + team.permission))
+            if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player))
             {
-                player.sendMessage(new TextComponent(PREFIX + "A player ticket has been assigned to the " +
-                        team.color + team.name() + PREFIX + " team."));
+                broadcastedPlayers.add(player);
+
+                TextComponent message = ChatBuilder.appendTextComponent(null, "A player ticket has been assigned to the ", PREFIX);
+                ChatBuilder.appendTextComponent(message, team.name(), team.color);
+                ChatBuilder.appendTextComponent(message, " team.", PREFIX);
+                player.sendMessage(message);
 
             }
         }

@@ -73,7 +73,7 @@
         <dependency>
             <groupId>co.lotc</groupId>
             <artifactId>tythan-bungee</artifactId>
-            <version>1.16.2.3</version>
+            <version>1.16.2.5</version>
         </dependency>
     </dependencies>
 </project>

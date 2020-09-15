@@ -1,5 +1,6 @@
 package io.github.plizga.ticketplugin.helpers;
 
+import co.lotc.core.bungee.util.ChatBuilder;
 import io.github.plizga.ticketplugin.TicketPluginBungee;
 import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
@@ -23,16 +24,16 @@ import java.util.UUID;
 public class Ticket implements Comparable<Ticket>
 {
     private static final int MINI_DESCRIPTION_LENGTH = 25;
-    private static final String USERNAME_COLOR_ONLINE = ChatColor.GREEN + "";
-    private static final String USERNAME_COLOR_OFFLINE = ChatColor.RED + "";
-    private static final String TEXT_COLOR = ChatColor.GRAY + "";
-    private static final String TIME_COLOR = ChatColor.YELLOW + "";
-    private static final String CLAIMED_COLOR = ChatColor.AQUA + "";
+    private static final ChatColor USERNAME_COLOR_ONLINE = ChatColor.GREEN;
+    private static final ChatColor USERNAME_COLOR_OFFLINE = ChatColor.RED;
+    private static final ChatColor TEXT_COLOR = ChatColor.GRAY;
+    private static final ChatColor TIME_COLOR = ChatColor.YELLOW;
+    private static final ChatColor CLAIMED_COLOR = ChatColor.AQUA;
     private String id;
     private String playerName;
     private Status status;
     private Team team;
-    private String assignedModerator;
+    private String assignedStaff;
     private String dateCreated;
     private String dateCleared;
     private String location;
@@ -42,7 +43,7 @@ public class Ticket implements Comparable<Ticket>
 
     private TicketPluginBungee plugin;
 
-    public Ticket(Plugin plugin, String id, String playerName, String playerID, Status status, Team team, String assignedModerator,
+    public Ticket(Plugin plugin, String id, String playerName, String playerID, Status status, Team team, String assignedStaff,
                   String dateCreated, String dateCleared, String location, String info)
     {
         this.plugin = (TicketPluginBungee) plugin;
@@ -50,7 +51,7 @@ public class Ticket implements Comparable<Ticket>
         this.playerName = playerName;
         this.status = status;
         this.team = team;
-        this.assignedModerator = assignedModerator;
+        this.assignedStaff = assignedStaff;
         this.dateCreated = dateCreated;
         this.dateCleared = dateCleared;
         this.location = location;
@@ -67,7 +68,7 @@ public class Ticket implements Comparable<Ticket>
                plugin.PREFIX + "\nInfo: " + plugin.ALT_COLOR + info +
                plugin.PREFIX + "\nStatus: " + plugin.ALT_COLOR + status.toString() +
                plugin.PREFIX + "\nTeam: " + plugin.ALT_COLOR + team.toString() +
-               plugin.PREFIX + "\nAssigned Staff Member: " + plugin.ALT_COLOR + assignedModerator +
+               plugin.PREFIX + "\nAssigned Staff Member: " + plugin.ALT_COLOR + assignedStaff +
                plugin.PREFIX + "\nDate Created: " + plugin.ALT_COLOR + dateCreated +
                plugin.PREFIX + "\nDate Cleared: " + plugin.ALT_COLOR + dateCleared +
                plugin.PREFIX + "\nLocation: " + plugin.ALT_COLOR + location;
@@ -126,8 +127,8 @@ public class Ticket implements Comparable<Ticket>
 
 
         //Assigned Staff Member
-        TextComponent assignedStaffText = new TextComponent(plugin.PREFIX + "Assigned Staff: " + plugin.ALT_COLOR + assignedModerator + "\n");
-        assignedStaffText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
+        TextComponent assignedStaffText = new TextComponent(plugin.PREFIX + "Assigned Staff: " + plugin.ALT_COLOR + assignedStaff + "\n");
+        assignedStaffText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedStaff + " "));
         assignedStaffText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to message this staff member.")));
 
         textComponents.add(assignedStaffText);
@@ -221,37 +222,32 @@ public class Ticket implements Comparable<Ticket>
     }
 
 
-    public ComponentBuilder toBasicInfo()
+    public TextComponent toBasicInfo()
     {
 
-        TextComponent[] textComponents = new TextComponent[5];
         //Set the team
-        TextComponent teamPrefix = new TextComponent(team.color + "[" + team.name().charAt(0) +
-                "] ");
-        teamPrefix.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
-        teamPrefix.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)));
-
-        textComponents[0] = teamPrefix;
+        TextComponent message = ChatBuilder.appendTextComponent(null, "[" + team.name().charAt(0) + "] ", team.color,
+                                                                false, false, false, false, false, null,
+                                                                new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
+                                                                new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
 
         //Set the player
-
         ProxiedPlayer player = plugin.getProxy().getPlayer(playerName);
-        TextComponent username;
-
-        if(player == null)
+        if (player == null)
         {
-            username = new TextComponent(USERNAME_COLOR_OFFLINE + "" + playerName + ChatColor.DARK_GRAY + ": ");
+            ChatBuilder.appendTextComponent(message, playerName, USERNAME_COLOR_OFFLINE,
+                                            false, false, false, false, false, null,
+                                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
+                                            new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
         }
         else
         {
-            username = new TextComponent(USERNAME_COLOR_ONLINE + "" + playerName + ChatColor.DARK_GRAY + ": ");
+            ChatBuilder.appendTextComponent(message, playerName, USERNAME_COLOR_ONLINE,
+                                            false, false, false, false, false, null,
+                                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
+                                            new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
         }
-
-        username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
-        username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)));
-
-        textComponents[1] = username;
+        ChatBuilder.appendTextComponent(message, ": ", ChatColor.DARK_GRAY);
 
 
         //Set the description
@@ -266,14 +262,10 @@ public class Ticket implements Comparable<Ticket>
             shortDescription = info;
         }
 
-        TextComponent description = new TextComponent(TEXT_COLOR + shortDescription + " ");
-        description.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                "/" + plugin.COMMAND_START + " staff expandTicket " + this.getId()));
-        description.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)));
-
-
-        textComponents[2] = description;
-
+        ChatBuilder.appendTextComponent(message, shortDescription + " ", TEXT_COLOR,
+                                        false, false, false, false, false, null,
+                                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff expandTicket " + this.getId()));
 
         //Get the time between the ticket's creation and now.
         Date currentDate = new Date();
@@ -293,88 +285,85 @@ public class Ticket implements Comparable<Ticket>
             long differenceHours = difference / (60 * 60 * 1000) % 24;
             long differenceMinutes = difference / (60 * 1000) % 60;
             boolean days = false, hours = false, minutes = false;
-            TextComponent timeSinceCreated;
+            String timeSinceCreated;
 
             if (differenceDays == 0) {
                 if (differenceHours == 0) {
                     if (differenceMinutes == 0) {
-                        timeSinceCreated = new TextComponent(TIME_COLOR + "Just Now ");
+                        timeSinceCreated = "Just Now ";
                     } else {
-                        timeSinceCreated = new TextComponent(TIME_COLOR + differenceMinutes + "M ");
+                        timeSinceCreated = differenceMinutes + "M ";
                     }
                 } else {
-                    timeSinceCreated = new TextComponent(TIME_COLOR + differenceHours +
-                                                         "H, " + differenceMinutes + "M ");
+                    timeSinceCreated = differenceHours + "H, " + differenceMinutes + "M ";
                 }
             } else {
-                timeSinceCreated = new TextComponent(TIME_COLOR + differenceDays +
-                                                     "D, " + differenceHours +
-                                                     "H, " + differenceMinutes + "M ");
+                timeSinceCreated = differenceDays + "D, " + differenceHours + "H, " + differenceMinutes + "M ";
             }
 
-            timeSinceCreated.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                                          "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
-            timeSinceCreated.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)));
-
-
-            textComponents[3] = timeSinceCreated;
+            ChatBuilder.appendTextComponent(message, timeSinceCreated, TIME_COLOR,
+                                            false, false, false, false, false, null,
+                                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
+                                            new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
         } else {
-            textComponents[3] = new TextComponent("Error getting Ticket Date.");
+            ChatBuilder.appendTextComponent(message, "Error getting Ticket Date.", plugin.ERROR_COLOR);
         }
 
 
-        //get the claimer
-        TextComponent claimer;
-
-        if(this.assignedModerator.equalsIgnoreCase("None"))
+        //Get the Claimer
+        String staff;
+        if (this.assignedStaff.equalsIgnoreCase("None"))
         {
-            claimer = new TextComponent(CLAIMED_COLOR +"UNCLAIMED");
+            staff = "UNCLAIMED";
         }
         else
         {
-            claimer = new TextComponent(CLAIMED_COLOR +assignedModerator);
+            staff = assignedStaff;
         }
-        claimer.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                "/" + plugin.COMMAND_START +" staff claim " + this.id));
-        claimer.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)));
 
-        textComponents[4] = claimer;
+        ChatBuilder.appendTextComponent(message, staff, CLAIMED_COLOR,
+                                        false, false, false, false, false, null,
+                                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START +" staff claim " + this.id));
 
-        ComponentBuilder componentBuilder = new ComponentBuilder("");
-        componentBuilder.append(textComponents);
-
-
-
-
-        return componentBuilder;
-
+        return message;
     }
 
 
-    public ComponentBuilder toPlayerInfo()
+    public TextComponent toPlayerInfo()
     {
-        String str = plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info +
-                plugin.PREFIX + ", Team: " + team.color + team +
-                plugin.PREFIX + ", Staff Member: " + plugin.ALT_COLOR + assignedModerator +
-                plugin.PREFIX + " Created: " + plugin.ALT_COLOR + dateCreated;
+        TextComponent message = ChatBuilder.appendTextComponent(null, "Info: ", plugin.PREFIX);
+        ChatBuilder.appendTextComponent(message, info, plugin.ALT_COLOR);
+
+        ChatBuilder.appendTextComponent(message, ", Team: ", plugin.PREFIX);
+        ChatBuilder.appendTextComponent(message, team.name(), team.color);
+
+        ChatBuilder.appendTextComponent(message, ", Staff Member: ", plugin.PREFIX);
+        ChatBuilder.appendTextComponent(message, assignedStaff, plugin.ALT_COLOR);
+
+        ChatBuilder.appendTextComponent(message, " Created: ", plugin.PREFIX);
+        ChatBuilder.appendTextComponent(message, dateCreated, plugin.ALT_COLOR);
 
         if(dateCleared != null)
         {
-            str = str.concat(plugin.PREFIX + " Cleared: " + plugin.ALT_COLOR + dateCleared);
+            ChatBuilder.appendTextComponent(message, " Cleared: ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, dateCleared, plugin.ALT_COLOR);
         }
 
-        TextComponent playerInfo = new TextComponent(str);
-        if(!this.assignedModerator.equals("None"))
+        if(!this.assignedStaff.equals("None"))
         {
-            playerInfo.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedModerator + " "));
-            playerInfo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to message the assigned staff member.")));
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedStaff + " "));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to message the assigned staff member.")));
         }
 
-        int commentAmount = getCommentAmountPlayer();
-        TextComponent viewComments = new TextComponent(plugin.PREFIX + " Comments: " + plugin.ALT_COLOR + commentAmount);
-        viewComments.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  "/" + plugin.COMMAND_START + " comment " + this.id));
-        viewComments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open the comments for this ticket.")));
-        return new ComponentBuilder(playerInfo).append(viewComments);
+        TextComponent comments = ChatBuilder.appendTextComponent(null, " Comments: ", plugin.PREFIX);
+        ChatBuilder.appendTextComponent(comments, getCommentAmountPlayer() + "", plugin.ALT_COLOR);
+        comments.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  "/" + plugin.COMMAND_START + " comment " + this.id));
+        comments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open the comments for this ticket.")));
+
+        message.addExtra(comments);
+
+        return message;
     }
 
 
@@ -420,14 +409,14 @@ public class Ticket implements Comparable<Ticket>
         this.team = team;
     }
 
-    public String getAssignedModerator()
+    public String getAssignedStaff()
     {
-        return assignedModerator;
+        return assignedStaff;
     }
 
-    public void setAssignedModerator(String assignedModerator)
+    public void setAssignedStaff(String assignedStaff)
     {
-        this.assignedModerator = assignedModerator;
+        this.assignedStaff = assignedStaff;
     }
 
     public String getDateCreated()

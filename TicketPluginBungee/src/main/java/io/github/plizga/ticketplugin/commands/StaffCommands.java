@@ -159,7 +159,7 @@ public class StaffCommands extends BaseCommand
                 Database database = plugin.getDatabase();
                 Ticket ticket = database.getTicketByUUID(uuid);
 
-                String assignedModerator = ticket.getAssignedModerator();
+                String assignedModerator = ticket.getAssignedStaff();
 
                 if(ticket.getStatus() == Status.OPEN)
                 {
@@ -184,7 +184,7 @@ public class StaffCommands extends BaseCommand
                 else
                 {
                     sender.sendMessage(new TextComponent(plugin.PREFIX + "This ticket has been claimed by " + plugin.ALT_COLOR +
-                                                         ticket.getAssignedModerator() + plugin.PREFIX + "."));
+                                                         ticket.getAssignedStaff() + plugin.PREFIX + "."));
                 }
             }
             catch(NullPointerException e)
@@ -323,7 +323,7 @@ public class StaffCommands extends BaseCommand
                 msg(addCommentsButton2);
                 msg(viewCommentsButton);
 
-                if(ticket.getAssignedModerator().equals(player.getName()))
+                if(ticket.getAssignedStaff().equals(player.getName()))
                 {
                     BaseComponent closeButton = MessageUtil.CommandButton("Close this Ticket", "/" + plugin.COMMAND_START + " staff closeTicket " + ticket.getId());
                     msg(closeButton);

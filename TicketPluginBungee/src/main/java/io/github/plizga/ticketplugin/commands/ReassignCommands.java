@@ -88,7 +88,7 @@ public class ReassignCommands extends BaseCommand
         }
 
         Ticket ticket = database.getTicketByUUID(uuid);
-        sendReassignMessage(ticket, team.name());
+        sendReassignMessage(ticket, team);
         plugin.notifyOnDutyStaff(team);
     }
 }

@@ -1,10 +1,12 @@
 package io.github.plizga.ticketplugin.commands;
 
+import co.lotc.core.bungee.util.ChatBuilder;
 import co.lotc.core.command.CommandTemplate;
 import co.lotc.core.util.MessageUtil;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import io.github.plizga.ticketplugin.TicketPluginBungee;
+import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Comment;
 import io.github.plizga.ticketplugin.helpers.OfflineStorage;
 import io.github.plizga.ticketplugin.helpers.Ticket;
@@ -40,14 +42,9 @@ public abstract class BaseCommand extends CommandTemplate
     {
         int index = 1;
 
-        for(Object o: ticketList)
+        for(Ticket ticket: ticketList)
         {
-            Ticket ticket = (Ticket) o;
-            ComponentBuilder componentBuilder = ticket.toBasicInfo();
-
-            sender.sendMessage(componentBuilder.create());
-
-
+            sender.sendMessage(ticket.toBasicInfo());
             index++;
         }
     }
@@ -61,16 +58,14 @@ public abstract class BaseCommand extends CommandTemplate
     void readPlayerTickets(CommandSender sender, List<Ticket> ticketList)
     {
         int index = 1; //omg an index!!!!
-        for(Object o : ticketList)
+        for(Ticket ticket : ticketList)
         {
-            msg("\nTicket " + index + ":");
-            Ticket ticket = (Ticket) o;
-            sender.sendMessage(ticket.toPlayerInfo().create());
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "\nTicket " + index + ":", plugin.PREFIX));
+            sender.sendMessage(ticket.toPlayerInfo());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + ticket.getId());
-            msg(cmdButton);
-            msg(plugin.PREFIX + TICKET_BORDER + "\n");
+            sender.sendMessage(cmdButton);
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, TICKET_BORDER + "\n", plugin.PREFIX));
             index++;
-
         }
 
     }
@@ -81,17 +76,17 @@ public abstract class BaseCommand extends CommandTemplate
 
         for(Ticket t : completedTickets)
         {
-            msg("\nTicket " + index + ":");
-            sender.sendMessage(t.toPlayerInfo().create());
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "\nTicket " + index + ":", plugin.PREFIX));
+            sender.sendMessage(t.toPlayerInfo());
             BaseComponent cmdButton = MessageUtil.CommandButton("View Comments", "/" + plugin.COMMAND_START + " comment " + t.getId());
-            msg(cmdButton);
+            sender.sendMessage(cmdButton);
 
             Database database = plugin.getDatabase();
 
             if(database.getReview(t.getId()) == null)
             {
                 BaseComponent cmdButton2 = MessageUtil.CommandButton("Add Review", "/" + plugin.COMMAND_START + " addReview " + t.getId());
-                msg(cmdButton2);
+                sender.sendMessage(cmdButton2);
             }
 
             index++;
@@ -99,15 +94,18 @@ public abstract class BaseCommand extends CommandTemplate
         }
     }
 
-    void sendReassignMessage(Ticket ticket, String team)
+    void sendReassignMessage(Ticket ticket, Team team)
     {
         ProxiedPlayer player = plugin.getProxy().getPlayer(ticket.getPlayerName());
 
         if(player != null)
         {
-            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                                                 ticket.getInfo() + plugin.PREFIX + ",\" has been reassigned to the " + plugin.ALT_COLOR +
-                                                 team + plugin.PREFIX + " team!"));
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Your ticket, with the description \"", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, ticket.getInfo(), plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, ",\" has been reassigned to the ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, team.name(), team.color);
+            ChatBuilder.appendTextComponent(message, " team!", plugin.PREFIX);
+            player.sendMessage(message);
         }
 
 
@@ -119,9 +117,12 @@ public abstract class BaseCommand extends CommandTemplate
 
         if(player != null)
         {
-            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                                                 ticket.getInfo() + plugin.PREFIX + "\" has been completed! Use " + plugin.ALT_COLOR + "\"/" +
-                                                 plugin.COMMAND_START + " viewCompleted\"" + plugin.PREFIX + "to add a review!"));
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Your ticket, with the description \"", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, ticket.getInfo(), plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, "\" has been completed! Use ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, "\"/" + plugin.COMMAND_START + " viewCompleted\" ", plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, "to add a review!", plugin.PREFIX);
+            player.sendMessage(message);
         }
     }
 
@@ -131,9 +132,12 @@ public abstract class BaseCommand extends CommandTemplate
 
         if(player != null)
         {
-            player.sendMessage(new TextComponent(plugin.PREFIX + "A comment has been added to your ticket, with the description \"" + plugin.ALT_COLOR +
-                                                 ticket.getInfo() + plugin.PREFIX + "\" Use " + plugin.ALT_COLOR + "\"/" +
-                                                 plugin.COMMAND_START + " view\"" + plugin.PREFIX + ", and click \"View Comments\" to view!"));
+            TextComponent message = ChatBuilder.appendTextComponent(null, "A comment has been added to your ticket, with the description \"", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, ticket.getInfo(), plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, "\" Use ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, "\"/" + plugin.COMMAND_START + " view\"", plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, ", and click \"View Comments\" to view!", plugin.PREFIX);
+            player.sendMessage(message);
         }
     }
 
@@ -143,9 +147,12 @@ public abstract class BaseCommand extends CommandTemplate
 
         if(player != null)
         {
-            player.sendMessage(new TextComponent(plugin.PREFIX + "Your ticket, with the description \"" + plugin.ALT_COLOR +
-                                                 ticket.getInfo() + plugin.PREFIX + "\" has been claimed by " + plugin.ALT_COLOR + ticket.getAssignedModerator() +
-                                                 "!"));
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Your ticket, with the description \"", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, ticket.getInfo(), plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, "\" has been claimed by ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, ticket.getAssignedStaff(), plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, "!", plugin.PREFIX);
+            player.sendMessage(message);
         }
     }
 
@@ -188,12 +195,12 @@ public abstract class BaseCommand extends CommandTemplate
 
                 server.sendData(plugin.CHANNEL, out.toByteArray());
             } else {
-                msg(plugin.ERROR_COLOR + "Unable to find the server you're on. Are you still online?");
+                sender.sendMessage(ChatBuilder.appendTextComponent(null, "Unable to find the server you're on. Are you still online?", plugin.ERROR_COLOR));
             }
         }
         else
         {
-            msg("Only players may access and modify comments.");
+            sender.sendMessage(ChatBuilder.appendTextComponent(null, "Only players may access and modify comments.", plugin.ERROR_COLOR));
         }
     }
 
@@ -251,10 +258,6 @@ public abstract class BaseCommand extends CommandTemplate
         {
             sender.sendMessage(new TextComponent(plugin.PREFIX + "There are only " + plugin.ALT_COLOR + totalPageCount + plugin.PREFIX + "pages."));
         }
-
-
-
-
     }
 
 

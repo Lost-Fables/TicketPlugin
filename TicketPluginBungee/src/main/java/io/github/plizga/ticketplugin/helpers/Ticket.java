@@ -74,151 +74,155 @@ public class Ticket implements Comparable<Ticket>
                plugin.PREFIX + "\nLocation: " + plugin.ALT_COLOR + location;
     }
 
-    public ComponentBuilder toExpandedInfo()
+    public List<BaseComponent> toExpandedInfo()
     {
-        ArrayList<TextComponent> textComponents = new ArrayList<>();
-
+        List<BaseComponent> output = new ArrayList<>();
         //id
-        TextComponent ticketID = new TextComponent(plugin.PREFIX + "Ticket ID: " + plugin.ALT_COLOR + id + "\n");
-        textComponents.add(ticketID);
+        {
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket ID: ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, id, plugin.ALT_COLOR);
+            output.add(message);
+        }
 
         //Player
-        TextComponent username;
-        ProxiedPlayer player = plugin.getProxy().getPlayer(playerName);
-        if(player == null)
         {
-            username = new TextComponent(plugin.PREFIX + "Player: " + USERNAME_COLOR_OFFLINE + playerName + "\n");
-        }
-        else
-        {
-            username = new TextComponent(plugin.PREFIX + "Player: " + USERNAME_COLOR_ONLINE + playerName + "\n");
-        }
+            ProxiedPlayer player = plugin.getProxy().getPlayer(playerName);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Player: ", plugin.PREFIX);
 
-        username.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
-        username.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to message this player.")));
+            if (player == null)
+            {
+                ChatBuilder.appendTextComponent(message, playerName, USERNAME_COLOR_OFFLINE);
+            } else {
+                ChatBuilder.appendTextComponent(message, playerName, USERNAME_COLOR_ONLINE);
+            }
 
-        textComponents.add(username);
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + playerName + " "));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to message this player.")));
+
+            output.add(message);
+        }
 
         //Info
-        TextComponent infoText = new TextComponent(plugin.PREFIX + "Info: " + plugin.ALT_COLOR + info + "\n");
-
-        textComponents.add(infoText);
-
-        //Status
-        TextComponent statusText = new TextComponent(plugin.PREFIX + "Status: " + plugin.ALT_COLOR + status + " ");
-        if(status.equals(Status.CLAIMED) || status.equals(Status.OPEN))
         {
-            statusText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                    "/" + plugin.COMMAND_START +" staff claim " + this.id));
-            statusText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                    new Text("Click to attempt to claim this ticket.")));
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Info: ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, info, plugin.ALT_COLOR);
+            output.add(message);
         }
 
-        textComponents.add(statusText);
+        //Status, Team, and Assigned Staff
+        {
+            TextComponent message = new TextComponent();
+            {
+                TextComponent statusMessage = ChatBuilder.appendTextComponent(null, "Status: ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(statusMessage, status.name(), plugin.ALT_COLOR);
+                if (status.equals(Status.CLAIMED) || status.equals(Status.OPEN)) {
+                    statusMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff claim " + this.id));
+                    statusMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to attempt to claim this ticket.")));
+                }
+                message.addExtra(statusMessage);
+            }
 
-        //Team
-        TextComponent teamText = new TextComponent(plugin.PREFIX + "Team: " + team.color + team.name() + " ");
-        teamText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
-        teamText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new Text("Click to reassign this ticket to another team.")));
+            {
+                TextComponent teamMessage = ChatBuilder.appendTextComponent(null, " Team: ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(teamMessage, team.name(), team.color);
+                teamMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+                teamMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to reassign this ticket to another team.")));
+                message.addExtra(teamMessage);
+            }
 
-        textComponents.add(teamText);
+            {
+                TextComponent assignedMessage = ChatBuilder.appendTextComponent(null, " Assigned Staff: ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(assignedMessage, assignedStaff, plugin.ALT_COLOR);
+                assignedMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedStaff + " "));
+                assignedMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to message this staff member.")));
+                message.addExtra(assignedMessage);
+            }
 
-
-        //Assigned Staff Member
-        TextComponent assignedStaffText = new TextComponent(plugin.PREFIX + "Assigned Staff: " + plugin.ALT_COLOR + assignedStaff + "\n");
-        assignedStaffText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedStaff + " "));
-        assignedStaffText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to message this staff member.")));
-
-        textComponents.add(assignedStaffText);
+            output.add(message);
+        }
 
         //Date Created and Date Cleared
-        TextComponent dateText = new TextComponent(plugin.PREFIX + "Date Created: " + plugin.ALT_COLOR + dateCreated + "\n" +
-                plugin.PREFIX + "Date Cleared: " + plugin.ALT_COLOR + dateCleared + "\n");
-        dateText.setHoverEvent(null);
-
-        textComponents.add(dateText);
-
-
-        //Location - There will be 4 items in the String array due to being hard-coded into the SQL database
-        TextComponent locationText = null;
-        if(location.contains(",")) {
-            String[] locationArray = this.location.split(",");
-
-            String text = null;
-            String click = null;
-            String hover = null;
-
-            int i = 0;
-
-            String worldName = "null";
-            if (locationArray.length > i) worldName = locationArray[i++];
-
-            int x = 0;
-            if (locationArray.length > i) {
-                try {
-                    x = Integer.parseInt(locationArray[i]);
-                } catch (NumberFormatException nfe) {
-                    x = (int) Double.parseDouble(locationArray[i]);
-                }
-                i++;
-            }
-
-            int y = 0;
-            if (locationArray.length > i) {
-                try {
-                    y = Integer.parseInt(locationArray[i]);
-                } catch (NumberFormatException nfe) {
-                    y = (int) Double.parseDouble(locationArray[i]);
-                }
-                i++;
-            }
-
-            int z = 0;
-            if (locationArray.length > i) {
-                try {
-                    z = Integer.parseInt(locationArray[i]);
-                } catch (NumberFormatException nfe) {
-                    z = (int) Double.parseDouble(locationArray[i]);
-                }
-                i++;
-            }
-
-            String serverName = "main";
-            if (locationArray.length > i) serverName = locationArray[i];
-
-            locationText = new TextComponent(plugin.PREFIX + "Location: " + plugin.ALT_COLOR + worldName +
-                                             ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z);
-            locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                                      "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + x + " " + y + " " + z + " " + serverName));
-            locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to teleport to this location.")));
-        }
-        else
         {
-            locationText = new TextComponent(plugin.ERROR_COLOR +
-                    "The following location information is from an erroneous or out-dated format. Please contact a developer if this persists. \n" +
-                    plugin.PREFIX + "Location: " + plugin.ALT_COLOR + location);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Date Created: ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, dateCreated, plugin.ALT_COLOR);
+            output.add(message);
+        }
+        if (dateCleared != null)
+        {
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Date Cleared: ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, dateCleared, plugin.ALT_COLOR);
+            output.add(message);
         }
 
-        textComponents.add(locationText);
+        //Location - There will be 5 items in the String array due to being hard-coded into the SQL database
+        {
+            TextComponent locationMessage = null;
+            if (location.contains(",")) {
+                String[] locationArray = this.location.split(",");
+
+                String text = null;
+                String click = null;
+                String hover = null;
+
+                int i = 0;
+
+                String worldName = "null";
+                if (locationArray.length > i) worldName = locationArray[i++];
+
+                int x = 0;
+                if (locationArray.length > i) {
+                    try {
+                        x = Integer.parseInt(locationArray[i]);
+                    } catch (NumberFormatException nfe) {
+                        x = (int) Double.parseDouble(locationArray[i]);
+                    }
+                    i++;
+                }
+
+                int y = 0;
+                if (locationArray.length > i) {
+                    try {
+                        y = Integer.parseInt(locationArray[i]);
+                    } catch (NumberFormatException nfe) {
+                        y = (int) Double.parseDouble(locationArray[i]);
+                    }
+                    i++;
+                }
+
+                int z = 0;
+                if (locationArray.length > i) {
+                    try {
+                        z = Integer.parseInt(locationArray[i]);
+                    } catch (NumberFormatException nfe) {
+                        z = (int) Double.parseDouble(locationArray[i]);
+                    }
+                    i++;
+                }
+
+                String serverName = "main";
+                if (locationArray.length > i) serverName = locationArray[i];
+
+                locationMessage = ChatBuilder.appendTextComponent(null, "Location: ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(locationMessage, serverName + " | " + worldName + ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z, plugin.ALT_COLOR);
+                locationMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + x + " " + y + " " + z + " " + serverName));
+                locationMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to teleport to this location.")));
+            } else {
+                locationMessage = ChatBuilder.appendTextComponent(null, "The following location information is from an erroneous or out-dated format. Please contact a developer if this persists.\n", plugin.ERROR_COLOR);
+                ChatBuilder.appendTextComponent(locationMessage, "Location: ", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(locationMessage, location, plugin.ALT_COLOR);
+            }
+            output.add(locationMessage);
+        }
 
         //Comments
-        int commentAmount = getCommentAmount();
-        TextComponent commentText = new TextComponent(plugin.PREFIX + " Comments: " + plugin.ALT_COLOR + commentAmount + " ");
-        textComponents.add(commentText);
-
-        //build
-        ComponentBuilder componentBuilder = new ComponentBuilder("");
-
-        for(TextComponent textComponent : textComponents)
         {
-            componentBuilder.append(textComponent);
-
+            int commentAmount = getCommentAmount();
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Comments: ", plugin.PREFIX);
+            ChatBuilder.appendTextComponent(message, commentAmount + "", plugin.ALT_COLOR);
+            output.add(message);
         }
 
-        return componentBuilder;
-
+        return output;
     }
 
 

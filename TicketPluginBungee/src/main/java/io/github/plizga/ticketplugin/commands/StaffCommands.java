@@ -16,10 +16,7 @@ import io.github.plizga.ticketplugin.helpers.Ticket;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -292,31 +289,40 @@ public class StaffCommands extends BaseCommand
                 Database database = plugin.getDatabase();
                 Ticket ticket =  database.getTicketByUUID(uuid);
                 msg(plugin.PREFIX + "Ticket Information: ");
-                sender.sendMessage(ticket.toExpandedInfo().create());
+                List <BaseComponent> ticketParts = ticket.toExpandedInfo();
+
+                HoverEvent basicHover = MessageUtil.hoverEvent("Click Here!");
 
                 TextComponent addCommentsButton = ChatBuilder.appendTextComponent(null, "[", plugin.ALT_COLOR);
                 ChatBuilder.appendTextComponent(addCommentsButton, "Add Staff Comment", plugin.PREFIX);
                 ChatBuilder.appendTextComponent(addCommentsButton, "]", plugin.ALT_COLOR);
                 addCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " true "));
+                addCommentsButton.setHoverEvent(basicHover);
 
                 TextComponent addCommentsButton2 = ChatBuilder.appendTextComponent(null, "[", plugin.ALT_COLOR);
-                ChatBuilder.appendTextComponent(addCommentsButton, "Add Player and Staff Comment", plugin.PREFIX);
-                ChatBuilder.appendTextComponent(addCommentsButton, "]", plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(addCommentsButton2, "Add Player and Staff Comment", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(addCommentsButton2, "]", plugin.ALT_COLOR);
                 addCommentsButton2.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + plugin.COMMAND_START +" staff addComment " + ticket.getId() + " false "));
+                addCommentsButton2.setHoverEvent(basicHover);
 
                 TextComponent viewCommentsButton = ChatBuilder.appendTextComponent(null, "[", plugin.ALT_COLOR);
-                ChatBuilder.appendTextComponent(addCommentsButton, "View Comments", plugin.PREFIX);
-                ChatBuilder.appendTextComponent(addCommentsButton, "]", plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(viewCommentsButton, "View Comments", plugin.PREFIX);
+                ChatBuilder.appendTextComponent(viewCommentsButton, "]", plugin.ALT_COLOR);
                 viewCommentsButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START +" staff comment " + ticket.getId()));
+                viewCommentsButton.setHoverEvent(basicHover);
 
-                sender.sendMessage(addCommentsButton);
-                sender.sendMessage(addCommentsButton2);
-                sender.sendMessage(viewCommentsButton);
+                ticketParts.add(addCommentsButton);
+                ticketParts.add(addCommentsButton2);
+                ticketParts.add(viewCommentsButton);
 
                 if(ticket.getAssignedStaff().equals(player.getName()))
                 {
                     BaseComponent closeButton = MessageUtil.CommandButton("Close this Ticket", "/" + plugin.COMMAND_START + " staff closeTicket " + ticket.getId());
-                    sender.sendMessage(closeButton);
+                    ticketParts.add(closeButton);
+                }
+
+                for (BaseComponent msg : ticketParts) {
+                    sender.sendMessage(msg);
                 }
 
             }

@@ -277,7 +277,7 @@ public final class TicketPluginBungee extends Plugin
                                                                 null,
                                                                 MessageUtil.hoverEvent("Click Here!"),
                                                                 new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/request staff view " + team.name()));
-                                ChatBuilder.appendTextComponent(message, "to view them.", PREFIX);
+                                ChatBuilder.appendTextComponent(message, " to view them.", PREFIX);
 
                                 player.sendMessage(message);
                             }

@@ -269,7 +269,7 @@ public final class TicketPluginBungee extends Plugin
                             if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId())) {
                                 broadcastedPlayers.add(player.getUniqueId());
 
-                                TextComponent message = ChatBuilder.appendTextComponent(null, "There are currently " + openTickets.size() + " open tickets for the ", PREFIX);
+                                TextComponent message = ChatBuilder.appendTextComponent(null, "There's currently " + openTickets.size() + " open ticket(s) for the ", PREFIX);
                                 ChatBuilder.appendTextComponent(message, team.name() + " Team", team.color);
                                 ChatBuilder.appendTextComponent(message, ". Use ", PREFIX);
                                 ChatBuilder.appendTextComponent(message, "/request staff view " + team.name(), ALT_COLOR,

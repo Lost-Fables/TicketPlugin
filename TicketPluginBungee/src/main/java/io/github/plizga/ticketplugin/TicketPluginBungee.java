@@ -3,18 +3,22 @@ package io.github.plizga.ticketplugin;
 import co.lotc.core.bungee.command.BungeeCommandData;
 import co.lotc.core.bungee.command.Commands;
 import co.lotc.core.bungee.util.ChatBuilder;
+import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.commands.UserCommands;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.enums.TicketViewOptions;
 import io.github.plizga.ticketplugin.helpers.Staff;
+import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.listeners.TicketPlayerListener;
 import io.github.plizga.ticketplugin.database.ConcreteDatabase;
 import io.github.plizga.ticketplugin.database.Database;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -26,6 +30,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -56,6 +61,8 @@ public final class TicketPluginBungee extends Plugin
     public final String TP_SUB_CHANNEL = "TicketsTeleport";
     public final String CREATE_SUB_CHANNEL = "TicketsCreate";
     public final String COMMENT_SUB_CHANNEL = "TicketsComment";
+    /** The scheduled reminder task. */
+    private static ScheduledTask reminderTask = null;
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
@@ -90,6 +97,7 @@ public final class TicketPluginBungee extends Plugin
         PluginManager pluginManager = getProxy().getPluginManager();
         TicketPlayerListener listener = new TicketPlayerListener(this);
         pluginManager.registerListener(this, listener);
+        startReminder();
     }
 
 
@@ -218,7 +226,6 @@ public final class TicketPluginBungee extends Plugin
                 ChatBuilder.appendTextComponent(message, team.name(), team.color);
                 ChatBuilder.appendTextComponent(message, " team.", PREFIX);
                 player.sendMessage(message);
-
             }
         }
     }
@@ -239,5 +246,55 @@ public final class TicketPluginBungee extends Plugin
     public void removeStaffOnDuty(String uuid)
     {
         database.updateStaffOnDuty(uuid, false);
+    }
+
+    /**
+     * Start the reminder process that pings staff every 5 mins of open tickets.
+     */
+    public void startReminder() {
+        if (reminderTask != null) {
+            reminderTask.cancel();
+        }
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                for (Team team : Team.values()) {
+                    List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
+                    if (openTickets.size() > 0) {
+                        List<UUID> broadcastedPlayers = new ArrayList<>();
+
+                        for(Staff staff : getStaffOnDuty()) {
+                            ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
+
+                            if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId())) {
+                                broadcastedPlayers.add(player.getUniqueId());
+
+                                TextComponent message = ChatBuilder.appendTextComponent(null, "There are currently " + openTickets.size() + " open tickets for the ", PREFIX);
+                                ChatBuilder.appendTextComponent(message, team.name() + " Team", team.color);
+                                ChatBuilder.appendTextComponent(message, ". Use ", PREFIX);
+                                ChatBuilder.appendTextComponent(message, "/request staff view " + team.name(), ALT_COLOR,
+                                                                false, false, false, false, false,
+                                                                null,
+                                                                MessageUtil.hoverEvent("Click Here!"),
+                                                                new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/request staff view " + team.name()));
+                                ChatBuilder.appendTextComponent(message, "to view them.", PREFIX);
+
+                                player.sendMessage(message);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        reminderTask = getProxy().getScheduler().schedule(this, runnable, 0, 5, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Cancel the reminder process that pings staff every 5 mins of open tickets, if it exists.
+     */
+    public void stopReminder() {
+        if (reminderTask != null) {
+            reminderTask.cancel();
+        }
     }
 }

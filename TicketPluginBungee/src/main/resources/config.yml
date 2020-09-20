@@ -1,6 +1,10 @@
+# The SQL information for storing tickets.
 mysql:
   host: 0.0.0.0
   username: username
   password: password
   port: 3306
   database: database
+
+# The delay between staff reminders of tickets.
+reminder-delay: 5

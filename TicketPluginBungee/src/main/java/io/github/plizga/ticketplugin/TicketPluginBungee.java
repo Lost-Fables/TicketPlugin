@@ -63,6 +63,8 @@ public final class TicketPluginBungee extends Plugin
     public final String COMMENT_SUB_CHANNEL = "TicketsComment";
     /** The scheduled reminder task. */
     private static ScheduledTask reminderTask = null;
+    /** The amount of minutes between reminders. */
+    private static int reminderDelay = -1;
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
@@ -252,6 +254,16 @@ public final class TicketPluginBungee extends Plugin
      * Start the reminder process that pings staff every 5 mins of open tickets.
      */
     public void startReminder() {
+        if (reminderDelay < 0) {
+            try {
+                reminderDelay = config.getInt("reminder-delay");
+            } catch (Exception e) {
+                getLogger().warning("Unable to parse reminder delay. Outdated config?");
+                e.printStackTrace();
+                reminderDelay = 5;
+            }
+        }
+
         if (reminderTask != null) {
             reminderTask.cancel();
         }
@@ -286,7 +298,7 @@ public final class TicketPluginBungee extends Plugin
                 }
             }
         };
-        reminderTask = getProxy().getScheduler().schedule(this, runnable, 0, 5, TimeUnit.MINUTES);
+        reminderTask = getProxy().getScheduler().schedule(this, runnable, 0, reminderDelay, TimeUnit.MINUTES);
     }
 
     /**

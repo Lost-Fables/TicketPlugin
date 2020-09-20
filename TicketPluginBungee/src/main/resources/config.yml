@@ -6,5 +6,5 @@ mysql:
   port: 3306
   database: database
 
-# The delay between staff reminders of tickets.
+# The delay between staff reminders of tickets in minutes.
 reminder-delay: 5

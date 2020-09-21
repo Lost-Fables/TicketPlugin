@@ -281,17 +281,22 @@ public final class TicketPluginBungee extends Plugin
                             if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId())) {
                                 broadcastedPlayers.add(player.getUniqueId());
 
-                                TextComponent message = ChatBuilder.appendTextComponent(null, "There's currently " + openTickets.size() + " open ticket(s) for the ", PREFIX);
-                                ChatBuilder.appendTextComponent(message, team.name() + " Team", team.color);
-                                ChatBuilder.appendTextComponent(message, ". Use ", PREFIX);
-                                ChatBuilder.appendTextComponent(message, "/request staff view " + team.name(), ALT_COLOR,
+                                TextComponent message1 = ChatBuilder.appendTextComponent(null, "There's currently ", PREFIX);
+                                ChatBuilder.appendTextComponent(message1, openTickets.size() + "", ALT_COLOR);
+                                ChatBuilder.appendTextComponent(message1, " open ticket(s) for the ", PREFIX);
+                                ChatBuilder.appendTextComponent(message1, team.name() + " Team", team.color);
+                                ChatBuilder.appendTextComponent(message1, ".", PREFIX);
+
+                                TextComponent message2 = ChatBuilder.appendTextComponent(null, "Use ", PREFIX);
+                                ChatBuilder.appendTextComponent(message2, "/request staff view " + team.name(), ALT_COLOR,
                                                                 false, false, false, false, false,
                                                                 null,
                                                                 MessageUtil.hoverEvent("Click Here!"),
                                                                 new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/request staff view " + team.name()));
-                                ChatBuilder.appendTextComponent(message, " to view them.", PREFIX);
+                                ChatBuilder.appendTextComponent(message2, " to view them.", PREFIX);
 
-                                player.sendMessage(message);
+                                player.sendMessage(message1);
+                                player.sendMessage(message2);
                             }
                         }
                     }

@@ -28,9 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -46,26 +44,39 @@ public final class TicketPluginBungee extends Plugin
     /** Defines the start of permissions used in this plugin. */
     public static final String PERMISSION_START = "ticketplugin";
     /** Defines the start of commands '/COMMAND_START create etc' */
-    public final String COMMAND_START = "request";
+    public static final String COMMAND_START = "request";
     /** Defines the first common color used in the plugin. */
-    public final ChatColor PREFIX = ChatColor.GRAY;
+    public static final ChatColor PREFIX = ChatColor.GRAY;
     /** Defines the second common color used in the plugin. */
-    public final ChatColor ALT_COLOR = ChatColor.BLUE;
+    public static final ChatColor ALT_COLOR = ChatColor.BLUE;
     /** Defines the common error color used in the plugin. */
-    public final ChatColor ERROR_COLOR = ChatColor.DARK_RED;
+    public static final ChatColor ERROR_COLOR = ChatColor.DARK_RED;
     /** Represents an instance of the ticket plugin. */
     private static TicketPluginBungee ticketPluginBungeeInstance;
     /** Represents the config file. */
     public static Configuration config;
     /** The Bungee-Bukkit channels we use to communicate. */
-    public final String CHANNEL = "lf:tickets";
-    public final String TP_SUB_CHANNEL = "TicketsTeleport";
-    public final String CREATE_SUB_CHANNEL = "TicketsCreate";
-    public final String COMMENT_SUB_CHANNEL = "TicketsComment";
+    public static final String CHANNEL = "lf:tickets";
+    public static final String TP_SUB_CHANNEL = "TicketsTeleport";
+    public static final String CREATE_SUB_CHANNEL = "TicketsCreate";
+    public static final String COMMENT_SUB_CHANNEL = "TicketsComment";
     /** The scheduled reminder task. */
     private static ScheduledTask reminderTask = null;
     /** The amount of minutes between reminders. */
     private static int reminderDelay = -1;
+
+
+    /** The use message during reminders. Always the same, no need to remake it every time. */
+    private static final TextComponent useMessage;
+    static {
+        useMessage = ChatBuilder.appendTextComponent(null, "Use ", PREFIX);
+        ChatBuilder.appendTextComponent(useMessage, "/request staff viewAll", ALT_COLOR,
+                                        false, false, false, false, false,
+                                        null,
+                                        MessageUtil.hoverEvent("Click Here!"),
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/request staff viewAll"));
+        ChatBuilder.appendTextComponent(useMessage, " to view all tickets.", PREFIX);
+    }
 
     /**
      * Static getter method that returns the {TicketPluginInstance}.
@@ -268,9 +279,27 @@ public final class TicketPluginBungee extends Plugin
         if (reminderTask != null) {
             reminderTask.cancel();
         }
-        Runnable runnable = new Runnable() {
+
+        reminderTask = getProxy().getScheduler().schedule(this, getReminderRunnable(), 0, reminderDelay, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Cancel the reminder process that pings staff every 5 mins of open tickets, if it exists.
+     */
+    public void stopReminder() {
+        if (reminderTask != null) {
+            reminderTask.cancel();
+        }
+    }
+
+    /**
+     * @return A reminder runnable for this instance of TicketPlugin for use in the scheduler.
+     */
+    private Runnable getReminderRunnable() {
+        return new Runnable() {
             @Override
             public void run() {
+                Map<Team, TextComponent> messages = new HashMap<>();
                 for (Team team : Team.values()) {
                     List<Ticket> openTickets = new ArrayList<>();
                     {
@@ -283,45 +312,33 @@ public final class TicketPluginBungee extends Plugin
                     }
 
                     if (openTickets.size() > 0) {
-                        List<UUID> broadcastedPlayers = new ArrayList<>();
+                        TextComponent message = ChatBuilder.appendTextComponent(null, "There's currently ", PREFIX);
+                        ChatBuilder.appendTextComponent(message, openTickets.size() + "", ALT_COLOR);
+                        ChatBuilder.appendTextComponent(message, " open ticket(s) for the ", PREFIX);
+                        ChatBuilder.appendTextComponent(message, team.name() + " Team", team.color);
+                        ChatBuilder.appendTextComponent(message, ".", PREFIX);
 
-                        for(Staff staff : getStaffOnDuty()) {
-                            ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
+                        messages.put(team, message);
+                    }
+                }
 
-                            if (player != null && player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId())) {
-                                broadcastedPlayers.add(player.getUniqueId());
+                if (messages.keySet().size() > 0) {
+                    List<UUID> broadcastedPlayers = new ArrayList<>();
+                    for (Staff staff : getStaffOnDuty()) {
+                        ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
 
-                                TextComponent message1 = ChatBuilder.appendTextComponent(null, "There's currently ", PREFIX);
-                                ChatBuilder.appendTextComponent(message1, openTickets.size() + "", ALT_COLOR);
-                                ChatBuilder.appendTextComponent(message1, " open ticket(s) for the ", PREFIX);
-                                ChatBuilder.appendTextComponent(message1, team.name() + " Team", team.color);
-                                ChatBuilder.appendTextComponent(message1, ".", PREFIX);
-
-                                TextComponent message2 = ChatBuilder.appendTextComponent(null, "Use ", PREFIX);
-                                ChatBuilder.appendTextComponent(message2, "/request staff view " + team.name(), ALT_COLOR,
-                                                                false, false, false, false, false,
-                                                                null,
-                                                                MessageUtil.hoverEvent("Click Here!"),
-                                                                new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/request staff view " + team.name()));
-                                ChatBuilder.appendTextComponent(message2, " to view them.", PREFIX);
-
-                                player.sendMessage(message1);
-                                player.sendMessage(message2);
+                        if (player != null) {
+                            for (Team team : messages.keySet()) {
+                                if (player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId())) {
+                                    player.sendMessage(messages.get(team));
+                                }
                             }
+                            broadcastedPlayers.add(player.getUniqueId());
+                            player.sendMessage(useMessage);
                         }
                     }
                 }
             }
         };
-        reminderTask = getProxy().getScheduler().schedule(this, runnable, 0, reminderDelay, TimeUnit.MINUTES);
-    }
-
-    /**
-     * Cancel the reminder process that pings staff every 5 mins of open tickets, if it exists.
-     */
-    public void stopReminder() {
-        if (reminderTask != null) {
-            reminderTask.cancel();
-        }
     }
 }

@@ -5,6 +5,7 @@ import co.lotc.core.bungee.command.Commands;
 import co.lotc.core.bungee.util.ChatBuilder;
 import co.lotc.core.util.MessageUtil;
 import io.github.plizga.ticketplugin.commands.UserCommands;
+import io.github.plizga.ticketplugin.enums.Status;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.enums.TicketViewOptions;
 import io.github.plizga.ticketplugin.helpers.Staff;
@@ -271,7 +272,16 @@ public final class TicketPluginBungee extends Plugin
             @Override
             public void run() {
                 for (Team team : Team.values()) {
-                    List<Ticket> openTickets = database.getOpenTicketsByTeam(team.name());
+                    List<Ticket> openTickets = new ArrayList<>();
+                    {
+                        List<Ticket> allTickets = database.getOpenTicketsByTeam(team.name());
+                        for (Ticket ticket : allTickets) {
+                            if (ticket.getStatus().equals(Status.OPEN)) {
+                                openTickets.add(ticket);
+                            }
+                        }
+                    }
+
                     if (openTickets.size() > 0) {
                         List<UUID> broadcastedPlayers = new ArrayList<>();
 

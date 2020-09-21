@@ -326,13 +326,13 @@ public final class TicketPluginBungee extends Plugin
                     for (Staff staff : getStaffOnDuty()) {
                         ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
 
-                        if (player != null) {
+                        if (player != null && !broadcastedPlayers.contains(player.getUniqueId())) {
+                            broadcastedPlayers.add(player.getUniqueId());
                             for (Team team : messages.keySet()) {
-                                if (player.hasPermission(PERMISSION_START + team.permission) && !broadcastedPlayers.contains(player.getUniqueId())) {
+                                if (player.hasPermission(PERMISSION_START + team.permission)) {
                                     player.sendMessage(messages.get(team));
                                 }
                             }
-                            broadcastedPlayers.add(player.getUniqueId());
                             player.sendMessage(useMessage);
                         }
                     }

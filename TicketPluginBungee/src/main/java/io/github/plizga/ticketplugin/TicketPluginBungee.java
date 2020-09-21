@@ -153,8 +153,7 @@ public final class TicketPluginBungee extends Plugin
 
 
     /**
-     * Returns a reference to the database.
-     * @return
+     * @return A reference to the database.
      */
     public Database getDatabase()
     {

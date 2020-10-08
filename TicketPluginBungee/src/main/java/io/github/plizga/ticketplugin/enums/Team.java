@@ -12,14 +12,14 @@ import java.awt.Color;
 public enum Team
 {
 
-    Admin     (ChatColor.of(ColorUtil.hexToColor("#1abc9c")), ".admin"),
-    Moderator (ChatColor.of(ColorUtil.hexToColor("#1a67ed")), ".mod"),
-    Tech      (ChatColor.of(ColorUtil.hexToColor("#95de16")), ".dev"),
-    Lore      (ChatColor.of(ColorUtil.hexToColor("#fae36e")), ".lore"),
-    Event     (ChatColor.of(ColorUtil.hexToColor("#cf0606")), ".event"),
-    Build     (ChatColor.of(ColorUtil.hexToColor("#ec9706")), ".build"),
-    Reception (ChatColor.of(ColorUtil.hexToColor("#8634b3")), ".reception"),
-    Design    (ChatColor.of(ColorUtil.hexToColor("#8634b3")), ".design"),
+    Admin     (ChatColor.of(Color.decode("#1abc9c")), ".admin"),
+    Moderator (ChatColor.of(Color.decode("#1a67ed")), ".mod"),
+    Tech      (ChatColor.of(Color.decode("#95de16")), ".dev"),
+    Lore      (ChatColor.of(Color.decode("#fae36e")), ".lore"),
+    Event     (ChatColor.of(Color.decode("#cf0606")), ".event"),
+    Build     (ChatColor.of(Color.decode("#ec9706")), ".build"),
+    Reception (ChatColor.of(Color.decode("#8634b3")), ".reception"),
+    Design    (ChatColor.of(Color.decode("#8634b3")), ".design"),
     Global    (ChatColor.WHITE,                               ".staff");
 
     public final ChatColor color;

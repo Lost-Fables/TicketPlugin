@@ -20,7 +20,7 @@ public enum Team
     Build     (ChatColor.of(Color.decode("#ec9706")), ".build"),
     Reception (ChatColor.of(Color.decode("#8634b3")), ".reception"),
     Design    (ChatColor.of(Color.decode("#8634b3")), ".design"),
-    Global    (ChatColor.WHITE,                               ".staff");
+    Global    (ChatColor.WHITE,                       ".staff");
 
     public final ChatColor color;
     public final String permission;

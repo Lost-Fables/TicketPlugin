@@ -23,7 +23,7 @@ public class TicketPlayerListener implements Listener
 {
 
     private TicketPluginBungee plugin;
-    public static List<UUID> waiting = new ArrayList<>();
+    public static ArrayList<UUID> waiting = new ArrayList<>();
 
     public TicketPlayerListener(Plugin plugin)
     {

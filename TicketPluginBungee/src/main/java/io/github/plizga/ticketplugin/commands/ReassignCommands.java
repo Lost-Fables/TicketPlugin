@@ -59,11 +59,11 @@ public class ReassignCommands extends BaseCommand
     }
 
 
-    @Cmd(value="Reassigns tickets to the build team.")
+    /*@Cmd(value="Reassigns tickets to the build team.")
     public void design(CommandSender sender, String uuid)
     {
         reassign(sender, uuid, Team.Design);
-    }
+    }*/
 
 
     @Cmd(value="Reassigns tickets to global.")

@@ -110,10 +110,10 @@ public class StaffCommands extends BaseCommand
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Build.name()));
                 }
-                if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Design.permission))
+                /*if(player.hasPermission(TicketPluginBungee.PERMISSION_START + Team.Design.permission))
                 {
                     openTickets.addAll(database.getOpenTicketsByTeam(Team.Design.name()));
-                }
+                }*/
 
 
                 openTickets.addAll(database.getOpenTicketsByTeam(Team.Global.name()));

@@ -19,7 +19,7 @@ public enum Team
     Event     (ChatColor.of(Color.decode("#cf0606")), ".event"),
     Build     (ChatColor.of(Color.decode("#ec9706")), ".build"),
     Reception (ChatColor.of(Color.decode("#8634b3")), ".reception"),
-    Design    (ChatColor.of(Color.decode("#8634b3")), ".design"),
+    //Design    (ChatColor.of(Color.decode("#8634b3")), ".design"),
     Global    (ChatColor.WHITE,                       ".staff");
 
     public final ChatColor color;

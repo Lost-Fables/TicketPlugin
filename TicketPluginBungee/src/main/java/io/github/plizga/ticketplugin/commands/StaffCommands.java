@@ -27,19 +27,31 @@ import java.util.List;
 
 public class StaffCommands extends BaseCommand
 {
-    private ReassignCommands reassignCommands;
     public StaffCommands()
     {
         this.database = plugin.getDatabase();
-        this.reassignCommands = new ReassignCommands();
     }
 
     @Cmd(value ="Internally used to reassign tickets to various teams.")
-    public BaseCommand reassign()
+    public void reassign(CommandSender sender, Team team, String uuid)
     {
-        return this.reassignCommands;
-    }
+        database.setTeam(uuid, team.name());
 
+        if(!team.equals(Team.Global))
+        {
+            msg(TicketPluginBungee.PREFIX + "Ticket has been reassigned to the " + TicketPluginBungee.ALT_COLOR + team.name() +
+                TicketPluginBungee.PREFIX + " team.");
+        }
+        else
+        {msg(TicketPluginBungee.PREFIX + "Ticket has been reassigned to " + TicketPluginBungee.ALT_COLOR + team.name() +
+             TicketPluginBungee.PREFIX + ".");
+
+        }
+
+        Ticket ticket = database.getTicketByUUID(uuid);
+        sendReassignMessage(ticket, team);
+        plugin.notifyOnDutyStaff(team);
+    }
 
     @Cmd(value="look at the list of tickets for a specific team")
     public void view(CommandSender sender, Team team)

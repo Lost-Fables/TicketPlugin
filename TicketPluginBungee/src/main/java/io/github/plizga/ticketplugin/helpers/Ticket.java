@@ -63,15 +63,15 @@ public class Ticket implements Comparable<Ticket>
     public String toString()
     {
 
-        return plugin.PREFIX + "Ticket ID: " + plugin.ALT_COLOR + id +
-               plugin.PREFIX + "\nPlayer: " + plugin.ALT_COLOR + playerName +
-               plugin.PREFIX + "\nInfo: " + plugin.ALT_COLOR + info +
-               plugin.PREFIX + "\nStatus: " + plugin.ALT_COLOR + status.toString() +
-               plugin.PREFIX + "\nTeam: " + plugin.ALT_COLOR + team.toString() +
-               plugin.PREFIX + "\nAssigned Staff Member: " + plugin.ALT_COLOR + assignedStaff +
-               plugin.PREFIX + "\nDate Created: " + plugin.ALT_COLOR + dateCreated +
-               plugin.PREFIX + "\nDate Cleared: " + plugin.ALT_COLOR + dateCleared +
-               plugin.PREFIX + "\nLocation: " + plugin.ALT_COLOR + location;
+        return TicketPluginBungee.PREFIX + "Ticket ID: " + TicketPluginBungee.ALT_COLOR + id +
+               TicketPluginBungee.PREFIX + "\nPlayer: " + TicketPluginBungee.ALT_COLOR + playerName +
+               TicketPluginBungee.PREFIX + "\nInfo: " + TicketPluginBungee.ALT_COLOR + info +
+               TicketPluginBungee.PREFIX + "\nStatus: " + TicketPluginBungee.ALT_COLOR + status.toString() +
+               TicketPluginBungee.PREFIX + "\nTeam: " + TicketPluginBungee.ALT_COLOR + team.toString() +
+               TicketPluginBungee.PREFIX + "\nAssigned Staff Member: " + TicketPluginBungee.ALT_COLOR + assignedStaff +
+               TicketPluginBungee.PREFIX + "\nDate Created: " + TicketPluginBungee.ALT_COLOR + dateCreated +
+               TicketPluginBungee.PREFIX + "\nDate Cleared: " + TicketPluginBungee.ALT_COLOR + dateCleared +
+               TicketPluginBungee.PREFIX + "\nLocation: " + TicketPluginBungee.ALT_COLOR + location;
     }
 
     public List<BaseComponent> toExpandedInfo()
@@ -79,15 +79,15 @@ public class Ticket implements Comparable<Ticket>
         List<BaseComponent> output = new ArrayList<>();
         //id
         {
-            TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket ID: ", plugin.PREFIX);
-            ChatBuilder.appendTextComponent(message, id, plugin.ALT_COLOR);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Ticket ID: ", TicketPluginBungee.PREFIX);
+            ChatBuilder.appendTextComponent(message, id, TicketPluginBungee.ALT_COLOR);
             output.add(message);
         }
 
         //Player
         {
             ProxiedPlayer player = plugin.getProxy().getPlayer(playerName);
-            TextComponent message = ChatBuilder.appendTextComponent(null, "Player: ", plugin.PREFIX);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Player: ", TicketPluginBungee.PREFIX);
 
             if (player == null)
             {
@@ -104,8 +104,8 @@ public class Ticket implements Comparable<Ticket>
 
         //Info
         {
-            TextComponent message = ChatBuilder.appendTextComponent(null, "Info: ", plugin.PREFIX);
-            ChatBuilder.appendTextComponent(message, info, plugin.ALT_COLOR);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Info: ", TicketPluginBungee.PREFIX);
+            ChatBuilder.appendTextComponent(message, info, TicketPluginBungee.ALT_COLOR);
             output.add(message);
         }
 
@@ -113,26 +113,26 @@ public class Ticket implements Comparable<Ticket>
         {
             TextComponent message = new TextComponent();
             {
-                TextComponent statusMessage = ChatBuilder.appendTextComponent(null, "Status: ", plugin.PREFIX);
-                ChatBuilder.appendTextComponent(statusMessage, status.name(), plugin.ALT_COLOR);
+                TextComponent statusMessage = ChatBuilder.appendTextComponent(null, "Status: ", TicketPluginBungee.PREFIX);
+                ChatBuilder.appendTextComponent(statusMessage, status.name(), TicketPluginBungee.ALT_COLOR);
                 if (status.equals(Status.CLAIMED) || status.equals(Status.OPEN)) {
-                    statusMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff claim " + this.id));
+                    statusMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START + " staff claim " + this.id));
                     statusMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to attempt to claim this ticket.")));
                 }
                 message.addExtra(statusMessage);
             }
 
             {
-                TextComponent teamMessage = ChatBuilder.appendTextComponent(null, " Team: ", plugin.PREFIX);
+                TextComponent teamMessage = ChatBuilder.appendTextComponent(null, " Team: ", TicketPluginBungee.PREFIX);
                 ChatBuilder.appendTextComponent(teamMessage, team.name(), team.color);
-                teamMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+                teamMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START + " staff reassignTicket " + this.id));
                 teamMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to reassign this ticket to another team.")));
                 message.addExtra(teamMessage);
             }
 
             {
-                TextComponent assignedMessage = ChatBuilder.appendTextComponent(null, " Assigned Staff: ", plugin.PREFIX);
-                ChatBuilder.appendTextComponent(assignedMessage, assignedStaff, plugin.ALT_COLOR);
+                TextComponent assignedMessage = ChatBuilder.appendTextComponent(null, " Assigned Staff: ", TicketPluginBungee.PREFIX);
+                ChatBuilder.appendTextComponent(assignedMessage, assignedStaff, TicketPluginBungee.ALT_COLOR);
                 assignedMessage.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + assignedStaff + " "));
                 assignedMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to message this staff member.")));
                 message.addExtra(assignedMessage);
@@ -143,14 +143,14 @@ public class Ticket implements Comparable<Ticket>
 
         //Date Created and Date Cleared
         {
-            TextComponent message = ChatBuilder.appendTextComponent(null, "Date Created: ", plugin.PREFIX);
-            ChatBuilder.appendTextComponent(message, dateCreated, plugin.ALT_COLOR);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Date Created: ", TicketPluginBungee.PREFIX);
+            ChatBuilder.appendTextComponent(message, dateCreated, TicketPluginBungee.ALT_COLOR);
             output.add(message);
         }
         if (dateCleared != null)
         {
-            TextComponent message = ChatBuilder.appendTextComponent(null, "Date Cleared: ", plugin.PREFIX);
-            ChatBuilder.appendTextComponent(message, dateCleared, plugin.ALT_COLOR);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Date Cleared: ", TicketPluginBungee.PREFIX);
+            ChatBuilder.appendTextComponent(message, dateCleared, TicketPluginBungee.ALT_COLOR);
             output.add(message);
         }
 
@@ -202,14 +202,14 @@ public class Ticket implements Comparable<Ticket>
                 String serverName = "main";
                 if (locationArray.length > i) serverName = locationArray[i];
 
-                locationMessage = ChatBuilder.appendTextComponent(null, "Location: ", plugin.PREFIX);
-                ChatBuilder.appendTextComponent(locationMessage, serverName + " | " + worldName + ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z, plugin.ALT_COLOR);
-                locationMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff ticketTP " + worldName + " " + x + " " + y + " " + z + " " + serverName));
+                locationMessage = ChatBuilder.appendTextComponent(null, "Location: ", TicketPluginBungee.PREFIX);
+                ChatBuilder.appendTextComponent(locationMessage, serverName + " | " + worldName + ": X:" + (short) x + " Y:" + (short) y + " Z:" + (short) z, TicketPluginBungee.ALT_COLOR);
+                locationMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START + " staff ticketTP " + worldName + " " + x + " " + y + " " + z + " " + serverName));
                 locationMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to teleport to this location.")));
             } else {
                 locationMessage = ChatBuilder.appendTextComponent(null, "The following location information is from an erroneous or out-dated format. Please contact a developer if this persists.\n", plugin.ERROR_COLOR);
-                ChatBuilder.appendTextComponent(locationMessage, "Location: ", plugin.PREFIX);
-                ChatBuilder.appendTextComponent(locationMessage, location, plugin.ALT_COLOR);
+                ChatBuilder.appendTextComponent(locationMessage, "Location: ", TicketPluginBungee.PREFIX);
+                ChatBuilder.appendTextComponent(locationMessage, location, TicketPluginBungee.ALT_COLOR);
             }
             output.add(locationMessage);
         }
@@ -217,8 +217,8 @@ public class Ticket implements Comparable<Ticket>
         //Comments
         {
             int commentAmount = getCommentAmount();
-            TextComponent message = ChatBuilder.appendTextComponent(null, "Comments: ", plugin.PREFIX);
-            ChatBuilder.appendTextComponent(message, commentAmount + "", plugin.ALT_COLOR);
+            TextComponent message = ChatBuilder.appendTextComponent(null, "Comments: ", TicketPluginBungee.PREFIX);
+            ChatBuilder.appendTextComponent(message, commentAmount + "", TicketPluginBungee.ALT_COLOR);
             output.add(message);
         }
 
@@ -233,7 +233,7 @@ public class Ticket implements Comparable<Ticket>
         TextComponent message = ChatBuilder.appendTextComponent(null, "[" + team.name().charAt(0) + "] ", team.color,
                                                                 false, false, false, false, false, null,
                                                                 new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
-                                                                new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff reassignTicket " + this.id));
+                                                                new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START + " staff reassignTicket " + this.id));
 
         //Set the player
         ProxiedPlayer player = plugin.getProxy().getPlayer(playerName);
@@ -269,7 +269,7 @@ public class Ticket implements Comparable<Ticket>
         ChatBuilder.appendTextComponent(message, shortDescription + " ", TEXT_COLOR,
                                         false, false, false, false, false, null,
                                         new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
-                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff expandTicket " + this.getId()));
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START + " staff expandTicket " + this.getId()));
 
         //Get the time between the ticket's creation and now.
         Date currentDate = new Date();
@@ -308,7 +308,7 @@ public class Ticket implements Comparable<Ticket>
             ChatBuilder.appendTextComponent(message, timeSinceCreated, TIME_COLOR,
                                             false, false, false, false, false, null,
                                             new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
-                                            new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START + " staff expandTicket " + this.id));
+                                            new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START + " staff expandTicket " + this.id));
         } else {
             ChatBuilder.appendTextComponent(message, "Error getting Ticket Date.", plugin.ERROR_COLOR);
         }
@@ -328,7 +328,7 @@ public class Ticket implements Comparable<Ticket>
         ChatBuilder.appendTextComponent(message, staff, CLAIMED_COLOR,
                                         false, false, false, false, false, null,
                                         new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(this.info)),
-                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.COMMAND_START +" staff claim " + this.id));
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + TicketPluginBungee.COMMAND_START +" staff claim " + this.id));
 
         return message;
     }
@@ -336,22 +336,22 @@ public class Ticket implements Comparable<Ticket>
 
     public TextComponent toPlayerInfo()
     {
-        TextComponent message = ChatBuilder.appendTextComponent(null, "Info: ", plugin.PREFIX);
-        ChatBuilder.appendTextComponent(message, info, plugin.ALT_COLOR);
+        TextComponent message = ChatBuilder.appendTextComponent(null, "Info: ", TicketPluginBungee.PREFIX);
+        ChatBuilder.appendTextComponent(message, info, TicketPluginBungee.ALT_COLOR);
 
-        ChatBuilder.appendTextComponent(message, ", Team: ", plugin.PREFIX);
+        ChatBuilder.appendTextComponent(message, ", Team: ", TicketPluginBungee.PREFIX);
         ChatBuilder.appendTextComponent(message, team.name(), team.color);
 
-        ChatBuilder.appendTextComponent(message, ", Staff Member: ", plugin.PREFIX);
-        ChatBuilder.appendTextComponent(message, assignedStaff, plugin.ALT_COLOR);
+        ChatBuilder.appendTextComponent(message, ", Staff Member: ", TicketPluginBungee.PREFIX);
+        ChatBuilder.appendTextComponent(message, assignedStaff, TicketPluginBungee.ALT_COLOR);
 
-        ChatBuilder.appendTextComponent(message, " Created: ", plugin.PREFIX);
-        ChatBuilder.appendTextComponent(message, dateCreated, plugin.ALT_COLOR);
+        ChatBuilder.appendTextComponent(message, " Created: ", TicketPluginBungee.PREFIX);
+        ChatBuilder.appendTextComponent(message, dateCreated, TicketPluginBungee.ALT_COLOR);
 
         if(dateCleared != null)
         {
-            ChatBuilder.appendTextComponent(message, " Cleared: ", plugin.PREFIX);
-            ChatBuilder.appendTextComponent(message, dateCleared, plugin.ALT_COLOR);
+            ChatBuilder.appendTextComponent(message, " Cleared: ", TicketPluginBungee.PREFIX);
+            ChatBuilder.appendTextComponent(message, dateCleared, TicketPluginBungee.ALT_COLOR);
         }
 
         if(!this.assignedStaff.equals("None"))
@@ -360,9 +360,9 @@ public class Ticket implements Comparable<Ticket>
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to message the assigned staff member.")));
         }
 
-        TextComponent comments = ChatBuilder.appendTextComponent(null, " Comments: ", plugin.PREFIX);
-        ChatBuilder.appendTextComponent(comments, getCommentAmountPlayer() + "", plugin.ALT_COLOR);
-        comments.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  "/" + plugin.COMMAND_START + " comment " + this.id));
+        TextComponent comments = ChatBuilder.appendTextComponent(null, " Comments: ", TicketPluginBungee.PREFIX);
+        ChatBuilder.appendTextComponent(comments, getCommentAmountPlayer() + "", TicketPluginBungee.ALT_COLOR);
+        comments.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  "/" + TicketPluginBungee.COMMAND_START + " comment " + this.id));
         comments.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open the comments for this ticket.")));
 
         message.addExtra(comments);

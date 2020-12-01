@@ -1,6 +1,7 @@
 package io.github.plizga.ticketplugin.commands;
 
 import co.lotc.core.command.annotate.Cmd;
+import io.github.plizga.ticketplugin.TicketPluginBungee;
 import io.github.plizga.ticketplugin.enums.Team;
 import io.github.plizga.ticketplugin.helpers.Ticket;
 import io.github.plizga.ticketplugin.database.Database;
@@ -59,11 +60,11 @@ public class ReassignCommands extends BaseCommand
     }
 
 
-    /*@Cmd(value="Reassigns tickets to the build team.")
-    public void design(CommandSender sender, String uuid)
+    @Cmd(value="Reassigns tickets to the build team.")
+    public void reception(CommandSender sender, String uuid)
     {
-        reassign(sender, uuid, Team.Design);
-    }*/
+        reassign(sender, uuid, Team.Reception);
+    }
 
 
     @Cmd(value="Reassigns tickets to global.")
@@ -78,12 +79,12 @@ public class ReassignCommands extends BaseCommand
 
         if(!team.equals(Team.Global))
         {
-            msg(plugin.PREFIX + "Ticket has been reassigned to the " + plugin.ALT_COLOR + team.name() +
-                    plugin.PREFIX + " team.");
+            msg(TicketPluginBungee.PREFIX + "Ticket has been reassigned to the " + TicketPluginBungee.ALT_COLOR + team.name() +
+                TicketPluginBungee.PREFIX + " team.");
         }
         else
-        {msg(plugin.PREFIX + "Ticket has been reassigned to " + plugin.ALT_COLOR + team.name() +
-                plugin.PREFIX + ".");
+        {msg(TicketPluginBungee.PREFIX + "Ticket has been reassigned to " + TicketPluginBungee.ALT_COLOR + team.name() +
+             TicketPluginBungee.PREFIX + ".");
 
         }
 

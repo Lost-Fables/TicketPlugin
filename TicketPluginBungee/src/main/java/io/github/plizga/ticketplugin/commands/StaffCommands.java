@@ -285,7 +285,7 @@ public class StaffCommands extends BaseCommand
         for(Team t: Team.values())
         {
             BaseComponent cmdButton = MessageUtil.CommandButton("Reassign to " + t.name(),
-                    "/" + TicketPluginBungee.COMMAND_START +" staff reassign " + t.name().toLowerCase() + " " + uuid, t.color, TicketPluginBungee.ALT_COLOR);
+                    "/" + TicketPluginBungee.COMMAND_START +" staff reassign " + t.name() + " " + uuid, t.color, TicketPluginBungee.ALT_COLOR);
             msg(cmdButton);
         }
     }

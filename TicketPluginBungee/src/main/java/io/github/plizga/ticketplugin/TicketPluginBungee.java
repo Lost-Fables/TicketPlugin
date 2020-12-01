@@ -170,13 +170,13 @@ public final class TicketPluginBungee extends Plugin
         Commands.defineArgumentType(Team.class)
                 .defaultName("Team")
                 .completer((s,$) ->  Team.getAvailable(s))
-                .mapperWithSender(((sender, type) -> Team.getByName(type)))
+                .mapperWithSender(((sender, team) -> Team.getByName(team)))
                 .register();
 
         Commands.defineArgumentType(TicketViewOptions.class)
                 .defaultName("Ticket_Options")
                 .completer((s,$) -> TicketViewOptions.getAvailable(s))
-                .mapperWithSender(((sender, type) -> TicketViewOptions.getByName(type)))
+                .mapperWithSender(((sender, options) -> TicketViewOptions.getByName(options)))
                 .register();
     }
 

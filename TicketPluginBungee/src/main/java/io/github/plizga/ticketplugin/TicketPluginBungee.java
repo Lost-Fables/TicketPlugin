@@ -325,15 +325,18 @@ public final class TicketPluginBungee extends Plugin
                     List<UUID> broadcastedPlayers = new ArrayList<>();
                     for (Staff staff : getStaffOnDuty()) {
                         ProxiedPlayer player = getProxy().getPlayer(UUID.fromString(staff.getUuid()));
-
-                        if (player != null && !broadcastedPlayers.contains(player.getUniqueId())) {
-                            broadcastedPlayers.add(player.getUniqueId());
-                            for (Team team : messages.keySet()) {
-                                if (player.hasPermission(PERMISSION_START + team.permission)) {
-                                    player.sendMessage(messages.get(team));
+                        if (player != null) {
+                            if (!player.hasPermission(TicketPluginBungee.PERMISSION_START + ".staff")) {
+                                getDatabase().removeStaffFromOnDuty(player.getUniqueId().toString());
+                            } else if (!broadcastedPlayers.contains(player.getUniqueId())) {
+                                broadcastedPlayers.add(player.getUniqueId());
+                                for (Team team : messages.keySet()) {
+                                    if (player.hasPermission(PERMISSION_START + team.permission)) {
+                                        player.sendMessage(messages.get(team));
+                                    }
                                 }
+                                player.sendMessage(useMessage);
                             }
-                            player.sendMessage(useMessage);
                         }
                     }
                 }
